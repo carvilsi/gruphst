@@ -1,10 +1,12 @@
 use std::io::Write;
+use std::io::Read;
+use std::fs::File;
 use std::error::Error;
 use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct Node {
     id: String,
@@ -20,7 +22,7 @@ impl Node {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct Graph {
     id: String,
@@ -37,22 +39,6 @@ impl Graph {
             from,
             to,
         }
-    }
-    fn save(&self, name: &str) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{name}.grphst");
-        let mut file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(file_name)?;
-        let bytes = bincode::serialize(self)?;
-        let written = file.write(&bytes)?;
-        #[cfg(debug_assertions)]
-        println!("{} bytes has been written", written);
-        #[cfg(debug_assertions)]
-        println!("The bytes: {:?}", bytes);
-        #[cfg(debug_assertions)]
-        println!("The size of the bytes: {}", bytes.len());            
-        Ok(())
     }
     pub fn from(&self) -> &Node {
         &self.from
@@ -101,10 +87,37 @@ impl Graphs {
         self.graphs.push(graph);
     }
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        for graph in self.graphs.iter() {
-            graph.save(self.name())?
-        }
+        let file_name = format!("{}.grphst", self.name());
+        let mut file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(file_name)?;
+        let bytes = bincode::serialize(self)?;
+        let written = file.write(&bytes)?;
+        #[cfg(debug_assertions)]
+        println!("{} bytes has been written", written);
+        #[cfg(debug_assertions)]
+        println!("The bytes: {:?}", bytes);
+        #[cfg(debug_assertions)]
+        println!("The size of the bytes: {}", bytes.len());            
         Ok(())
+    }
+    pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
+        let file_name = format!("{}.grphst", name);
+        let mut read_file = File::open(file_name)?;
+        let mut buffer = [0; 1780];
+        let _ = read_file.read(&mut buffer[..])?;
+        #[cfg(debug_assertions)]
+        println!("The readed bytes: {:?}", buffer);
+        let readed_graph: Graphs = bincode::deserialize(&buffer)?;
+        
+        #[cfg(debug_assertions)]
+        println!("readed graph: {:#?}", readed_graph);
+        //match readed_graph {
+            //Ok(readed_graph) => readed_graph,
+            //Err(e) => return Err(e),
+        //}
+        Ok(readed_graph)
     }
 }
 
@@ -122,18 +135,18 @@ impl Gruphst for Node {
     }
 }
 
-impl Gruphst for Graphs {
-    fn name(&self)  -> &String {
-        &self.name
+impl Gruphst for Graph {
+    fn name(&self) -> &String {
+        &self.relation
     }
     fn id(&self) -> &String {
         &self.id
     }
 }
 
-impl Gruphst for Graph {
-    fn name(&self) -> &String {
-        &self.relation
+impl Gruphst for Graphs {
+    fn name(&self)  -> &String {
+        &self.name
     }
     fn id(&self) -> &String {
         &self.id
@@ -195,13 +208,22 @@ mod tests {
         let graph1 = Graph::new("relation a-b".to_string(), node1, node2);
         gru.add(graph1.clone());
 
-        let _ = graph1.save("data-test");
-
         let node3 = Node::new("c node".to_string());
         let node4 = Node::new("d node".to_string());
         let graph2 = Graph::new("relation c-d".to_string(), node3, node4);
-        gru.add(graph2);
+        gru.add(graph2.clone());
 
         let _ = gru.persists();
+
+        let name = gru.name();
+        let grphs = Graphs::load(name);
+        match grphs {
+            Ok(grphs) => {
+                assert_eq!(grphs.name(), name);
+                assert_eq!(grphs.graphs[0].name(), graph1.name());
+                assert_eq!(grphs.graphs[1], graph2);
+            },
+            Err(_) => panic!(),
+        }
     }
 }
