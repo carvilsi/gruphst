@@ -4,7 +4,7 @@ use std::error::Error;
 use std::mem;
 
 use gruphst::Gruphst;
-use gruphst::{Node, Graph};
+use gruphst::{Node, Graph, Graphs};
 
 fn main()-> Result<(), Box<dyn Error>> {    
    
@@ -14,13 +14,16 @@ fn main()-> Result<(), Box<dyn Error>> {
     let n2 = node2.clone();
     let graph = Graph::new(String::from("related to"), node1, node2);
     let g = graph.clone();
+
+    let mut gr = Graphs::new("graphs-name".to_string());
+    gr.graphs.push(graph.clone());
    
     #[cfg(debug_assertions)]
     println!("graph: {:#?}", graph);
     #[cfg(debug_assertions)]
     println!("mem of graph: {}", mem::size_of_val(&g)); 
 
-    graph.persists()?;
+    //graph.persists()?;
     
     #[cfg(debug_assertions)]
     println!("The name of node1: {}", n1.name());
@@ -29,6 +32,8 @@ fn main()-> Result<(), Box<dyn Error>> {
     #[cfg(debug_assertions)]
     println!("The name of graph: {}", graph.name());
 
+    #[cfg(debug_assertions)]
+    println!("Find a graph by relation: {:#?}", gr.find_relation("to"));
     #[cfg(debug_assertions)]
     println!("----------");
 
