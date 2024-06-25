@@ -64,13 +64,12 @@ impl Graphs {
             graphs: vec![],
         }
     }
-    pub fn find_relation(&mut self, q: &str) -> Option<&mut Graph> {
-        for graph in self.graphs.iter_mut() {
-            if graph.relation == q {
-                return Some(graph);
-            }
-        }
-        None
+    pub fn find_by_relation(&mut self, q: &str) -> Option<Vec<&Graph>> {
+        let graphs = self.graphs
+            .iter()
+            .filter(|grph| grph.relation == q)
+            .collect::<Vec<&Graph>>();
+        Some(graphs)
     }
     pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
         for graph in self.graphs.iter_mut() {
@@ -113,10 +112,6 @@ impl Graphs {
         
         #[cfg(debug_assertions)]
         println!("readed graph: {:#?}", readed_graph);
-        //match readed_graph {
-            //Ok(readed_graph) => readed_graph,
-            //Err(e) => return Err(e),
-        //}
         Ok(readed_graph)
     }
 }
@@ -182,22 +177,34 @@ mod tests {
         let node1 = Node::new("a node".to_string());
         let n1 = node1.clone();
         let node2 = Node::new("b node".to_string());
-        let graph1 = Graph::new("relation a-b".to_string(), node1, node2);
+        let graph1 = Graph::new("friend of".to_string(), node1, node2);
         gru.add(graph1);
         assert_eq!(gru.graphs.len(), 1);
 
         let node3 = Node::new("c node".to_string());
         let node4 = Node::new("d node".to_string());
-        let graph2 = Graph::new("relation c-d".to_string(), node3, node4);
+        let graph2 = Graph::new("knows".to_string(), node3, node4);
         gru.add(graph2);
         assert_eq!(gru.graphs.len(), 2);
 
-        let mut result = gru.find_relation("relation c-d");
-        assert_eq!(result.unwrap().name(), "relation c-d");
+        let mut result = gru.find_by_relation("knows");
+        let mut res_graphs = result.unwrap();
+        assert_eq!(res_graphs.len(), 1);
+        assert_eq!(res_graphs[0].name(), "knows");
 
         let node1_id = n1.id();
-        result = gru.find_by_id(&node1_id);
-        assert_eq!(result.unwrap().from().id(), node1_id);
+        let res = gru.find_by_id(&node1_id);
+        assert_eq!(res.unwrap().from().id(), node1_id);
+
+        let node5 = Node::new("e node".to_string());
+        let graph3 = Graph::new("friend of".to_string(), n1, node5);
+        gru.add(graph3);
+
+        result = gru.find_by_relation("friend of");
+        res_graphs = result.unwrap();
+        assert_eq!(res_graphs.len(), 2);
+        assert_eq!(res_graphs[0].name(), "friend of");
+        assert_eq!(res_graphs[1].name(), "friend of");
     }
     
     #[test]
