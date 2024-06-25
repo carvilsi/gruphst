@@ -198,7 +198,10 @@ impl Graph {
     /// let alice_node = Node::new(String::from("alice node"));
     /// let bob_node = Node::new("bob node".to_string());
     /// let bob_node_c = bob_node.clone();
-    /// let mut graph = Graph::new(alice_node.clone(), "best friends".to_string(), bob_node);
+    /// let mut graph = Graph::new(
+    ///     alice_node.clone(),
+    ///     "best friends".to_string(),
+    ///     bob_node);
     /// assert_eq!(graph.from().name(), "alice node");
     /// assert_eq!(graph.to().name(), "bob node");
     /// let fred_node = Node::new("fred node".to_string());
@@ -363,15 +366,57 @@ impl Graphs {
     ///
     /// assert_eq!(my_graph.graphs.len(), 2);
     ///
-    /// my_graph.delete(alice_bob.id()); 
+    /// my_graph.delete_graph_by_id(alice_bob.id()); 
     /// assert_eq!(my_graph.graphs.len(), 1);
     /// ```
-    pub fn delete(&mut self, id: &str) {
+    pub fn delete_graph_by_id(&mut self, id: &str) {
         let index = self.graphs
             .iter()
             .position(|graph| graph.id == id)
             .unwrap();
         self.graphs.remove(index);
+    }
+    
+    /// Updates the Graphs with the provided one
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graphs = Graphs::new(String::from("my-graphs"));
+    ///
+    /// let alice_node = Node::new(String::from("Alice"));
+    /// let alice_node_c = alice_node.clone();
+    /// let bob_node = Node::new(String::from("Bob"));
+    /// let alice_bob_graph =
+    ///     Graph::new(alice_node, "best friends".to_string(), bob_node);
+    /// my_graphs.add(alice_bob_graph);
+    ///
+    /// let fred_node = Node::new(String::from("Fred"));
+    /// let mut alice_fred_graph = 
+    ///     Graph::new(alice_node_c, "super friends".to_string(), fred_node);
+    /// my_graphs.add(alice_fred_graph.clone());
+    ///
+    /// assert_eq!(my_graphs.graphs.len(), 2);
+    /// assert_eq!(my_graphs.graphs[1].relation(), "super friends");
+    ///
+    /// alice_fred_graph.update_relation("besties");
+    /// my_graphs.update_graph(alice_fred_graph.clone());
+    /// 
+    /// assert_eq!(my_graphs.graphs.len(), 2);
+    /// let updated_graph = my_graphs.find_by_id(alice_fred_graph.id());
+    /// assert_eq!(updated_graph.unwrap().relation(), "besties");
+    /// ```
+    pub fn update_graph(&mut self, graph_to_update: Graph) {
+        let index = self.graphs
+            .iter()
+            .position(|graph| graph.id == graph_to_update.id)
+            .unwrap();
+        self.graphs.remove(index);
+        self.graphs.push(graph_to_update);
     }
 
     /// Saves the current Graphs into a file with the Graphs's name
@@ -393,15 +438,17 @@ impl Graphs {
     /// my_graph.persists();
     /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{}.grphst", self.name());
+        let file_name = format!("{}.grphst", self.name().replace(' ', "_"));
         let mut file = OpenOptions::new()
             .create(true)
             .append(true)
-            .open(file_name)?;
+            .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         #[cfg(debug_assertions)]
         println!("The size of the bytes: {}", bytes.len());            
         file.write_all(&bytes)?;
+        println!("Current Graphs persisted at {} file with {} bytes written",
+            file_name, bytes.len());
         Ok(())
     }
 
@@ -577,7 +624,7 @@ mod tests {
 
         assert_eq!(my_graph.graphs.len(), 2);
 
-        my_graph.delete(alice_bob.id()); 
+        my_graph.delete_graph_by_id(alice_bob.id()); 
         assert_eq!(my_graph.graphs.len(), 1);
     }
 
