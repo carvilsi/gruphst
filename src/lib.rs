@@ -6,14 +6,21 @@ use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
 
+/// Representation of a Node
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct Node {
+    /// A Node consists on a uuid as identifier
     id: String,
+    /// and a name
     name: String,
 }
 
 impl Node {
+    /// Creates a Node with the given name, the id is generated
+    ///
+    /// # Examples
+    /// let node = Node::new(String::from("alice node"));
     pub fn new(name: String) -> Node {
         Node {
             name,
@@ -32,7 +39,7 @@ pub struct Graph {
 }
 
 impl Graph {
-    pub fn new(name: String, from: Node, to: Node) -> Graph {
+    pub fn new(from: Node, name: String, to: Node) -> Graph {
         Graph { 
             relation: name,
             id: Uuid::new_v4().to_string(),
@@ -162,7 +169,7 @@ mod tests {
     fn create_graph() {
         let node1 = Node::new("a node".to_string());
         let node2 = Node::new("b node".to_string());
-        let graph = Graph::new("relation a-b".to_string(), node1, node2);
+        let graph = Graph::new(node1, "relation a-b".to_string(), node2);
         assert_eq!(graph.relation, "relation a-b");
         assert_eq!(graph.name(), "relation a-b");
         assert_eq!(graph.from.name, "a node");
@@ -177,13 +184,13 @@ mod tests {
         let node1 = Node::new("a node".to_string());
         let n1 = node1.clone();
         let node2 = Node::new("b node".to_string());
-        let graph1 = Graph::new("friend of".to_string(), node1, node2);
+        let graph1 = Graph::new(node1, "friend of".to_string(), node2);
         gru.add(graph1);
         assert_eq!(gru.graphs.len(), 1);
 
         let node3 = Node::new("c node".to_string());
         let node4 = Node::new("d node".to_string());
-        let graph2 = Graph::new("knows".to_string(), node3, node4);
+        let graph2 = Graph::new(node3, "knows".to_string(), node4);
         gru.add(graph2);
         assert_eq!(gru.graphs.len(), 2);
 
@@ -197,7 +204,7 @@ mod tests {
         assert_eq!(res.unwrap().from().id(), node1_id);
 
         let node5 = Node::new("e node".to_string());
-        let graph3 = Graph::new("friend of".to_string(), n1, node5);
+        let graph3 = Graph::new(n1, "friend of".to_string(), node5);
         gru.add(graph3);
 
         result = gru.find_by_relation("friend of");
@@ -212,12 +219,12 @@ mod tests {
         let mut gru = Graphs::new("graphs-a".to_string());
         let node1 = Node::new("a node".to_string());
         let node2 = Node::new("b node".to_string());
-        let graph1 = Graph::new("relation a-b".to_string(), node1, node2);
+        let graph1 = Graph::new(node1, "relation a-b".to_string(), node2);
         gru.add(graph1.clone());
 
         let node3 = Node::new("c node".to_string());
         let node4 = Node::new("d node".to_string());
-        let graph2 = Graph::new("relation c-d".to_string(), node3, node4);
+        let graph2 = Graph::new(node3, "relation c-d".to_string(), node4);
         gru.add(graph2.clone());
 
         let _ = gru.persists();
