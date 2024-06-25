@@ -239,6 +239,23 @@ impl Graphs {
             graphs: vec![],
         }
     }
+    
+    /// Updates the name of the Graphs
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graph = Graphs::new(String::from("my_graph"));
+    /// assert_eq!(my_graph.name(), "my_graph");
+    ///
+    /// my_graph.update_name("graphy");
+    /// assert_eq!(my_graph.name(), "graphy");
+    /// ```
+    pub fn update_name(&mut self, name: &str) {
+        self.name = name.to_string();
+    }
 
     /// Adds a Graph element to the colection
     ///
