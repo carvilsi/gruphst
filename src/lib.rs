@@ -1,3 +1,9 @@
+//! Gruphst
+//!
+//! An in-memory graph database.
+//! 
+//! Possible to persists on file.
+
 use std::io::Write;
 use std::io::Read;
 use std::fs::File;
@@ -174,6 +180,36 @@ impl Graphs {
             .collect::<Vec<&Graph>>();
         Some(graphs)
     }
+
+    /// Returns a Graph that matches with the provided id
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graph = Graphs::new("friends".to_string());
+    /// let alice = Node::new("Alice".to_string());
+    /// let alice_c = alice.clone();
+    /// let bob = Node::new("Bob".to_string());
+    /// let bob_c = bob.clone();
+    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
+    /// my_graph.add(alice_bob.clone());
+    ///
+    /// let alice_fred =
+    ///     Graph::new(
+    ///         alice_c,
+    ///         String::from("is firend of"),
+    ///         Node::new("Fred".to_string())
+    ///     );
+    /// my_graph.add(alice_fred);
+    /// 
+    /// let bob_node_id = bob_c.id(); 
+    /// let res = my_graph.find_by_id(&bob_node_id);
+    /// assert_eq!(res.unwrap().to().id(), bob_node_id);
+    /// ```
     pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
         for graph in self.graphs.iter_mut() {
             if graph.id == id ||
@@ -185,6 +221,36 @@ impl Graphs {
         }
         None
     }
+
+    /// Deletes the Graph that matches with the provided id
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graph = Graphs::new("friends".to_string());
+    /// let alice = Node::new("Alice".to_string());
+    /// let alice_c = alice.clone();
+    /// let bob = Node::new("Bob".to_string());
+    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
+    /// my_graph.add(alice_bob.clone());
+    ///
+    /// let alice_fred =
+    ///     Graph::new(
+    ///         alice_c,
+    ///         String::from("is firend of"),
+    ///         Node::new("Fred".to_string())
+    ///     );
+    /// my_graph.add(alice_fred);
+    ///
+    /// assert_eq!(my_graph.graphs.len(), 2);
+    ///
+    /// my_graph.delete(alice_bob.id()); 
+    /// assert_eq!(my_graph.graphs.len(), 1);
+    /// ```
     pub fn delete(&mut self, id: &str) {
         let index = self.graphs
             .iter()
@@ -192,6 +258,25 @@ impl Graphs {
             .unwrap();
         self.graphs.remove(index);
     }
+
+    /// Saves the current Graphs into a file with the Graphs's name
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graph = Graphs::new("friends".to_string());
+    /// let alice = Node::new("Alice".to_string());
+    /// let alice_c = alice.clone();
+    /// let bob = Node::new("Bob".to_string());
+    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
+    /// my_graph.add(alice_bob);
+    ///
+    /// my_graph.persists();
+    /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.name());
         let mut file = OpenOptions::new()
@@ -204,6 +289,34 @@ impl Graphs {
         file.write(&bytes)?;
         Ok(())
     }
+
+    /// Loads the persisted Graphs on a file
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    /// use crate::gruphst::Gruphst;
+    ///
+    /// let mut my_graph = Graphs::new("friends".to_string());
+    /// let alice = Node::new("Alice".to_string());
+    /// let alice_c = alice.clone();
+    /// let bob = Node::new("Bob".to_string());
+    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
+    /// my_graph.add(alice_bob.clone());
+    ///
+    /// let _ = my_graph.persists();
+    /// let name = my_graph.name();
+    /// let loaded_graphs = Graphs::load(name);
+    /// match loaded_graphs {
+    ///     Ok(loaded_graphs) => {
+    ///         assert_eq!(loaded_graphs.name(), name);
+    ///         assert_eq!(loaded_graphs.graphs[0].name(), alice_bob.name());
+    ///     },
+    ///     Err(_) => panic!(),
+    /// }
+    /// ```
     pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
         let file_name = format!("{}.grphst", name);
         let mut read_file = File::open(file_name)?;
