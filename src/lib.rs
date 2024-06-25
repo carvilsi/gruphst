@@ -4,6 +4,8 @@
 //! 
 //! Possible to persists on file.
 
+#![allow(clippy::unused_io_amount)]
+
 use std::io::Write;
 use std::io::Read;
 use std::fs::File;
@@ -211,15 +213,11 @@ impl Graphs {
     /// assert_eq!(res.unwrap().to().id(), bob_node_id);
     /// ```
     pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
-        for graph in self.graphs.iter_mut() {
-            if graph.id == id ||
-               graph.from.id == id ||
-               graph.to.id == id 
-            {
-                return Some(graph);
-            }
-        }
-        None
+        self.graphs
+            .iter_mut()
+            .find(|graph| graph.id == id ||
+                   graph.from.id == id ||
+                   graph.to.id == id)
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -286,7 +284,7 @@ impl Graphs {
         let bytes = bincode::serialize(self)?;
         #[cfg(debug_assertions)]
         println!("The size of the bytes: {}", bytes.len());            
-        file.write(&bytes)?;
+        file.write_all(&bytes)?;
         Ok(())
     }
 
@@ -433,6 +431,7 @@ mod tests {
 
         let name = gru.name();
         let grphs = Graphs::load(name);
+        println!("{:#?}", grphs);
         match grphs {
             Ok(grphs) => {
                 assert_eq!(grphs.name(), name);
