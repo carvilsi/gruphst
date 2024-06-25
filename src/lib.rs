@@ -4,7 +4,7 @@
 //! 
 //! Possible to persists on file.
 
-#![allow(clippy::unused_io_amount)]
+//#![allow(clippy::unused_io_amount)]
 
 use std::io::Write;
 use std::io::Read;
