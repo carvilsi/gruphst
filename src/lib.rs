@@ -6,13 +6,15 @@ use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
 
+const MAX_STACK_SIZE: usize = 10000;
+
 /// Representation of a Node
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct Node {
     /// A Node consists on a uuid as identifier
     id: String,
-    /// and a name
+    /// And a name
     name: String,
 }
 
@@ -20,7 +22,11 @@ impl Node {
     /// Creates a Node with the given name, the id is generated
     ///
     /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
     /// let node = Node::new(String::from("alice node"));
+    /// ```
     pub fn new(name: String) -> Node {
         Node {
             name,
@@ -29,16 +35,32 @@ impl Node {
     }
 }
 
+/// Representation of a Graph, relating two nodes
 #[derive(Debug, Clone, PartialEq)]
 #[derive(Serialize, Deserialize)]
 pub struct Graph {
+    /// A Graph has an uuid
     id: String,
+    /// A name fot the relation 
     relation: String,
+    /// Origin node
     from: Node,
+    /// Target node
     to: Node,
 }
 
 impl Graph {
+    /// Creates a Graph, the id is generated
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let alice = Node::new(String::from("Alice"));
+    /// let bob = Node::new(String::from("Bob"));
+    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// ```
     pub fn new(from: Node, name: String, to: Node) -> Graph {
         Graph { 
             relation: name,
@@ -47,23 +69,61 @@ impl Graph {
             to,
         }
     }
+    
+    /// Gets the "from" Node from Graph
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let alice = Node::new(String::from("Alice"));
+    /// let bob = Node::new(String::from("Bob"));
+    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let alice_node = alice_bob_graph.from();
+    /// ```
     pub fn from(&self) -> &Node {
         &self.from
     }
+
+    /// Gets the "to" Node from Graph
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let alice = Node::new(String::from("Alice"));
+    /// let bob = Node::new(String::from("Bob"));
+    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let bob_node = alice_bob_graph.to();
+    /// ```
     pub fn to(&self) -> &Node {
         &self.to
     }
 }
 
+/// A colection of Graph 
 #[derive(Debug, Clone)]
 #[derive(Serialize, Deserialize)]
 pub struct Graphs {
+    /// The collection of Graph
     pub graphs: Vec<Graph>,
+    /// Name for the collection
     pub name: String,
+    /// The uuid for the collection
     pub id: String,
 }
 
 impl Graphs {
+    /// Creates a new collection of Graph elements
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    ///
+    /// let my_graph = Graphs::new(String::from("my_graph"));
+    /// ```
     pub fn new(name: String) -> Graphs {
         Graphs {
             name, 
@@ -71,6 +131,42 @@ impl Graphs {
             graphs: vec![],
         }
     }
+
+    /// Adds a Graph element to the colection
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let alice = Node::new(String::from("Alice"));
+    /// let bob = Node::new(String::from("Bob"));
+    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let mut my_graph = Graphs::new(String::from("my_graph"));
+    /// my_graph.add(alice_bob_graph);
+    /// ```
+    pub fn add(&mut self, graph: Graph) {
+        self.graphs.push(graph);
+    }
+    
+    /// Returns a collection of Graps elements that matches the relation 
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let alice = Node::new(String::from("Alice"));
+    /// let bob = Node::new(String::from("Bob"));
+    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let mut my_graph = Graphs::new(String::from("my_graph"));
+    /// my_graph.add(alice_bob_graph);
+    ///
+    /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
+    /// assert_eq!(result_graph.len(), 1);
+    /// ```
     pub fn find_by_relation(&mut self, q: &str) -> Option<Vec<&Graph>> {
         let graphs = self.graphs
             .iter()
@@ -89,8 +185,12 @@ impl Graphs {
         }
         None
     }
-    pub fn add(&mut self, graph: Graph) {
-        self.graphs.push(graph);
+    pub fn delete(&mut self, id: &str) {
+        let index = self.graphs
+            .iter()
+            .position(|graph| graph.id == id)
+            .unwrap();
+        self.graphs.remove(index);
     }
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.name());
@@ -99,26 +199,17 @@ impl Graphs {
             .append(true)
             .open(file_name)?;
         let bytes = bincode::serialize(self)?;
-        let written = file.write(&bytes)?;
-        #[cfg(debug_assertions)]
-        println!("{} bytes has been written", written);
-        #[cfg(debug_assertions)]
-        println!("The bytes: {:?}", bytes);
         #[cfg(debug_assertions)]
         println!("The size of the bytes: {}", bytes.len());            
+        file.write(&bytes)?;
         Ok(())
     }
     pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
         let file_name = format!("{}.grphst", name);
         let mut read_file = File::open(file_name)?;
-        let mut buffer = [0; 1780];
-        let _ = read_file.read(&mut buffer[..])?;
-        #[cfg(debug_assertions)]
-        println!("The readed bytes: {:?}", buffer);
+        let mut buffer = [0; MAX_STACK_SIZE];
+        read_file.read(&mut buffer[..])?;
         let readed_graph: Graphs = bincode::deserialize(&buffer)?;
-        
-        #[cfg(debug_assertions)]
-        println!("readed graph: {:#?}", readed_graph);
         Ok(readed_graph)
     }
 }
@@ -194,8 +285,7 @@ mod tests {
         gru.add(graph2);
         assert_eq!(gru.graphs.len(), 2);
 
-        let mut result = gru.find_by_relation("knows");
-        let mut res_graphs = result.unwrap();
+        let mut res_graphs= gru.find_by_relation("knows").unwrap();
         assert_eq!(res_graphs.len(), 1);
         assert_eq!(res_graphs[0].name(), "knows");
 
@@ -207,8 +297,7 @@ mod tests {
         let graph3 = Graph::new(n1, "friend of".to_string(), node5);
         gru.add(graph3);
 
-        result = gru.find_by_relation("friend of");
-        res_graphs = result.unwrap();
+        res_graphs = gru.find_by_relation("friend of").unwrap();
         assert_eq!(res_graphs.len(), 2);
         assert_eq!(res_graphs[0].name(), "friend of");
         assert_eq!(res_graphs[1].name(), "friend of");
@@ -239,5 +328,28 @@ mod tests {
             },
             Err(_) => panic!(),
         }
+    }
+
+    #[test]
+    fn delete_from_graph() {
+        let mut my_graph = Graphs::new("friends".to_string());
+        let alice = Node::new("Alice".to_string());
+        let alice_c = alice.clone();
+        let bob = Node::new("Bob".to_string());
+        let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
+        my_graph.add(alice_bob.clone());
+
+        let alice_fred =
+            Graph::new(
+                alice_c,
+                String::from("is firend of"),
+                Node::new("Fred".to_string())
+            );
+        my_graph.add(alice_fred);
+
+        assert_eq!(my_graph.graphs.len(), 2);
+
+        my_graph.delete(alice_bob.id()); 
+        assert_eq!(my_graph.graphs.len(), 1);
     }
 }
