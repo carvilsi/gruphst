@@ -13,8 +13,22 @@ use std::error::Error;
 use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
+use log::{ debug, info };
 
 const MAX_STACK_SIZE: usize = 10000;
+
+// TODO: add env config for level
+/// Enables logging providing a level
+///
+/// # Examples
+/// ```rust
+/// use gruphst::enable_logging;
+///
+/// enable_logging(log::Level::Info);
+/// ```
+pub fn enable_logging(level: log::Level) {
+    simple_logger::init_with_level(level).unwrap();
+}
 
 /// Representation of a Node
 #[derive(Debug, Clone, PartialEq)]
@@ -36,10 +50,12 @@ impl Node {
     /// let node = Node::new("alice node");
     /// ```
     pub fn new(name: &str) -> Node {
-        Node {
+        let node = Node {
             name: String::from(name),
             id: Uuid::new_v4().to_string()
-        }
+        };
+        debug!("The created node: {:#?}", &node);
+        node
     }
 
     /// Updates the name of the Node
@@ -55,6 +71,7 @@ impl Node {
     /// assert_eq!(node.name, "just alice");
     /// ```
     pub fn update_name(&mut self, name: &str) {
+        debug!("Updated Node [{}] with name: {}", self.id, name);
         self.name = name.to_string();
     }
 }
@@ -87,28 +104,15 @@ impl Graph {
     ///     Graph::new(&alice, "friend of", &bob);
     /// ```
     pub fn new(from: &Node, relation: &str, to: &Node) -> Graph {
-        Graph { 
+        let graph = Graph { 
             relation: String::from(relation),
             id: Uuid::new_v4().to_string(),
             from: from.clone(),
             to: to.clone(),
-        }
+        };
+        debug!("The created Graph: {:#?}", graph);
+        graph
     }
-    
-    /// Retrieves the relation value for the Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
-    /// 
-    ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let mut alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// 
-    /// assert_eq!(alice_bob_graph.relation, "friend of");
-    /// ```
 
     /// Updates the relation for the Graph
     ///
@@ -128,41 +132,10 @@ impl Graph {
     /// assert_eq!(alice_bob_graph.relation, "best friends");
     /// ```
     pub fn update_relation(&mut self, relation: &str) {
+        debug!("Updated Graph [{}] with Relation: {}", self.id, relation);
         self.relation = relation.to_string();
     }
     
-    /// Gets the "from" Node from Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
-    ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let alice_node = alice_bob_graph.from();
-    /// ```
-    pub fn from(&self) -> &Node {
-        &self.from
-    }
-
-    /// Gets the "to" Node from Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
-    ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let bob_node = alice_bob_graph.to();
-    /// ```
-    pub fn to(&self) -> &Node {
-        &self.to
-    }
-
     /// Updates the "from" node in Graph
     ///
     /// # Examples
@@ -174,13 +147,14 @@ impl Graph {
     /// let mut alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
     /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.from().name, "alice node");
-    /// assert_eq!(graph.to().name, "bob node");
+    /// assert_eq!(graph.from.name, "alice node");
+    /// assert_eq!(graph.to.name, "bob node");
     /// alice_node.update_name("alice");
     /// graph.update_from(&alice_node);
-    /// assert_eq!(graph.from().name, "alice");
+    /// assert_eq!(graph.from.name, "alice");
     /// ```
     pub fn update_from(&mut self, from_node: &Node) {
+        debug!("Updated Graph [{}] from Node: {:#?}", self.id, from_node);
         self.from = from_node.clone();
     }
 
@@ -195,14 +169,15 @@ impl Graph {
     /// let alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
     /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.from().name, "alice node");
-    /// assert_eq!(graph.to().name, "bob node");
+    /// assert_eq!(graph.from.name, "alice node");
+    /// assert_eq!(graph.to.name, "bob node");
     /// let fred_node = Node::new("fred node");
     /// graph.update_to(&fred_node);
-    /// assert_eq!(graph.to().name, "fred node");
-    /// assert_ne!(graph.to().id, bob_node.id);
+    /// assert_eq!(graph.to.name, "fred node");
+    /// assert_ne!(graph.to.id, bob_node.id);
     /// ```
     pub fn update_to(&mut self, to_node: &Node) {
+        debug!("Updated Graph [{}] to Node: {:#?}", self.id, to_node);
         self.to = to_node.clone();
     }
 }
@@ -229,11 +204,13 @@ impl Graphs {
     /// let my_graph = Graphs::new("my_graph");
     /// ```
     pub fn new(name: &str) -> Graphs {
-        Graphs {
+        let graphs = Graphs {
             name: String::from(name), 
             id: Uuid::new_v4().to_string(),
             graphs: vec![],
-        }
+        };
+        debug!("Created new Graphs: {:#?}", graphs);
+        graphs
     }
     
     /// Updates the name of the Graphs
@@ -250,6 +227,7 @@ impl Graphs {
     /// assert_eq!(my_graph.name, "graphy");
     /// ```
     pub fn update_name(&mut self, name: &str) {
+        debug!("Update Graph [{}] with name: {}", self.id, name);
         self.name = name.to_string();
     }
 
@@ -268,6 +246,10 @@ impl Graphs {
     /// my_graph.add(&alice_bob_graph);
     /// ```
     pub fn add(&mut self, graph: &Graph) {
+        debug!("Added new graph to Graphs [{}]
+            current length: {}",
+            self.id,
+            self.graphs.len());
         self.graphs.push(graph.clone());
     }
     
@@ -293,6 +275,7 @@ impl Graphs {
             .iter()
             .filter(|grph| grph.relation == q)
             .collect::<Vec<&Graph>>();
+        debug!("Founded {} graphs with '{}' relation name", graphs.len(), q);
         Some(graphs)
     }
 
@@ -317,14 +300,16 @@ impl Graphs {
     /// 
     /// let bob_node_id = bob.id; 
     /// let res = my_graph.find_by_id(&bob_node_id);
-    /// assert_eq!(res.unwrap().to().id, bob_node_id);
+    /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
     pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
-        self.graphs
+        let graph = self.graphs
             .iter_mut()
             .find(|graph| graph.id == id ||
                    graph.from.id == id ||
-                   graph.to.id == id)
+                   graph.to.id == id);
+        debug!("Founded by id: {:#?}", graph);
+        graph
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -356,6 +341,7 @@ impl Graphs {
             .iter()
             .position(|graph| graph.id == id)
             .unwrap();
+        debug!("Delete graph: {}", id);
         self.graphs.remove(index);
     }
     
@@ -392,10 +378,13 @@ impl Graphs {
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
     pub fn update_graph(&mut self, graph_to_update: &Graph) {
+        // TODO: add here something when the index is not found
+        debug!("Going to update Graphs with {:#?}", graph_to_update);
         let index = self.graphs
             .iter()
             .position(|graph| graph.id == graph_to_update.id)
             .unwrap();
+        debug!("Graph to update found it at index: {index}");
         self.graphs.remove(index);
         self.graphs.push(graph_to_update.clone());
     }
@@ -417,6 +406,7 @@ impl Graphs {
     ///
     /// my_graph.persists();
     /// ```
+    // XXX: Maybe append is not anymore the best way
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.name.replace(' ', "_"));
         let mut file = OpenOptions::new()
@@ -424,10 +414,8 @@ impl Graphs {
             .append(true)
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
-        #[cfg(debug_assertions)]
-        println!("The size of the bytes: {}", bytes.len());            
         file.write_all(&bytes)?;
-        println!("Current Graphs persisted at {} file with {} bytes written",
+        info!("Current Graphs persisted at {} file with {} bytes written",
             file_name, bytes.len());
         Ok(())
     }
@@ -460,11 +448,41 @@ impl Graphs {
     /// ```
     pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
         let file_name = format!("{}.grphst", name);
+        debug!("Loading persisted file {}", &file_name);
         let mut read_file = File::open(file_name)?;
         let mut buffer = [0; MAX_STACK_SIZE];
         read_file.read(&mut buffer[..])?;
         let readed_graph: Graphs = bincode::deserialize(&buffer)?;
+        debug!("Loaded persisted file with {} Graphs", readed_graph.graphs.len());
         Ok(readed_graph)
+    }
+
+    /// Returns the current size of Graphs in bytes
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Graphs;
+    /// use gruphst::Node;
+    /// use gruphst::Graph;
+    ///
+    /// let mut my_graphs = Graphs::new("memories");
+    /// my_graphs.add(
+    ///     &Graph::new(
+    ///         &Node::new("Alice"),
+    ///         "recalls friendship with",
+    ///         &Node::new("Bob")
+    ///     )
+    /// );
+    ///
+    /// assert_eq!(my_graphs.graphs.len(), 1);
+    /// assert_eq!(my_graphs.memory_usage().unwrap(), 255);
+    /// ```
+    // TODO: add length
+    pub fn memory_usage(&self) -> Result<usize, Box<dyn Error>> {
+        let bytes = bincode::serialize(self)?;
+        debug!("Graphs [{}] '{}' current size: {} bytes",
+            self.id, self.name, bytes.len());
+        Ok(bytes.len())
     }
 }
 
