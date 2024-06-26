@@ -1,9 +1,15 @@
 use gruphst::{ Graphs, Graph, Node };
+use gruphst::enable_logging;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    
+    #[test] 
+    fn logg() {
+        enable_logging(log::Level::Debug);
+    }  
+    
     #[test]
     fn create_node() {
         let n = Node::new("Node 1");
@@ -38,12 +44,14 @@ mod tests {
         gru.add(&graph2);
         assert_eq!(gru.graphs.len(), 2);
 
+        // TODO: test when nothing is found
         let mut res_graphs= gru.find_by_relation("knows").unwrap();
         assert_eq!(res_graphs.len(), 1);
         assert_eq!(res_graphs[0].relation, "knows");
 
+        // TODO: test when not found
         let res = gru.find_by_id(&node1.id);
-        assert_eq!(res.unwrap().from().id, node1.id);
+        assert_eq!(res.unwrap().from.id, node1.id);
 
         let node5 = Node::new("e node");
         let graph3 = Graph::new(&node1, "friend of", &node5);
@@ -55,6 +63,7 @@ mod tests {
         assert_eq!(res_graphs[1].relation, "friend of");
     }
     
+    // TODO: Add a test when the file has not correct data
     #[test]
     fn persistence() {
         let mut gru = Graphs::new("graphs-a");
@@ -114,7 +123,7 @@ mod tests {
         let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
         alice_node.update_name("alice");
         graph.update_from(&alice_node);
-        assert_eq!(graph.from().name, "alice");
+        assert_eq!(graph.from.name, "alice");
     }
 
     #[test]
@@ -122,19 +131,19 @@ mod tests {
         let mut alice_node = Node::new("alice node");
         let bob_node = Node::new("bob node");
         let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
-        assert_eq!(graph.from().name, "alice node");
-        assert_eq!(graph.to().name, "bob node");
+        assert_eq!(graph.from.name, "alice node");
+        assert_eq!(graph.to.name, "bob node");
         alice_node.update_name("alice");
         graph.update_from(&alice_node);
-        assert_eq!(graph.from().name, "alice");
+        assert_eq!(graph.from.name, "alice");
         let fred_node = Node::new("fred node");
         graph.update_to(&fred_node);
-        assert_eq!(graph.to().name, "fred node");
-        assert_ne!(graph.to().id, bob_node.id);
+        assert_eq!(graph.to.name, "fred node");
+        assert_ne!(graph.to.id, bob_node.id);
     }
 
     #[test]
-    fn more_complicated_graph() {
+    fn graph_memory_usage() {
         let mut graphs = Graphs::new("friends-and-enemies");
 
         let alice = Node::new("Alice");
@@ -157,5 +166,6 @@ mod tests {
         graphs.add(&graph);
 
         assert_eq!(graphs.graphs.len(), 4);
+        assert_eq!(graphs.memory_usage().unwrap(), 774);
     }
 }
