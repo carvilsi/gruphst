@@ -21,9 +21,9 @@ const MAX_STACK_SIZE: usize = 10000;
 #[derive(Serialize, Deserialize)]
 pub struct Node {
     /// A Node consists on a uuid as identifier
-    id: String,
+    pub id: String,
     /// And a name
-    name: String,
+    pub name: String,
 }
 
 impl Node {
@@ -33,11 +33,11 @@ impl Node {
     /// ```rust
     /// use gruphst::Node;
     ///
-    /// let node = Node::new(String::from("alice node"));
+    /// let node = Node::new("alice node");
     /// ```
-    pub fn new(name: String) -> Node {
+    pub fn new(name: &str) -> Node {
         Node {
-            name,
+            name: String::from(name),
             id: Uuid::new_v4().to_string()
         }
     }
@@ -47,12 +47,12 @@ impl Node {
     /// # Examples
     /// ```rust
     /// use gruphst::Node;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut node = Node::new(String::from("alice node"));
-    /// assert_eq!(node.name(), "alice node");
+    /// let mut node = Node::new("alice node");
+    /// assert_eq!(node.name, "alice node");
     /// node.update_name("just alice");
-    /// assert_eq!(node.name(), "just alice");
+    /// assert_eq!(node.name, "just alice");
     /// ```
     pub fn update_name(&mut self, name: &str) {
         self.name = name.to_string();
@@ -64,13 +64,13 @@ impl Node {
 #[derive(Serialize, Deserialize)]
 pub struct Graph {
     /// A Graph has an uuid
-    id: String,
+    pub id: String,
     /// A name fot the relation 
-    relation: String,
+    pub relation: String,
     /// Origin node
-    from: Node,
+    pub from: Node,
     /// Target node
-    to: Node,
+    pub to: Node,
 }
 
 impl Graph {
@@ -81,16 +81,17 @@ impl Graph {
     /// use gruphst::Node;
     /// use gruphst::Graph;
     ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = 
+    ///     Graph::new(&alice, "friend of", &bob);
     /// ```
-    pub fn new(from: Node, name: String, to: Node) -> Graph {
+    pub fn new(from: &Node, relation: &str, to: &Node) -> Graph {
         Graph { 
-            relation: name,
+            relation: String::from(relation),
             id: Uuid::new_v4().to_string(),
-            from,
-            to,
+            from: from.clone(),
+            to: to.clone(),
         }
     }
     
@@ -100,17 +101,14 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
-    ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let mut alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
     /// 
-    /// assert_eq!(alice_bob_graph.relation(), "friend of");
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let mut alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// 
+    /// assert_eq!(alice_bob_graph.relation, "friend of");
     /// ```
-    pub fn relation(&self) -> &String {
-        self.name()
-    }
 
     /// Updates the relation for the Graph
     ///
@@ -118,16 +116,16 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
-    ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let mut alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
     /// 
-    /// assert_eq!(alice_bob_graph.name(), "friend of");
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let mut alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// 
+    /// assert_eq!(alice_bob_graph.relation, "friend of");
     ///
     /// alice_bob_graph.update_relation("best friends");
-    /// assert_eq!(alice_bob_graph.name(), "best friends");
+    /// assert_eq!(alice_bob_graph.relation, "best friends");
     /// ```
     pub fn update_relation(&mut self, relation: &str) {
         self.relation = relation.to_string();
@@ -140,9 +138,9 @@ impl Graph {
     /// use gruphst::Node;
     /// use gruphst::Graph;
     ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let alice_node = alice_bob_graph.from();
     /// ```
     pub fn from(&self) -> &Node {
@@ -156,9 +154,9 @@ impl Graph {
     /// use gruphst::Node;
     /// use gruphst::Graph;
     ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_node = alice_bob_graph.to();
     /// ```
     pub fn to(&self) -> &Node {
@@ -171,20 +169,19 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut alice_node = Node::new(String::from("alice node"));
-    /// let bob_node = Node::new("bob node".to_string());
-    /// let bob_node_c = bob_node.clone();
-    /// let mut graph = Graph::new(alice_node.clone(), "best friends".to_string(), bob_node);
-    /// assert_eq!(graph.from().name(), "alice node");
-    /// assert_eq!(graph.to().name(), "bob node");
+    /// let mut alice_node = Node::new("alice node");
+    /// let bob_node = Node::new("bob node");
+    /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
+    /// assert_eq!(graph.from().name, "alice node");
+    /// assert_eq!(graph.to().name, "bob node");
     /// alice_node.update_name("alice");
-    /// graph.update_from(alice_node);
-    /// assert_eq!(graph.from().name(), "alice");
+    /// graph.update_from(&alice_node);
+    /// assert_eq!(graph.from().name, "alice");
     /// ```
-    pub fn update_from(&mut self, from_node: Node) {
-        self.from = from_node;
+    pub fn update_from(&mut self, from_node: &Node) {
+        self.from = from_node.clone();
     }
 
     /// Updates the "to" node in Graph
@@ -193,24 +190,20 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let alice_node = Node::new(String::from("alice node"));
-    /// let bob_node = Node::new("bob node".to_string());
-    /// let bob_node_c = bob_node.clone();
-    /// let mut graph = Graph::new(
-    ///     alice_node.clone(),
-    ///     "best friends".to_string(),
-    ///     bob_node);
-    /// assert_eq!(graph.from().name(), "alice node");
-    /// assert_eq!(graph.to().name(), "bob node");
-    /// let fred_node = Node::new("fred node".to_string());
-    /// graph.update_to(fred_node);
-    /// assert_eq!(graph.to().name(), "fred node");
-    /// assert_ne!(graph.to().id(), bob_node_c.id());
+    /// let alice_node = Node::new("alice node");
+    /// let bob_node = Node::new("bob node");
+    /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
+    /// assert_eq!(graph.from().name, "alice node");
+    /// assert_eq!(graph.to().name, "bob node");
+    /// let fred_node = Node::new("fred node");
+    /// graph.update_to(&fred_node);
+    /// assert_eq!(graph.to().name, "fred node");
+    /// assert_ne!(graph.to().id, bob_node.id);
     /// ```
-    pub fn update_to(&mut self, to_node: Node) {
-        self.to = to_node;
+    pub fn update_to(&mut self, to_node: &Node) {
+        self.to = to_node.clone();
     }
 }
 
@@ -233,11 +226,11 @@ impl Graphs {
     /// ```rust
     /// use gruphst::Graphs;
     ///
-    /// let my_graph = Graphs::new(String::from("my_graph"));
+    /// let my_graph = Graphs::new("my_graph");
     /// ```
-    pub fn new(name: String) -> Graphs {
+    pub fn new(name: &str) -> Graphs {
         Graphs {
-            name, 
+            name: String::from(name), 
             id: Uuid::new_v4().to_string(),
             graphs: vec![],
         }
@@ -248,13 +241,13 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::Graphs;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut my_graph = Graphs::new(String::from("my_graph"));
-    /// assert_eq!(my_graph.name(), "my_graph");
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// assert_eq!(my_graph.name, "my_graph");
     ///
     /// my_graph.update_name("graphy");
-    /// assert_eq!(my_graph.name(), "graphy");
+    /// assert_eq!(my_graph.name, "graphy");
     /// ```
     pub fn update_name(&mut self, name: &str) {
         self.name = name.to_string();
@@ -268,14 +261,14 @@ impl Graphs {
     /// use gruphst::Node;
     /// use gruphst::Graph;
     ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
-    /// let mut my_graph = Graphs::new(String::from("my_graph"));
-    /// my_graph.add(alice_bob_graph);
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
     /// ```
-    pub fn add(&mut self, graph: Graph) {
-        self.graphs.push(graph);
+    pub fn add(&mut self, graph: &Graph) {
+        self.graphs.push(graph.clone());
     }
     
     /// Returns a collection of Graps elements that matches the relation 
@@ -286,11 +279,11 @@ impl Graphs {
     /// use gruphst::Node;
     /// use gruphst::Graph;
     ///
-    /// let alice = Node::new(String::from("Alice"));
-    /// let bob = Node::new(String::from("Bob"));
-    /// let alice_bob_graph = Graph::new(alice, String::from("friend of"), bob);
-    /// let mut my_graph = Graphs::new(String::from("my_graph"));
-    /// my_graph.add(alice_bob_graph);
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
     ///
     /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
     /// assert_eq!(result_graph.len(), 1);
@@ -310,27 +303,21 @@ impl Graphs {
     /// use gruphst::Graphs;
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut my_graph = Graphs::new("friends".to_string());
-    /// let alice = Node::new("Alice".to_string());
-    /// let alice_c = alice.clone();
-    /// let bob = Node::new("Bob".to_string());
-    /// let bob_c = bob.clone();
-    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
-    /// my_graph.add(alice_bob.clone());
+    /// let mut my_graph = Graphs::new("friends");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// my_graph.add(&alice_bob);
     ///
     /// let alice_fred =
-    ///     Graph::new(
-    ///         alice_c,
-    ///         String::from("is firend of"),
-    ///         Node::new("Fred".to_string())
-    ///     );
-    /// my_graph.add(alice_fred);
+    ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
+    /// my_graph.add(&alice_fred);
     /// 
-    /// let bob_node_id = bob_c.id(); 
+    /// let bob_node_id = bob.id; 
     /// let res = my_graph.find_by_id(&bob_node_id);
-    /// assert_eq!(res.unwrap().to().id(), bob_node_id);
+    /// assert_eq!(res.unwrap().to().id, bob_node_id);
     /// ```
     pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
         self.graphs
@@ -347,29 +334,24 @@ impl Graphs {
     /// use gruphst::Graphs;
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut my_graph = Graphs::new("friends".to_string());
-    /// let alice = Node::new("Alice".to_string());
-    /// let alice_c = alice.clone();
-    /// let bob = Node::new("Bob".to_string());
-    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
-    /// my_graph.add(alice_bob.clone());
+    /// let mut my_graph = Graphs::new("friends");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// my_graph.add(&alice_bob);
     ///
     /// let alice_fred =
-    ///     Graph::new(
-    ///         alice_c,
-    ///         String::from("is firend of"),
-    ///         Node::new("Fred".to_string())
-    ///     );
-    /// my_graph.add(alice_fred);
+    ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
+    /// my_graph.add(&alice_fred);
     ///
     /// assert_eq!(my_graph.graphs.len(), 2);
     ///
-    /// my_graph.delete_graph_by_id(alice_bob.id()); 
+    /// my_graph.delete_graph_by_id(alice_bob.id); 
     /// assert_eq!(my_graph.graphs.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(&mut self, id: &str) {
+    pub fn delete_graph_by_id(&mut self, id: String) {
         let index = self.graphs
             .iter()
             .position(|graph| graph.id == id)
@@ -384,39 +366,38 @@ impl Graphs {
     /// use gruphst::Graphs;
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut my_graphs = Graphs::new(String::from("my-graphs"));
+    /// let mut my_graphs = Graphs::new("my-graphs");
     ///
-    /// let alice_node = Node::new(String::from("Alice"));
-    /// let alice_node_c = alice_node.clone();
-    /// let bob_node = Node::new(String::from("Bob"));
+    /// let alice_node = Node::new("Alice");
+    /// let bob_node = Node::new("Bob");
     /// let alice_bob_graph =
-    ///     Graph::new(alice_node, "best friends".to_string(), bob_node);
-    /// my_graphs.add(alice_bob_graph);
+    ///     Graph::new(&alice_node, "best friends", &bob_node);
+    /// my_graphs.add(&alice_bob_graph);
     ///
-    /// let fred_node = Node::new(String::from("Fred"));
+    /// let fred_node = Node::new("Fred");
     /// let mut alice_fred_graph = 
-    ///     Graph::new(alice_node_c, "super friends".to_string(), fred_node);
-    /// my_graphs.add(alice_fred_graph.clone());
+    ///     Graph::new(&alice_node, "super friends", &fred_node);
+    /// my_graphs.add(&alice_fred_graph);
     ///
     /// assert_eq!(my_graphs.graphs.len(), 2);
-    /// assert_eq!(my_graphs.graphs[1].relation(), "super friends");
+    /// assert_eq!(my_graphs.graphs[1].relation, "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
-    /// my_graphs.update_graph(alice_fred_graph.clone());
+    /// my_graphs.update_graph(&alice_fred_graph);
     /// 
     /// assert_eq!(my_graphs.graphs.len(), 2);
-    /// let updated_graph = my_graphs.find_by_id(alice_fred_graph.id());
-    /// assert_eq!(updated_graph.unwrap().relation(), "besties");
+    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
+    /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(&mut self, graph_to_update: Graph) {
+    pub fn update_graph(&mut self, graph_to_update: &Graph) {
         let index = self.graphs
             .iter()
             .position(|graph| graph.id == graph_to_update.id)
             .unwrap();
         self.graphs.remove(index);
-        self.graphs.push(graph_to_update);
+        self.graphs.push(graph_to_update.clone());
     }
 
     /// Saves the current Graphs into a file with the Graphs's name
@@ -426,19 +407,18 @@ impl Graphs {
     /// use gruphst::Graphs;
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
+    /// 
     ///
-    /// let mut my_graph = Graphs::new("friends".to_string());
-    /// let alice = Node::new("Alice".to_string());
-    /// let alice_c = alice.clone();
-    /// let bob = Node::new("Bob".to_string());
-    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
-    /// my_graph.add(alice_bob);
+    /// let mut my_graph = Graphs::new("friends");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// my_graph.add(&alice_bob);
     ///
     /// my_graph.persists();
     /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{}.grphst", self.name().replace(' ', "_"));
+        let file_name = format!("{}.grphst", self.name.replace(' ', "_"));
         let mut file = OpenOptions::new()
             .create(true)
             .append(true)
@@ -459,22 +439,21 @@ impl Graphs {
     /// use gruphst::Graphs;
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// use crate::gruphst::Gruphst;
     ///
-    /// let mut my_graph = Graphs::new("friends".to_string());
-    /// let alice = Node::new("Alice".to_string());
-    /// let alice_c = alice.clone();
-    /// let bob = Node::new("Bob".to_string());
-    /// let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
-    /// my_graph.add(alice_bob.clone());
+    /// let mut my_graph = Graphs::new("friends");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// my_graph.add(&alice_bob);
     ///
     /// let _ = my_graph.persists();
-    /// let name = my_graph.name();
-    /// let loaded_graphs = Graphs::load(name);
+    ///
+    /// let name = my_graph.name;
+    /// let loaded_graphs = Graphs::load(&name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
-    ///         assert_eq!(loaded_graphs.name(), name);
-    ///         assert_eq!(loaded_graphs.graphs[0].name(), alice_bob.name());
+    ///         assert_eq!(loaded_graphs.name, name);
+    ///         assert_eq!(loaded_graphs.graphs[0].relation, alice_bob.relation);
     ///     },
     ///     Err(_) => panic!(),
     /// }
@@ -489,172 +468,3 @@ impl Graphs {
     }
 }
 
-pub trait Gruphst {
-    fn name(&self) -> &String;
-    fn id(&self) -> &String;
-}
-
-impl Gruphst for Node {
-    fn name(&self)  -> &String {
-        &self.name
-    }
-    fn id(&self) -> &String {
-        &self.id
-    }
-}
-
-impl Gruphst for Graph {
-    fn name(&self) -> &String {
-        &self.relation
-    }
-    fn id(&self) -> &String {
-        &self.id
-    }
-}
-
-impl Gruphst for Graphs {
-    fn name(&self)  -> &String {
-        &self.name
-    }
-    fn id(&self) -> &String {
-        &self.id
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn create_node() {
-        let n = Node::new(String::from("Node 1"));
-        assert_eq!(n.name(), "Node 1");
-    }
-
-    #[test]
-    fn create_graph() {
-        let node1 = Node::new("a node".to_string());
-        let node2 = Node::new("b node".to_string());
-        let graph = Graph::new(node1, "relation a-b".to_string(), node2);
-        assert_eq!(graph.relation, "relation a-b");
-        assert_eq!(graph.name(), "relation a-b");
-        assert_eq!(graph.from.name, "a node");
-        assert_eq!(graph.to.name, "b node");
-    }
-
-    #[test]
-    fn find_in_graphs() {
-        let mut gru = Graphs::new("graphs-a".to_string());
-        assert_eq!(gru.name(), "graphs-a");
-
-        let node1 = Node::new("a node".to_string());
-        let n1 = node1.clone();
-        let node2 = Node::new("b node".to_string());
-        let graph1 = Graph::new(node1, "friend of".to_string(), node2);
-        gru.add(graph1);
-        assert_eq!(gru.graphs.len(), 1);
-
-        let node3 = Node::new("c node".to_string());
-        let node4 = Node::new("d node".to_string());
-        let graph2 = Graph::new(node3, "knows".to_string(), node4);
-        gru.add(graph2);
-        assert_eq!(gru.graphs.len(), 2);
-
-        let mut res_graphs= gru.find_by_relation("knows").unwrap();
-        assert_eq!(res_graphs.len(), 1);
-        assert_eq!(res_graphs[0].name(), "knows");
-
-        let node1_id = n1.id();
-        let res = gru.find_by_id(&node1_id);
-        assert_eq!(res.unwrap().from().id(), node1_id);
-
-        let node5 = Node::new("e node".to_string());
-        let graph3 = Graph::new(n1, "friend of".to_string(), node5);
-        gru.add(graph3);
-
-        res_graphs = gru.find_by_relation("friend of").unwrap();
-        assert_eq!(res_graphs.len(), 2);
-        assert_eq!(res_graphs[0].name(), "friend of");
-        assert_eq!(res_graphs[1].name(), "friend of");
-    }
-    
-    #[test]
-    fn persistence() {
-        let mut gru = Graphs::new("graphs-a".to_string());
-        let node1 = Node::new("a node".to_string());
-        let node2 = Node::new("b node".to_string());
-        let graph1 = Graph::new(node1, "relation a-b".to_string(), node2);
-        gru.add(graph1.clone());
-
-        let node3 = Node::new("c node".to_string());
-        let node4 = Node::new("d node".to_string());
-        let graph2 = Graph::new(node3, "relation c-d".to_string(), node4);
-        gru.add(graph2.clone());
-
-        let _ = gru.persists();
-
-        let name = gru.name();
-        let grphs = Graphs::load(name);
-        match grphs {
-            Ok(grphs) => {
-                assert_eq!(grphs.name(), name);
-                assert_eq!(grphs.graphs[0].name(), graph1.name());
-                assert_eq!(grphs.graphs[1], graph2);
-            },
-            Err(_) => panic!(),
-        }
-    }
-
-    #[test]
-    fn delete_from_graph() {
-        let mut my_graph = Graphs::new("friends".to_string());
-        let alice = Node::new("Alice".to_string());
-        let alice_c = alice.clone();
-        let bob = Node::new("Bob".to_string());
-        let alice_bob = Graph::new(alice, String::from("is friend of"), bob);
-        my_graph.add(alice_bob.clone());
-
-        let alice_fred =
-            Graph::new(
-                alice_c,
-                String::from("is firend of"),
-                Node::new("Fred".to_string())
-            );
-        my_graph.add(alice_fred);
-
-        assert_eq!(my_graph.graphs.len(), 2);
-
-        my_graph.delete_graph_by_id(alice_bob.id()); 
-        assert_eq!(my_graph.graphs.len(), 1);
-    }
-
-    #[test]
-    fn update_node_name() {
-        let mut alice_node = Node::new(String::from("alice node"));
-        assert_eq!(alice_node.name(), "alice node");
-        alice_node.update_name("just alice");
-        assert_eq!(alice_node.name(), "just alice");
-        let bob_node = Node::new("bob node".to_string());
-        let mut graph = Graph::new(alice_node.clone(), "best friends".to_string(), bob_node);
-        alice_node.update_name("alice");
-        graph.update_from(alice_node);
-        assert_eq!(graph.from().name(), "alice");
-    }
-
-    #[test]
-    fn update_graph_node() {
-        let mut alice_node = Node::new(String::from("alice node"));
-        let bob_node = Node::new("bob node".to_string());
-        let bob_node_c = bob_node.clone();
-        let mut graph = Graph::new(alice_node.clone(), "best friends".to_string(), bob_node);
-        assert_eq!(graph.from().name(), "alice node");
-        assert_eq!(graph.to().name(), "bob node");
-        alice_node.update_name("alice");
-        graph.update_from(alice_node);
-        assert_eq!(graph.from().name(), "alice");
-        let fred_node = Node::new("fred node".to_string());
-        graph.update_to(fred_node);
-        assert_eq!(graph.to().name(), "fred node");
-        assert_ne!(graph.to().id(), bob_node_c.id());
-    }
-}
