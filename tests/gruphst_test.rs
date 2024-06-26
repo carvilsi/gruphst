@@ -132,4 +132,30 @@ mod tests {
         assert_eq!(graph.to().name, "fred node");
         assert_ne!(graph.to().id, bob_node.id);
     }
+
+    #[test]
+    fn more_complicated_graph() {
+        let mut graphs = Graphs::new("friends-and-enemies");
+
+        let alice = Node::new("Alice");
+        let bob = Node::new("Bob");
+        let fred = Node::new("Fred");
+        let john = Node::new("John");
+        let peter = Node::new("Peter");
+        
+        let relation_friend_of = "friend_of";
+        let mut graph = Graph::new(&alice, relation_friend_of, &bob);
+        graphs.add(&graph);
+
+        graph = Graph::new(&alice, relation_friend_of, &fred);
+        graphs.add(&graph);
+
+        graph = Graph::new(&alice, relation_friend_of, &john);
+        graphs.add(&graph);
+        
+        graph = Graph::new(&peter, relation_friend_of, &john);
+        graphs.add(&graph);
+
+        assert_eq!(graphs.graphs.len(), 4);
+    }
 }
