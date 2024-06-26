@@ -143,7 +143,7 @@ mod tests {
     }
 
     #[test]
-    fn graph_memory_usage() {
+    fn graphs_stats() {
         let mut graphs = Graphs::new("friends-and-enemies");
 
         let alice = Node::new("Alice");
@@ -165,7 +165,9 @@ mod tests {
         graph = Graph::new(&peter, relation_friend_of, &john);
         graphs.add(&graph);
 
-        assert_eq!(graphs.graphs.len(), 4);
-        assert_eq!(graphs.memory_usage().unwrap(), 774);
+        // XXX: Note that this could be arch dependent
+        let stats = graphs.stats().unwrap();
+        assert_eq!(stats.len, 4);
+        assert_eq!(stats.mem, 774);
     }
 }

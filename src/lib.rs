@@ -194,6 +194,11 @@ pub struct Graphs {
     pub id: String,
 }
 
+pub struct GraphsStats {
+    pub mem: usize,
+    pub len: usize,
+}
+
 impl Graphs {
     /// Creates a new collection of Graph elements
     ///
@@ -474,15 +479,23 @@ impl Graphs {
     ///     )
     /// );
     ///
-    /// assert_eq!(my_graphs.graphs.len(), 1);
-    /// assert_eq!(my_graphs.memory_usage().unwrap(), 255);
+    /// let stats = my_graphs.stats().unwrap();
+    /// assert_eq!(stats.mem, 255);
+    /// assert_eq!(stats.len, 1);
     /// ```
-    // TODO: add length
-    pub fn memory_usage(&self) -> Result<usize, Box<dyn Error>> {
+    pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
-        debug!("Graphs [{}] '{}' current size: {} bytes",
-            self.id, self.name, bytes.len());
-        Ok(bytes.len())
+        debug!("Graphs [{}] '{} stats:'
+            current size: {} bytes
+            current length: {}",
+            self.id, self.name,
+            bytes.len(),
+            self.graphs.len());
+        let stats = GraphsStats {
+            mem: bytes.len(),
+            len: self.graphs.len(),
+        };
+        Ok(stats)
     }
 }
 
