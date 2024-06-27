@@ -194,9 +194,13 @@ pub struct Graphs {
     pub id: String,
 }
 
+/// Represents stats data from the Graphs
 pub struct GraphsStats <'a> {
+    /// memory used by Graphs in bytes
     pub mem: usize,
+    /// length of the Grpahs
     pub len: usize,
+    /// name of the Graph
     pub name: &'a str,
 }
 
