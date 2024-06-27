@@ -49,7 +49,7 @@ impl Node {
     ///
     /// let node = Node::new("alice node");
     /// ```
-    pub fn new(name: &str) -> Node {
+    pub fn new(name: &str) -> Self {
         let node = Node {
             name: String::from(name),
             id: Uuid::new_v4().to_string()
@@ -103,7 +103,7 @@ impl Graph {
     /// let alice_bob_graph = 
     ///     Graph::new(&alice, "friend of", &bob);
     /// ```
-    pub fn new(from: &Node, relation: &str, to: &Node) -> Graph {
+    pub fn new(from: &Node, relation: &str, to: &Node) -> Self {
         let graph = Graph { 
             relation: String::from(relation),
             id: Uuid::new_v4().to_string(),
@@ -213,7 +213,7 @@ impl Graphs {
     ///
     /// let my_graph = Graphs::new("my_graph");
     /// ```
-    pub fn new(name: &str) -> Graphs {
+    pub fn new(name: &str) -> Self {
         let graphs = Graphs {
             name: String::from(name), 
             id: Uuid::new_v4().to_string(),
