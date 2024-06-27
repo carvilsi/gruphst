@@ -521,7 +521,8 @@ impl Graphs {
     /// let _ = my_graph.persists();
     ///
     /// let name = my_graph.name;
-    /// let loaded_graphs = Graphs::load(&name);
+    /// let file_name = format!("{}.grphst", name);
+    /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
     ///         assert_eq!(loaded_graphs.name, name);
@@ -530,8 +531,7 @@ impl Graphs {
     ///     Err(_) => panic!(),
     /// }
     /// ```
-    pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
-        let file_name = format!("{}.grphst", name);
+    pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         debug!("Loading persisted file {}", &file_name);
         let mut read_file = File::open(file_name)?;
         let mut buffer = [0; MAX_STACK_SIZE];

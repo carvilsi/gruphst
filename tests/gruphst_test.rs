@@ -98,7 +98,8 @@ mod tests {
         let _ = gru.persists();
 
         let name = gru.name;
-        let grphs = Graphs::load(&name);
+        let file_name = format!("{}.grphst", name);
+        let grphs = Graphs::load(&file_name);
         match grphs {
             Ok(grphs) => {
                 assert_eq!(grphs.name, name);
@@ -241,6 +242,10 @@ mod tests {
         assert!(!graphs.is_empty());
     }
 
-
-    
+    #[test]
+    #[serial]
+    fn load_persisted_fail() {
+        assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
+        assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
+    }
 }
