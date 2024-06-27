@@ -13,7 +13,7 @@ use std::error::Error;
 use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
-use log::{ debug, info };
+use log::{ debug, info, error };
 
 const MAX_STACK_SIZE: usize = 10000;
 
@@ -194,9 +194,14 @@ pub struct Graphs {
     pub id: String,
 }
 
-pub struct GraphsStats {
+/// Represents stats data from the Graphs
+pub struct GraphsStats <'a> {
+    /// memory used by Graphs in bytes
     pub mem: usize,
+    /// length of the Grpahs
     pub len: usize,
+    /// name of the Graph
+    pub name: &'a str,
 }
 
 impl Graphs {
@@ -216,6 +221,49 @@ impl Graphs {
         };
         debug!("Created new Graphs: {:#?}", graphs);
         graphs
+    }
+
+    /// Retrieves the length of the Graphs
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{ Graphs, Node, Graph };
+    ///
+    /// let mut graphs = Graphs::new("lengths");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    ///
+    /// graphs.add(&Graph::new(&alice, "friend", &bob));
+    /// graphs.add(&Graph::new(&bob, "friend", &alice));
+    ///
+    /// assert_eq!(graphs.len(), 2);
+    /// ```
+    pub fn len(&self) -> usize {
+        debug!("Requested length for graphs, current length: {}",
+            self.graphs.len());
+        self.graphs.len()
+    }
+
+    /// Checks if the Graphs is empty
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{ Graphs, Node, Graph };
+    ///
+    /// let mut graphs = Graphs::new("lengths");
+    /// 
+    /// assert!(graphs.is_empty());
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    ///
+    /// graphs.add(&Graph::new(&alice, "friend", &bob));
+    /// graphs.add(&Graph::new(&bob, "friend", &alice));
+    ///
+    /// assert!(!graphs.is_empty());
+    /// ```
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
     
     /// Updates the name of the Graphs
@@ -254,7 +302,7 @@ impl Graphs {
         debug!("Added new graph to Graphs [{}]
             current length: {}",
             self.id,
-            self.graphs.len());
+            self.len());
         self.graphs.push(graph.clone());
     }
     
@@ -275,16 +323,26 @@ impl Graphs {
     /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
     /// assert_eq!(result_graph.len(), 1);
     /// ```
-    pub fn find_by_relation(&mut self, q: &str) -> Option<Vec<&Graph>> {
+    pub fn find_by_relation(
+        &mut self,
+        relation_name: &str
+    ) -> Result<Vec<&Graph>, &'static str> {
         let graphs = self.graphs
             .iter()
-            .filter(|grph| grph.relation == q)
+            .filter(|grph| grph.relation == relation_name)
             .collect::<Vec<&Graph>>();
-        debug!("Founded {} graphs with '{}' relation name", graphs.len(), q);
-        Some(graphs)
+        if !graphs.is_empty() {
+            debug!(
+                "Founded {} graphs with '{}' relation name",
+               graphs.len(), relation_name);
+            Ok(graphs)
+        } else {
+            error!("Any graph found for relation: {}", relation_name);
+            Err("Any graph found for relation")
+        }
     }
 
-    /// Returns a Graph that matches with the provided id
+    /// Returns a Graph that provided id matches with Graph, or From, To Nodes 
     ///
     /// # Examples
     /// ```rust
@@ -307,14 +365,22 @@ impl Graphs {
     /// let res = my_graph.find_by_id(&bob_node_id);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
-    pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
+    pub fn find_by_id(
+        &mut self,
+        id: &str
+    ) -> Result<&mut Graph, &'static str> {
         let graph = self.graphs
             .iter_mut()
             .find(|graph| graph.id == id ||
                    graph.from.id == id ||
                    graph.to.id == id);
-        debug!("Founded by id: {:#?}", graph);
-        graph
+        if graph.is_some() {
+            debug!("Founded Graph by id: {:#?}", graph);
+            Ok(graph.unwrap())
+        } else {
+            error!("Graph with id [{}] not found", id);
+            Err("Graph not found")
+        }
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -336,18 +402,26 @@ impl Graphs {
     ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
     /// my_graph.add(&alice_fred);
     ///
-    /// assert_eq!(my_graph.graphs.len(), 2);
+    /// assert_eq!(my_graph.len(), 2);
     ///
     /// my_graph.delete_graph_by_id(alice_bob.id); 
-    /// assert_eq!(my_graph.graphs.len(), 1);
+    /// assert_eq!(my_graph.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(&mut self, id: String) {
+    pub fn delete_graph_by_id(
+        &mut self,
+        id: String,
+    ) -> Result<(), &'static str> {
         let index = self.graphs
             .iter()
-            .position(|graph| graph.id == id)
-            .unwrap();
-        debug!("Delete graph: {}", id);
-        self.graphs.remove(index);
+            .position(|graph| graph.id == id);
+        if index.is_some() {
+            debug!("Delete graph: {}", id);
+            self.graphs.remove(index.unwrap());
+            Ok(())
+        } else {
+            error!("Graph [{}] to delete not found", id);
+            Err("Graph to delete not found")
+        }
     }
     
     /// Updates the Graphs with the provided one
@@ -372,26 +446,35 @@ impl Graphs {
     ///     Graph::new(&alice_node, "super friends", &fred_node);
     /// my_graphs.add(&alice_fred_graph);
     ///
-    /// assert_eq!(my_graphs.graphs.len(), 2);
+    /// assert_eq!(my_graphs.len(), 2);
     /// assert_eq!(my_graphs.graphs[1].relation, "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
     /// my_graphs.update_graph(&alice_fred_graph);
     /// 
-    /// assert_eq!(my_graphs.graphs.len(), 2);
+    /// assert_eq!(my_graphs.len(), 2);
     /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(&mut self, graph_to_update: &Graph) {
-        // TODO: add here something when the index is not found
+    pub fn update_graph(
+        &mut self,
+        graph_to_update: &Graph
+    ) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
         let index = self.graphs
             .iter()
-            .position(|graph| graph.id == graph_to_update.id)
-            .unwrap();
-        debug!("Graph to update found it at index: {index}");
-        self.graphs.remove(index);
-        self.graphs.push(graph_to_update.clone());
+            .position(|graph| graph.id == graph_to_update.id);
+        if index.is_some() {
+            let i = index.unwrap();
+            self.graphs.remove(i);
+            debug!("Graph to update found it at index: {i}");
+            self.graphs.push(graph_to_update.clone());
+            Ok(())
+        } else {
+            error!("Graph to update with id: [{}] not found",
+                graph_to_update.id);
+            Err("Graph not found")
+        }
     }
 
     /// Saves the current Graphs into a file with the Graphs's name
@@ -411,12 +494,12 @@ impl Graphs {
     ///
     /// my_graph.persists();
     /// ```
-    // XXX: Maybe append is not anymore the best way
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.name.replace(' ', "_"));
         let mut file = OpenOptions::new()
             .create(true)
-            .append(true)
+            .write(true)
+            .truncate(true)
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
@@ -442,7 +525,8 @@ impl Graphs {
     /// let _ = my_graph.persists();
     ///
     /// let name = my_graph.name;
-    /// let loaded_graphs = Graphs::load(&name);
+    /// let file_name = format!("{}.grphst", name);
+    /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
     ///         assert_eq!(loaded_graphs.name, name);
@@ -451,14 +535,13 @@ impl Graphs {
     ///     Err(_) => panic!(),
     /// }
     /// ```
-    pub fn load(name: &str) -> Result<Graphs, Box<dyn Error>> {
-        let file_name = format!("{}.grphst", name);
+    pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         debug!("Loading persisted file {}", &file_name);
         let mut read_file = File::open(file_name)?;
         let mut buffer = [0; MAX_STACK_SIZE];
         read_file.read(&mut buffer[..])?;
         let readed_graph: Graphs = bincode::deserialize(&buffer)?;
-        debug!("Loaded persisted file with {} Graphs", readed_graph.graphs.len());
+        debug!("Loaded persisted file with {} Graphs", readed_graph.len());
         Ok(readed_graph)
     }
 
@@ -482,6 +565,7 @@ impl Graphs {
     /// let stats = my_graphs.stats().unwrap();
     /// assert_eq!(stats.mem, 255);
     /// assert_eq!(stats.len, 1);
+    /// assert_eq!(stats.name, "memories");
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
@@ -490,10 +574,11 @@ impl Graphs {
             current length: {}",
             self.id, self.name,
             bytes.len(),
-            self.graphs.len());
+            self.len());
         let stats = GraphsStats {
             mem: bytes.len(),
-            len: self.graphs.len(),
+            len: self.len(),
+            name: &self.name,
         };
         Ok(stats)
     }
