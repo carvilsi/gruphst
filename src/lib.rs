@@ -13,7 +13,7 @@ use std::error::Error;
 use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
-use log::{ debug, info };
+use log::{ debug, info, error };
 
 const MAX_STACK_SIZE: usize = 10000;
 
@@ -275,13 +275,23 @@ impl Graphs {
     /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
     /// assert_eq!(result_graph.len(), 1);
     /// ```
-    pub fn find_by_relation(&mut self, q: &str) -> Option<Vec<&Graph>> {
+    pub fn find_by_relation(
+        &mut self,
+        relation_name: &str
+    ) -> Result<Vec<&Graph>, &'static str> {
         let graphs = self.graphs
             .iter()
-            .filter(|grph| grph.relation == q)
+            .filter(|grph| grph.relation == relation_name)
             .collect::<Vec<&Graph>>();
-        debug!("Founded {} graphs with '{}' relation name", graphs.len(), q);
-        Some(graphs)
+        if graphs.len() > 0 {
+            debug!(
+                "Founded {} graphs with '{}' relation name",
+                graphs.len(), relation_name);
+            Ok(Some(graphs).unwrap())
+        } else {
+            error!("Any graph found for relation: {}", relation_name);
+            Err("Any graph found for relation")
+        }
     }
 
     /// Returns a Graph that matches with the provided id
@@ -307,14 +317,22 @@ impl Graphs {
     /// let res = my_graph.find_by_id(&bob_node_id);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
-    pub fn find_by_id(&mut self, id: &str) -> Option<&mut Graph> {
+    pub fn find_by_id(
+        &mut self,
+        id: &str
+    ) -> Result<&mut Graph, &'static str> {
         let graph = self.graphs
             .iter_mut()
             .find(|graph| graph.id == id ||
                    graph.from.id == id ||
                    graph.to.id == id);
-        debug!("Founded by id: {:#?}", graph);
-        graph
+        if graph.is_some() {
+            debug!("Founded Graph by id: {:#?}", graph);
+            Ok(graph.unwrap())
+        } else {
+            error!("Graph with id [{}] not found", id);
+            Err("Graph not found")
+        }
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -341,13 +359,21 @@ impl Graphs {
     /// my_graph.delete_graph_by_id(alice_bob.id); 
     /// assert_eq!(my_graph.graphs.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(&mut self, id: String) {
+    pub fn delete_graph_by_id(
+        &mut self,
+        id: String,
+    ) -> Result<(), &'static str> {
         let index = self.graphs
             .iter()
-            .position(|graph| graph.id == id)
-            .unwrap();
-        debug!("Delete graph: {}", id);
-        self.graphs.remove(index);
+            .position(|graph| graph.id == id);
+        if index.is_some() {
+            debug!("Delete graph: {}", id);
+            self.graphs.remove(index.unwrap());
+            Ok(())
+        } else {
+            error!("Graph [{}] to delete not found", id);
+            Err("Graph to delete not found")
+        }
     }
     
     /// Updates the Graphs with the provided one
@@ -382,16 +408,25 @@ impl Graphs {
     /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(&mut self, graph_to_update: &Graph) {
-        // TODO: add here something when the index is not found
+    pub fn update_graph(
+        &mut self,
+        graph_to_update: &Graph
+    ) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
         let index = self.graphs
             .iter()
-            .position(|graph| graph.id == graph_to_update.id)
-            .unwrap();
-        debug!("Graph to update found it at index: {index}");
-        self.graphs.remove(index);
-        self.graphs.push(graph_to_update.clone());
+            .position(|graph| graph.id == graph_to_update.id);
+        if index.is_some() {
+            let i = index.unwrap();
+            self.graphs.remove(i);
+            debug!("Graph to update found it at index: {i}");
+            self.graphs.push(graph_to_update.clone());
+            Ok(())
+        } else {
+            error!("Graph to update with id: [{}] not found",
+                graph_to_update.id);
+            Err("Graph not found")
+        }
     }
 
     /// Saves the current Graphs into a file with the Graphs's name

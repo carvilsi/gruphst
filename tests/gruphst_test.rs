@@ -49,7 +49,6 @@ mod tests {
         assert_eq!(res_graphs.len(), 1);
         assert_eq!(res_graphs[0].relation, "knows");
 
-        // TODO: test when not found
         let res = gru.find_by_id(&node1.id);
         assert_eq!(res.unwrap().from.id, node1.id);
 
@@ -109,8 +108,23 @@ mod tests {
 
         assert_eq!(my_graph.graphs.len(), 2);
 
-        my_graph.delete_graph_by_id(alice_bob.id); 
+        let _ = my_graph.delete_graph_by_id(alice_bob.id); 
         assert_eq!(my_graph.graphs.len(), 1);
+    }
+
+    #[test]
+    fn delete_from_graph_fail() {
+        let mut my_graph = Graphs::new("failing");
+        assert!(
+            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
+        my_graph.add(
+            &Graph::new(
+                &Node::new("Alice"),
+                "is friend",
+                &Node::new("Bob")
+        ));
+        assert!(
+            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
     }
 
     #[test]
@@ -165,9 +179,36 @@ mod tests {
         graph = Graph::new(&peter, relation_friend_of, &john);
         graphs.add(&graph);
 
-        // XXX: Note that this could be arch dependent
+        // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
         assert_eq!(stats.len, 4);
         assert_eq!(stats.mem, 774);
+    }
+
+    #[test]
+    fn update_graph_fail() {
+        let mut grphs = Graphs::new("foobar");
+
+        let alice = Node::new("Alice");
+        let bob = Node::new("Bob");
+        let alice_bob = Graph::new(&alice, "friend of", &bob);
+        grphs.add(&alice_bob);
+
+        let bob_alice = Graph::new(&bob, "friend of", &alice);
+        assert!(grphs.update_graph(&bob_alice).is_err());
+    }
+
+    #[test]
+    fn find_in_graphs_failing() {
+        let mut my_graph = Graphs::new("failing");
+        assert!(my_graph.find_by_id("foobarid").is_err());
+        my_graph.add(
+            &Graph::new(
+                &Node::new("Alice"),
+                "is friend",
+                &Node::new("Bob")
+        ));
+        assert!(my_graph.find_by_id("foobarid").is_err());
+        assert!(my_graph.find_by_relation("lol").is_err());
     }
 }
