@@ -288,9 +288,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
@@ -310,9 +308,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
@@ -346,9 +342,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     /// 
     ///
     /// let mut my_graph = Graphs::new("friends");
@@ -387,9 +381,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     /// 
     ///
     /// let mut my_graph = Graphs::new("friends");
@@ -428,9 +420,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     /// 
     ///
     /// let mut my_graphs = Graphs::new("my-graphs");
@@ -481,9 +471,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     /// 
     ///
     /// let mut my_graph = Graphs::new("friends");
@@ -512,9 +500,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     ///
     /// let mut my_graph = Graphs::new("friends");
     /// let alice = Node::new("Alice");
@@ -538,6 +524,8 @@ impl Graphs {
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         debug!("Loading persisted file {}", &file_name);
         let mut read_file = File::open(file_name)?;
+        // TODO: change this fixed size buffer reading
+        // to something more flexible.
         let mut buffer = [0; MAX_STACK_SIZE];
         read_file.read(&mut buffer[..])?;
         let readed_graph: Graphs = bincode::deserialize(&buffer)?;
@@ -549,9 +537,7 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::Graphs;
-    /// use gruphst::Node;
-    /// use gruphst::Graph;
+    /// use gruphst::{ Graphs, Node, Graph };
     ///
     /// let mut my_graphs = Graphs::new("memories");
     /// my_graphs.add(

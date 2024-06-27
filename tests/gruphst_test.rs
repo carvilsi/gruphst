@@ -80,7 +80,6 @@ mod tests {
         assert_eq!(res_graphs[1].relation, "friend of");
     }
     
-    // TODO: Add a test when the file has not correct data
     #[test]
     #[serial]
     fn persistence() {
@@ -249,3 +248,4 @@ mod tests {
         assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
     }
 }
+
