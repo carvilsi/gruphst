@@ -14,6 +14,7 @@ use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
 use log::{ debug, info, error };
+use std::collections::HashMap;
 
 const MAX_STACK_SIZE: usize = 10000;
 
@@ -38,6 +39,7 @@ pub struct Node {
     pub id: String,
     /// And a name
     pub name: String,
+    attr: HashMap<String, String>,
 }
 
 impl Node {
@@ -52,7 +54,8 @@ impl Node {
     pub fn new(name: &str) -> Self {
         let node = Node {
             name: String::from(name),
-            id: Uuid::new_v4().to_string()
+            id: Uuid::new_v4().to_string(),
+            attr: HashMap::new(),
         };
         debug!("The created node: {:#?}", &node);
         node
@@ -73,6 +76,32 @@ impl Node {
     pub fn update_name(&mut self, name: &str) {
         debug!("Updated Node [{}] with name: {}", self.id, name);
         self.name = name.to_string();
+    }
+
+    pub fn set_attr<T>(
+        &mut self,
+        attr_k: String,
+        attr_v: T)
+    where T: std::fmt::Display,
+    {
+        self.attr.insert(attr_k, attr_v.to_string());
+    }
+
+    pub fn get_attr(
+        &self,
+        attr_k: String,
+    //) -> Result<&String, &'static str> {
+    ) -> &String {
+        println!("LoL--------");
+        let res = self.attr.get(&attr_k);
+        res.unwrap()
+        //match res {
+            //Some(res) => {
+                //println!("------");
+                //Ok(res)
+            //}
+            //None => Err("not found"),
+        //}
     }
 }
 
@@ -549,7 +578,7 @@ impl Graphs {
     /// );
     ///
     /// let stats = my_graphs.stats().unwrap();
-    /// assert_eq!(stats.mem, 255);
+    /// assert_eq!(stats.mem, 271);
     /// assert_eq!(stats.len, 1);
     /// assert_eq!(stats.name, "memories");
     /// ```

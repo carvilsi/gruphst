@@ -206,7 +206,7 @@ mod tests {
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
         assert_eq!(stats.len, 4);
-        assert_eq!(stats.mem, 774);
+        assert_eq!(stats.mem, 838);
         assert_eq!(stats.name, "friends-and-enemies");
     }
 
@@ -246,6 +246,14 @@ mod tests {
     fn load_persisted_fail() {
         assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
         assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
+    }
+
+    #[test]
+    #[serial]
+    fn attributes() {
+        let mut alice = Node::new("Alice");
+        alice.set_attr("age".to_string(), 5);
+        assert_eq!(alice.get_attr("age".to_string()), "5");
     }
 }
 
