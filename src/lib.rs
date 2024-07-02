@@ -90,9 +90,24 @@ impl Node {
     pub fn get_attr(
         &self,
         attr_k: &str,
-    ) -> &String {
+    ) -> Result<&String, &'static str> {
         let res = self.attr.get(attr_k);
-        res.unwrap()
+        match res {
+            Some(res) => Ok(res),
+            None => Err("attribute not found"),
+        }
+    }
+
+    pub fn len_attr(&self) -> usize {
+        self.attr.len()
+    }
+
+    pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
+        let res = self.attr.remove(v);
+        match res {
+            Some(_) => Ok(()),
+            None => Err("attribute not found for remove"),
+        }
     }
 }
 

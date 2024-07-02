@@ -252,11 +252,16 @@ mod tests {
     #[serial]
     fn attributes() {
         let mut alice = Node::new("Alice");
+        assert_eq!(alice.len_attr(), 0);
         alice.set_attr("address", "Elm Street");
-        assert_eq!(alice.get_attr("address"), "Elm Street");
+        assert_eq!(alice.get_attr("address").unwrap(), "Elm Street");
+        assert_eq!(alice.len_attr(), 1);
         alice.set_attr("age", 5);
-        assert_eq!(alice.get_attr("age"), "5");
-        assert!(alice.get_attr("ages").is_err());
+        assert_eq!(alice.get_attr("age").unwrap(), "5");
+        assert_eq!(alice.len_attr(), 2);
+        assert!(alice.get_attr("phone").is_err());
+        let _ = alice.del_attr("age");
+        assert_eq!(alice.len_attr(), 1);
     }
 }
 
