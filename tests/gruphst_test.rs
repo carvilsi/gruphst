@@ -84,7 +84,8 @@ mod tests {
     #[serial]
     fn persistence() {
         let mut gru = Graphs::new("graphs-a");
-        let node1 = Node::new("a node");
+        let mut node1 = Node::new("a node");
+        node1.set_attr("foo", "bar");
         let node2 = Node::new("b node");
         let graph1 = Graph::new(&node1, "relation a-b", &node2);
         gru.add(&graph1);
@@ -103,6 +104,9 @@ mod tests {
             Ok(grphs) => {
                 assert_eq!(grphs.name, name);
                 assert_eq!(grphs.graphs[0].relation, graph1.relation);
+                assert_eq!(grphs.graphs[0].from.name, "a node");
+                assert_eq!(grphs.graphs[0].from.len_attr(), 1);
+                assert_eq!(grphs.graphs[0].from.get_attr("foo").unwrap(), "bar");
                 assert_eq!(grphs.graphs[1], graph2);
             },
             Err(_) => panic!(),
