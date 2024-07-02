@@ -80,28 +80,19 @@ impl Node {
 
     pub fn set_attr<T>(
         &mut self,
-        attr_k: String,
+        attr_k: &str,
         attr_v: T)
     where T: std::fmt::Display,
     {
-        self.attr.insert(attr_k, attr_v.to_string());
+        self.attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
     pub fn get_attr(
         &self,
-        attr_k: String,
-    //) -> Result<&String, &'static str> {
+        attr_k: &str,
     ) -> &String {
-        println!("LoL--------");
-        let res = self.attr.get(&attr_k);
+        let res = self.attr.get(attr_k);
         res.unwrap()
-        //match res {
-            //Some(res) => {
-                //println!("------");
-                //Ok(res)
-            //}
-            //None => Err("not found"),
-        //}
     }
 }
 
