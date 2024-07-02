@@ -135,7 +135,7 @@ impl Node {
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 5);
+    /// node.set_attr("age", 25);
     /// assert_eq!(node.len_attr(), 2);
     /// ```
     pub fn len_attr(&self) -> usize {
@@ -151,7 +151,7 @@ impl Node {
     /// let mut node = Node::new("Alice");
     /// assert!(node.is_empty_attr());
     /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 5);
+    /// node.set_attr("age", 25);
     /// assert!(!node.is_empty_attr());
     /// ```
     pub fn is_empty_attr(&self) -> bool {
@@ -305,13 +305,18 @@ pub struct Graphs {
 }
 
 /// Represents stats data from the Graphs
+#[derive(Debug)]
 pub struct GraphsStats <'a> {
     /// memory used by Graphs in bytes
     pub mem: usize,
-    /// length of the Grpahs
+    /// length of the Graphs
     pub len: usize,
     /// name of the Graph
     pub name: &'a str,
+    /// total attributes
+    pub total_attributes: usize,
+    /// total nodes
+    pub total_nodes: usize,
 }
 
 impl Graphs {
@@ -492,7 +497,6 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::{ Graphs, Node, Graph };
-    /// 
     ///
     /// let mut my_graph = Graphs::new("friends");
     /// let alice = Node::new("Alice");
@@ -665,17 +669,20 @@ impl Graphs {
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
-        debug!("Graphs [{}] '{} stats:'
-            current size: {} bytes
-            current length: {}",
-            self.id, self.name,
-            bytes.len(),
-            self.len());
+        let mut attr_counter = 0;
+        for graph in self.graphs.iter() {
+            attr_counter += graph.from.len_attr();
+            attr_counter += graph.to.len_attr();
+        }
+
         let stats = GraphsStats {
             mem: bytes.len(),
             len: self.len(),
             name: &self.name,
+            total_attributes: attr_counter,
+            total_nodes: self.len() * 2,
         };
+        debug!("Graphs stats: {:#?}", stats);
         Ok(stats)
     }
 }

@@ -188,12 +188,20 @@ mod tests {
     fn graphs_stats() {
         let mut graphs = Graphs::new("friends-and-enemies");
 
-        let alice = Node::new("Alice");
-        let bob = Node::new("Bob");
+        let mut alice = Node::new("Alice");
+        let mut bob = Node::new("Bob");
         let fred = Node::new("Fred");
         let john = Node::new("John");
         let peter = Node::new("Peter");
-        
+
+        alice.set_attr("address", "Elm street");
+        alice.set_attr("email", "alice@mailinator.com");
+        alice.set_attr("age", 35);
+ 
+        bob.set_attr("address", "Talbot street");
+        bob.set_attr("email", "bob@mailinator.com");
+        bob.set_attr("age", 40);
+       
         let relation_friend_of = "friend_of";
         let mut graph = Graph::new(&alice, relation_friend_of, &bob);
         graphs.add(&graph);
@@ -210,7 +218,9 @@ mod tests {
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
         assert_eq!(stats.len, 4);
-        assert_eq!(stats.mem, 838);
+        assert_eq!(stats.total_nodes, 8);
+        assert_eq!(stats.total_attributes, 12);
+        assert_eq!(stats.mem, 1219);
         assert_eq!(stats.name, "friends-and-enemies");
     }
 
@@ -261,8 +271,8 @@ mod tests {
         alice.set_attr("address", "Elm Street");
         assert_eq!(alice.get_attr("address").unwrap(), "Elm Street");
         assert_eq!(alice.len_attr(), 1);
-        alice.set_attr("age", 5);
-        assert_eq!(alice.get_attr("age").unwrap(), "5");
+        alice.set_attr("age", 34);
+        assert_eq!(alice.get_attr("age").unwrap(), "34");
         assert_eq!(alice.len_attr(), 2);
         assert!(alice.get_attr("phone").is_err());
         let _ = alice.del_attr("age");
