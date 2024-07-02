@@ -253,6 +253,7 @@ mod tests {
     fn attributes() {
         let mut alice = Node::new("Alice");
         assert_eq!(alice.len_attr(), 0);
+        assert!(alice.is_empty_attr());
         alice.set_attr("address", "Elm Street");
         assert_eq!(alice.get_attr("address").unwrap(), "Elm Street");
         assert_eq!(alice.len_attr(), 1);
@@ -262,6 +263,7 @@ mod tests {
         assert!(alice.get_attr("phone").is_err());
         let _ = alice.del_attr("age");
         assert_eq!(alice.len_attr(), 1);
+        assert!(!alice.is_empty_attr());
     }
 }
 

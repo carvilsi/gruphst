@@ -13,7 +13,7 @@ use std::error::Error;
 use serde::{ Deserialize, Serialize };
 use uuid::Uuid;
 use std::fs::OpenOptions;
-use log::{ debug, info, error };
+use log::{ debug, info, error, warn };
 use std::collections::HashMap;
 
 const MAX_STACK_SIZE: usize = 10000;
@@ -78,35 +78,110 @@ impl Node {
         self.name = name.to_string();
     }
 
+    /// Set attributes for a Node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// ```
     pub fn set_attr<T>(
         &mut self,
         attr_k: &str,
         attr_v: T)
     where T: std::fmt::Display,
     {
+        debug!("added attribute key: {} with value {} for node {}",
+            attr_k, attr_v, self.id);
         self.attr.insert(attr_k.to_string(), attr_v.to_string());
     }
-
+    
+    /// Get attributes for a Node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// let attr = node.get_attr("Address").unwrap();
+    /// assert_eq!(attr, "Elm street"); 
+    /// ```
     pub fn get_attr(
         &self,
         attr_k: &str,
     ) -> Result<&String, &'static str> {
         let res = self.attr.get(attr_k);
         match res {
-            Some(res) => Ok(res),
-            None => Err("attribute not found"),
+            Some(res) => {
+                debug!("retrieved attribute value '{}' for '{}' for node [{}]",
+                    res, attr_k, self.id);
+                Ok(res)
+            }
+            None => { 
+                warn!("attribute '{}' not found", attr_k); 
+                Err("attribute not found")
+            }
         }
     }
-
+    
+    /// Retrieves the lenght of attributes for a Node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 5);
+    /// assert_eq!(node.len_attr(), 2);
+    /// ```
     pub fn len_attr(&self) -> usize {
         self.attr.len()
     }
-
+    
+    /// Checks if attributes for a Node is empty
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// assert!(node.is_empty_attr());
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 5);
+    /// assert!(!node.is_empty_attr());
+    /// ```
+    pub fn is_empty_attr(&self) -> bool {
+        self.len_attr() == 0
+    }
+    
+    /// Deletes an attribute for a Node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// assert!(node.is_empty_attr());
+    /// node.set_attr("Address", "Elm street");
+    /// assert!(!node.is_empty_attr());
+    /// node.del_attr("Address");
+    /// assert!(node.is_empty_attr());
+    /// ```
     pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.attr.remove(v);
         match res {
-            Some(_) => Ok(()),
-            None => Err("attribute not found for remove"),
+            Some(_) => { 
+                debug!("Removed '{}' attribute for {}", v, self.id); 
+                Ok(())
+            }
+            None => { 
+                warn!("attribute {} not found for remove", v);
+                Err("attribute not found for remove")
+            }
         }
     }
 }
