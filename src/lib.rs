@@ -126,7 +126,63 @@ impl Node {
             }
         }
     }
-    
+
+    /// Returns an Array containing all attribute keys
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 44);
+    /// let keys = node.get_attr_keys();
+    /// assert!(keys.contains(&&"Address"));
+    /// assert!(keys.contains(&&"age"));
+    /// ```
+    pub fn get_attr_keys(&self) -> Vec<&str> {
+        let mut key_vec = Vec::new();
+        for key in self.attr.keys() {
+            key_vec.push(key.as_str());
+        }
+        debug!("requested array of attributes for {} node {:#?}",
+            self.id,
+            key_vec);
+        key_vec
+    }
+
+    /// Updates the value of an attribute
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 44);
+    ///
+    /// assert_eq!(node.get_attr("age").unwrap(), "44");
+    ///
+    /// node.update_attr("age", 55);
+    /// assert_eq!(node.get_attr("age").unwrap(), "55");
+    /// ```
+    // TODO: maybe add a upsert function????
+    pub fn update_attr<T>(
+        &mut self,
+        attr_k: &str,
+        attr_v: T
+    ) -> Result<(), &'static str>
+    where T: std::fmt::Display,
+    {
+        debug!("updated attribute key: {} with value {} for node {}",
+            attr_k, attr_v, self.id);
+        if let Some(attr) = self.attr.get_mut(attr_k) {
+            *attr = attr_v.to_string();
+            return Ok(());
+        }
+        Err("not attribute found to update")
+    }
+
     /// Retrieves the lenght of attributes for a Node
     ///
     /// # Examples
@@ -669,6 +725,7 @@ impl Graphs {
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
+        // lets count the amount of attributes in the graph
         let mut attr_counter = 0;
         for graph in self.graphs.iter() {
             attr_counter += graph.from.len_attr();

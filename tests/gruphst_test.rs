@@ -273,7 +273,12 @@ mod tests {
         assert_eq!(alice.len_attr(), 1);
         alice.set_attr("age", 34);
         assert_eq!(alice.get_attr("age").unwrap(), "34");
+        let _ = alice.update_attr("age", 43);
+        assert_eq!(alice.get_attr("age").unwrap(), "43");
         assert_eq!(alice.len_attr(), 2);
+        let attrs = alice.get_attr_keys();
+        assert!(attrs.contains(&&"age"));
+        assert!(attrs.contains(&&"address"));
         assert!(alice.get_attr("phone").is_err());
         let _ = alice.del_attr("age");
         assert_eq!(alice.len_attr(), 1);
