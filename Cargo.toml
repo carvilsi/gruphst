@@ -8,6 +8,8 @@ documentation = "https://docs.rs/gruphst"
 readme = "README.md"
 repository = "https://github.com/carvilsi/gruphst"
 homepage = "https://github.com/carvilsi/gruphst"
+keywords = ["graph-database", "in-memory-database", "persistence"]
+categories = ["database"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
