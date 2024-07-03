@@ -11,7 +11,19 @@
 
 An in-memory graph database.
  
-Possible to persists on file.
+Possible to persists on file (just because if something that we always expect from an in-memory databases).
+
+Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
+
+
+To run tests:
+
+`$ cargo test`
+
+To run tests with debug output:
+
+`$ cargo test -- --show-output`
+
 
 ## Nodes
 
