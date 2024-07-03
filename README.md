@@ -15,14 +15,26 @@ Possible to persists on file (just because if something that we always expect fr
 
 Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
 
+[Documentation](https://docs.rs/gruphst/latest/gruphst/)
 
-To run tests:
+
+**To run tests**
 
 `$ cargo test`
 
 To run tests with debug output:
 
 `$ cargo test -- --show-output`
+
+**Install**
+
+Run the following Cargo command in your project directory:
+
+`$ cargo add gruphst`
+
+Or add the following line to your Cargo.toml:
+
+`gruphst = "0.1.0"`
 
 
 ## Nodes
