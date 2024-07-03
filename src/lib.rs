@@ -734,7 +734,8 @@ impl Graphs {
         Ok(readed_graph)
     }
 
-    /// Returns the current size of Graphs in bytes
+    /// Returns stats from Graphs; size in bytes, amount of graph, name, total number of attributes
+    /// and total amount of Nodes
     ///
     /// # Examples
     /// ```rust
