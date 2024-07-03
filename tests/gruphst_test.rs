@@ -274,5 +274,11 @@ mod tests {
         let _ = alice.del_attr("age");
         assert_eq!(alice.len_attr(), 1);
         assert!(!alice.is_empty_attr());
+        alice.upsert_attr("phone", "555-555-555");
+        assert_eq!(alice.get_attr("phone").unwrap(), "555-555-555");
+        assert_eq!(alice.len_attr(), 2);
+        alice.upsert_attr("phone", "556-554-553");
+        assert_eq!(alice.get_attr("phone").unwrap(), "556-554-553");
+        assert_eq!(alice.len_attr(), 2);
     }
 }

@@ -90,11 +90,11 @@ impl Node {
     where
         T: std::fmt::Display,
     {
+        self.attr.insert(attr_k.to_string(), attr_v.to_string());
         debug!(
             "added attribute key: {} with value {} for node {}",
             attr_k, attr_v, self.id
         );
-        self.attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
     /// Get attributes for a Node
@@ -165,7 +165,6 @@ impl Node {
     /// node.update_attr("age", 55);
     /// assert_eq!(node.get_attr("age").unwrap(), "55");
     /// ```
-    // TODO: maybe add a upsert method????
     pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
@@ -179,6 +178,44 @@ impl Node {
             return Ok(());
         }
         Err("not attribute found to update")
+    }
+
+    /// Updates the value of an attribute or creates a new one if attribute key does not exists
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// assert_eq!(node.len_attr(), 1);
+    /// node.upsert_attr("age", 44);
+    /// assert_eq!(node.len_attr(), 2);
+    /// assert_eq!(node.get_attr("age").unwrap(), "44");
+    ///
+    /// node.upsert_attr("age", 55);
+    /// assert_eq!(node.get_attr("age").unwrap(), "55");
+    /// ```
+    pub fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    where
+        T: std::fmt::Display,
+    {
+        match self.attr.get_mut(attr_k) {
+            Some(attr) => {
+                *attr = attr_v.to_string();
+                debug!(
+                    "updated (upsert) attribute key: {} with value {} for node {}",
+                    attr_k, attr_v, self.id
+                );
+            }
+            None => {
+                self.attr.insert(attr_k.to_string(), attr_v.to_string());
+                debug!(
+                    "added (upsert) attribute key: {} with value {} for node {}",
+                    attr_k, attr_v, self.id
+                );
+            }
+        }
     }
 
     /// Retrieves the lenght of attributes for a Node
