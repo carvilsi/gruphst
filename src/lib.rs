@@ -1,20 +1,20 @@
 //! Gruphst
 //!
 //! An in-memory graph database.
-//! 
+//!
 //! Possible to persists on file.
 
 #![allow(clippy::unused_io_amount)]
 
-use std::io::Write;
-use std::io::Read;
-use std::fs::File;
-use std::error::Error;
-use serde::{ Deserialize, Serialize };
-use uuid::Uuid;
-use std::fs::OpenOptions;
-use log::{ debug, info, error, warn };
+use log::{debug, error, info, warn};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::error::Error;
+use std::fs::File;
+use std::fs::OpenOptions;
+use std::io::Read;
+use std::io::Write;
+use uuid::Uuid;
 
 const MAX_STACK_SIZE: usize = 10000;
 
@@ -32,8 +32,7 @@ pub fn enable_logging(level: log::Level) {
 }
 
 /// Representation of a Node
-#[derive(Debug, Clone, PartialEq)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Node {
     /// A Node consists on a uuid as identifier
     pub id: String,
@@ -66,7 +65,7 @@ impl Node {
     /// # Examples
     /// ```rust
     /// use gruphst::Node;
-    /// 
+    ///
     ///
     /// let mut node = Node::new("alice node");
     /// assert_eq!(node.name, "alice node");
@@ -87,17 +86,17 @@ impl Node {
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
     /// ```
-    pub fn set_attr<T>(
-        &mut self,
-        attr_k: &str,
-        attr_v: T)
-    where T: std::fmt::Display,
+    pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    where
+        T: std::fmt::Display,
     {
-        debug!("added attribute key: {} with value {} for node {}",
-            attr_k, attr_v, self.id);
+        debug!(
+            "added attribute key: {} with value {} for node {}",
+            attr_k, attr_v, self.id
+        );
         self.attr.insert(attr_k.to_string(), attr_v.to_string());
     }
-    
+
     /// Get attributes for a Node
     ///
     /// # Examples
@@ -107,21 +106,20 @@ impl Node {
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
     /// let attr = node.get_attr("Address").unwrap();
-    /// assert_eq!(attr, "Elm street"); 
+    /// assert_eq!(attr, "Elm street");
     /// ```
-    pub fn get_attr(
-        &self,
-        attr_k: &str,
-    ) -> Result<&String, &'static str> {
+    pub fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
         let res = self.attr.get(attr_k);
         match res {
             Some(res) => {
-                debug!("retrieved attribute value '{}' for '{}' for node [{}]",
-                    res, attr_k, self.id);
+                debug!(
+                    "retrieved attribute value '{}' for '{}' for node [{}]",
+                    res, attr_k, self.id
+                );
                 Ok(res)
             }
-            None => { 
-                warn!("attribute '{}' not found", attr_k); 
+            None => {
+                warn!("attribute '{}' not found", attr_k);
                 Err("attribute not found")
             }
         }
@@ -145,9 +143,10 @@ impl Node {
         for key in self.attr.keys() {
             key_vec.push(key.as_str());
         }
-        debug!("requested array of attributes for {} node {:#?}",
-            self.id,
-            key_vec);
+        debug!(
+            "requested array of attributes for {} node {:#?}",
+            self.id, key_vec
+        );
         key_vec
     }
 
@@ -167,15 +166,14 @@ impl Node {
     /// assert_eq!(node.get_attr("age").unwrap(), "55");
     /// ```
     // TODO: maybe add a upsert function????
-    pub fn update_attr<T>(
-        &mut self,
-        attr_k: &str,
-        attr_v: T
-    ) -> Result<(), &'static str>
-    where T: std::fmt::Display,
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    where
+        T: std::fmt::Display,
     {
-        debug!("updated attribute key: {} with value {} for node {}",
-            attr_k, attr_v, self.id);
+        debug!(
+            "updated attribute key: {} with value {} for node {}",
+            attr_k, attr_v, self.id
+        );
         if let Some(attr) = self.attr.get_mut(attr_k) {
             *attr = attr_v.to_string();
             return Ok(());
@@ -197,7 +195,7 @@ impl Node {
     pub fn len_attr(&self) -> usize {
         self.attr.len()
     }
-    
+
     /// Checks if attributes for a Node is empty
     ///
     /// # Examples
@@ -213,7 +211,7 @@ impl Node {
     pub fn is_empty_attr(&self) -> bool {
         self.len_attr() == 0
     }
-    
+
     /// Deletes an attribute for a Node
     ///
     /// # Examples
@@ -230,11 +228,11 @@ impl Node {
     pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.attr.remove(v);
         match res {
-            Some(_) => { 
-                debug!("Removed '{}' attribute for {}", v, self.id); 
+            Some(_) => {
+                debug!("Removed '{}' attribute for {}", v, self.id);
                 Ok(())
             }
-            None => { 
+            None => {
                 warn!("attribute {} not found for remove", v);
                 Err("attribute not found for remove")
             }
@@ -243,12 +241,11 @@ impl Node {
 }
 
 /// Representation of a Graph, relating two nodes
-#[derive(Debug, Clone, PartialEq)]
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Graph {
     /// A Graph has an uuid
     pub id: String,
-    /// A name fot the relation 
+    /// A name fot the relation
     pub relation: String,
     /// Origin node
     pub from: Node,
@@ -266,11 +263,11 @@ impl Graph {
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = 
+    /// let alice_bob_graph =
     ///     Graph::new(&alice, "friend of", &bob);
     /// ```
     pub fn new(from: &Node, relation: &str, to: &Node) -> Self {
-        let graph = Graph { 
+        let graph = Graph {
             relation: String::from(relation),
             id: Uuid::new_v4().to_string(),
             from: from.clone(),
@@ -286,12 +283,12 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// 
+    ///
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let mut alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// 
+    ///
     /// assert_eq!(alice_bob_graph.relation, "friend of");
     ///
     /// alice_bob_graph.update_relation("best friends");
@@ -301,14 +298,14 @@ impl Graph {
         debug!("Updated Graph [{}] with Relation: {}", self.id, relation);
         self.relation = relation.to_string();
     }
-    
+
     /// Updates the "from" node in Graph
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// 
+    ///
     ///
     /// let mut alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
@@ -330,7 +327,7 @@ impl Graph {
     /// ```rust
     /// use gruphst::Node;
     /// use gruphst::Graph;
-    /// 
+    ///
     ///
     /// let alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
@@ -348,9 +345,8 @@ impl Graph {
     }
 }
 
-/// A colection of Graph 
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
+/// A colection of Graph
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
     /// The collection of Graph
     pub graphs: Vec<Graph>,
@@ -362,7 +358,7 @@ pub struct Graphs {
 
 /// Represents stats data from the Graphs
 #[derive(Debug)]
-pub struct GraphsStats <'a> {
+pub struct GraphsStats<'a> {
     /// memory used by Graphs in bytes
     pub mem: usize,
     /// length of the Graphs
@@ -386,7 +382,7 @@ impl Graphs {
     /// ```
     pub fn new(name: &str) -> Self {
         let graphs = Graphs {
-            name: String::from(name), 
+            name: String::from(name),
             id: Uuid::new_v4().to_string(),
             graphs: vec![],
         };
@@ -410,8 +406,10 @@ impl Graphs {
     /// assert_eq!(graphs.len(), 2);
     /// ```
     pub fn len(&self) -> usize {
-        debug!("Requested length for graphs, current length: {}",
-            self.graphs.len());
+        debug!(
+            "Requested length for graphs, current length: {}",
+            self.graphs.len()
+        );
         self.graphs.len()
     }
 
@@ -422,7 +420,7 @@ impl Graphs {
     /// use gruphst::{ Graphs, Node, Graph };
     ///
     /// let mut graphs = Graphs::new("lengths");
-    /// 
+    ///
     /// assert!(graphs.is_empty());
     ///
     /// let alice = Node::new("Alice");
@@ -436,13 +434,13 @@ impl Graphs {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    
+
     /// Updates the name of the Graphs
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::Graphs;
-    /// 
+    ///
     ///
     /// let mut my_graph = Graphs::new("my_graph");
     /// assert_eq!(my_graph.name, "my_graph");
@@ -468,14 +466,16 @@ impl Graphs {
     /// my_graph.add(&alice_bob_graph);
     /// ```
     pub fn add(&mut self, graph: &Graph) {
-        debug!("Added new graph to Graphs [{}]
+        debug!(
+            "Added new graph to Graphs [{}]
             current length: {}",
             self.id,
-            self.len());
+            self.len()
+        );
         self.graphs.push(graph.clone());
     }
-    
-    /// Returns a collection of Graps elements that matches the relation 
+
+    /// Returns a collection of Graps elements that matches the relation
     ///
     /// # Examples
     /// ```rust
@@ -490,18 +490,18 @@ impl Graphs {
     /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
     /// assert_eq!(result_graph.len(), 1);
     /// ```
-    pub fn find_by_relation(
-        &mut self,
-        relation_name: &str
-    ) -> Result<Vec<&Graph>, &'static str> {
-        let graphs = self.graphs
+    pub fn find_by_relation(&mut self, relation_name: &str) -> Result<Vec<&Graph>, &'static str> {
+        let graphs = self
+            .graphs
             .iter()
             .filter(|grph| grph.relation == relation_name)
             .collect::<Vec<&Graph>>();
         if !graphs.is_empty() {
             debug!(
                 "Founded {} graphs with '{}' relation name",
-               graphs.len(), relation_name);
+                graphs.len(),
+                relation_name
+            );
             Ok(graphs)
         } else {
             error!("Any graph found for relation: {}", relation_name);
@@ -509,12 +509,12 @@ impl Graphs {
         }
     }
 
-    /// Returns a Graph that provided id matches with Graph, or From, To Nodes 
+    /// Returns a Graph that provided id matches with Graph, or From, To Nodes
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::{ Graphs, Node, Graph };
-    /// 
+    ///
     ///
     /// let mut my_graph = Graphs::new("friends");
     /// let alice = Node::new("Alice");
@@ -525,20 +525,16 @@ impl Graphs {
     /// let alice_fred =
     ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
     /// my_graph.add(&alice_fred);
-    /// 
-    /// let bob_node_id = bob.id; 
+    ///
+    /// let bob_node_id = bob.id;
     /// let res = my_graph.find_by_id(&bob_node_id);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
-    pub fn find_by_id(
-        &mut self,
-        id: &str
-    ) -> Result<&mut Graph, &'static str> {
-        let graph = self.graphs
+    pub fn find_by_id(&mut self, id: &str) -> Result<&mut Graph, &'static str> {
+        let graph = self
+            .graphs
             .iter_mut()
-            .find(|graph| graph.id == id ||
-                   graph.from.id == id ||
-                   graph.to.id == id);
+            .find(|graph| graph.id == id || graph.from.id == id || graph.to.id == id);
         if graph.is_some() {
             debug!("Founded Graph by id: {:#?}", graph);
             Ok(graph.unwrap())
@@ -566,16 +562,11 @@ impl Graphs {
     ///
     /// assert_eq!(my_graph.len(), 2);
     ///
-    /// my_graph.delete_graph_by_id(alice_bob.id); 
+    /// my_graph.delete_graph_by_id(alice_bob.id);
     /// assert_eq!(my_graph.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(
-        &mut self,
-        id: String,
-    ) -> Result<(), &'static str> {
-        let index = self.graphs
-            .iter()
-            .position(|graph| graph.id == id);
+    pub fn delete_graph_by_id(&mut self, id: String) -> Result<(), &'static str> {
+        let index = self.graphs.iter().position(|graph| graph.id == id);
         if index.is_some() {
             debug!("Delete graph: {}", id);
             self.graphs.remove(index.unwrap());
@@ -585,13 +576,13 @@ impl Graphs {
             Err("Graph to delete not found")
         }
     }
-    
+
     /// Updates the Graphs with the provided one
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::{ Graphs, Node, Graph };
-    /// 
+    ///
     ///
     /// let mut my_graphs = Graphs::new("my-graphs");
     ///
@@ -602,7 +593,7 @@ impl Graphs {
     /// my_graphs.add(&alice_bob_graph);
     ///
     /// let fred_node = Node::new("Fred");
-    /// let mut alice_fred_graph = 
+    /// let mut alice_fred_graph =
     ///     Graph::new(&alice_node, "super friends", &fred_node);
     /// my_graphs.add(&alice_fred_graph);
     ///
@@ -611,17 +602,15 @@ impl Graphs {
     ///
     /// alice_fred_graph.update_relation("besties");
     /// my_graphs.update_graph(&alice_fred_graph);
-    /// 
+    ///
     /// assert_eq!(my_graphs.len(), 2);
     /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(
-        &mut self,
-        graph_to_update: &Graph
-    ) -> Result<(), &'static str> {
+    pub fn update_graph(&mut self, graph_to_update: &Graph) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
-        let index = self.graphs
+        let index = self
+            .graphs
             .iter()
             .position(|graph| graph.id == graph_to_update.id);
         if index.is_some() {
@@ -631,8 +620,10 @@ impl Graphs {
             self.graphs.push(graph_to_update.clone());
             Ok(())
         } else {
-            error!("Graph to update with id: [{}] not found",
-                graph_to_update.id);
+            error!(
+                "Graph to update with id: [{}] not found",
+                graph_to_update.id
+            );
             Err("Graph not found")
         }
     }
@@ -642,7 +633,7 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::{ Graphs, Node, Graph };
-    /// 
+    ///
     ///
     /// let mut my_graph = Graphs::new("friends");
     /// let alice = Node::new("Alice");
@@ -661,8 +652,11 @@ impl Graphs {
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
-        info!("Current Graphs persisted at {} file with {} bytes written",
-            file_name, bytes.len());
+        info!(
+            "Current Graphs persisted at {} file with {} bytes written",
+            file_name,
+            bytes.len()
+        );
         Ok(())
     }
 
@@ -743,4 +737,3 @@ impl Graphs {
         Ok(stats)
     }
 }
-

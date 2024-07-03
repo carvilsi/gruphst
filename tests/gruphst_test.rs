@@ -1,26 +1,25 @@
-use gruphst::{ Graphs, Graph, Node };
 use gruphst::enable_logging;
+use gruphst::{Graph, Graphs, Node};
 use serial_test::serial;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
-    #[test] 
+
+    #[test]
     #[serial]
     fn logg() {
         enable_logging(log::Level::Debug);
-    }  
-    
+    }
+
     #[test]
     #[serial]
     fn find_in_graphs_failing() {
         let mut my_graph = Graphs::new("failing");
-        my_graph.add(
-            &Graph::new(
-                &Node::new("Alice"),
-                "is friend",
-                &Node::new("Bob")
+        my_graph.add(&Graph::new(
+            &Node::new("Alice"),
+            "is friend",
+            &Node::new("Bob"),
         ));
         assert!(my_graph.find_by_id("foobarid").is_err());
         assert!(my_graph.find_by_relation("lol").is_err());
@@ -63,7 +62,7 @@ mod tests {
         gru.add(&graph2);
         assert_eq!(gru.len(), 2);
 
-        let mut res_graphs= gru.find_by_relation("knows").unwrap();
+        let mut res_graphs = gru.find_by_relation("knows").unwrap();
         assert_eq!(res_graphs.len(), 1);
         assert_eq!(res_graphs[0].relation, "knows");
 
@@ -79,7 +78,7 @@ mod tests {
         assert_eq!(res_graphs[0].relation, "friend of");
         assert_eq!(res_graphs[1].relation, "friend of");
     }
-    
+
     #[test]
     #[serial]
     fn persistence() {
@@ -108,7 +107,7 @@ mod tests {
                 assert_eq!(grphs.graphs[0].from.len_attr(), 1);
                 assert_eq!(grphs.graphs[0].from.get_attr("foo").unwrap(), "bar");
                 assert_eq!(grphs.graphs[1], graph2);
-            },
+            }
             Err(_) => panic!(),
         }
     }
@@ -122,17 +121,12 @@ mod tests {
         let alice_bob = Graph::new(&alice, "is friend of", &bob);
         my_graph.add(&alice_bob);
 
-        let alice_fred =
-            Graph::new(
-                &alice,
-                "is firend of",
-                &Node::new("Fred")
-            );
+        let alice_fred = Graph::new(&alice, "is firend of", &Node::new("Fred"));
         my_graph.add(&alice_fred);
 
         assert_eq!(my_graph.len(), 2);
 
-        let _ = my_graph.delete_graph_by_id(alice_bob.id); 
+        let _ = my_graph.delete_graph_by_id(alice_bob.id);
         assert_eq!(my_graph.len(), 1);
     }
 
@@ -140,16 +134,13 @@ mod tests {
     #[serial]
     fn delete_from_graph_fail() {
         let mut my_graph = Graphs::new("failing");
-        assert!(
-            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
-        my_graph.add(
-            &Graph::new(
-                &Node::new("Alice"),
-                "is friend",
-                &Node::new("Bob")
+        assert!(my_graph.delete_graph_by_id("foobar".to_string()).is_err());
+        my_graph.add(&Graph::new(
+            &Node::new("Alice"),
+            "is friend",
+            &Node::new("Bob"),
         ));
-        assert!(
-            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
+        assert!(my_graph.delete_graph_by_id("foobar".to_string()).is_err());
     }
 
     #[test]
@@ -197,11 +188,11 @@ mod tests {
         alice.set_attr("address", "Elm street");
         alice.set_attr("email", "alice@mailinator.com");
         alice.set_attr("age", 35);
- 
+
         bob.set_attr("address", "Talbot street");
         bob.set_attr("email", "bob@mailinator.com");
         bob.set_attr("age", 40);
-       
+
         let relation_friend_of = "friend_of";
         let mut graph = Graph::new(&alice, relation_friend_of, &bob);
         graphs.add(&graph);
@@ -211,7 +202,7 @@ mod tests {
 
         graph = Graph::new(&alice, relation_friend_of, &john);
         graphs.add(&graph);
-        
+
         graph = Graph::new(&peter, relation_friend_of, &john);
         graphs.add(&graph);
 
@@ -247,10 +238,10 @@ mod tests {
 
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
-    
+
         graphs.add(&Graph::new(&alice, "friend", &bob));
         graphs.add(&Graph::new(&bob, "friend", &alice));
-        
+
         assert_eq!(graphs.len(), 2);
         assert!(!graphs.is_empty());
     }
@@ -285,4 +276,3 @@ mod tests {
         assert!(!alice.is_empty_attr());
     }
 }
-
