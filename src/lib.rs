@@ -165,7 +165,7 @@ impl Node {
     /// node.update_attr("age", 55);
     /// assert_eq!(node.get_attr("age").unwrap(), "55");
     /// ```
-    // TODO: maybe add a upsert function????
+    // TODO: maybe add a upsert method????
     pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
