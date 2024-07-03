@@ -426,4 +426,8 @@ use gruphst::enable_logging;
 
 enable_logging(log::Level::Info);
 ```
+---
+
+Feedback from usage and contributions are very welcome.
+Also if you like it, please leave a :star: I would appreciate it ;)
 

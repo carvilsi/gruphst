@@ -2,6 +2,8 @@
 name = "gruphst"
 version = "0.1.0"
 edition = "2021"
+description = "An in-memory graph database"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
