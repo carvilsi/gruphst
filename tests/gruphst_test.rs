@@ -1,26 +1,25 @@
-use gruphst::{ Graphs, Graph, Node };
 use gruphst::enable_logging;
+use gruphst::{Graph, Graphs, Node};
 use serial_test::serial;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
-    #[test] 
+
+    #[test]
     #[serial]
     fn logg() {
         enable_logging(log::Level::Debug);
-    }  
-    
+    }
+
     #[test]
     #[serial]
     fn find_in_graphs_failing() {
         let mut my_graph = Graphs::new("failing");
-        my_graph.add(
-            &Graph::new(
-                &Node::new("Alice"),
-                "is friend",
-                &Node::new("Bob")
+        my_graph.add(&Graph::new(
+            &Node::new("Alice"),
+            "is friend",
+            &Node::new("Bob"),
         ));
         assert!(my_graph.find_by_id("foobarid").is_err());
         assert!(my_graph.find_by_relation("lol").is_err());
@@ -63,7 +62,7 @@ mod tests {
         gru.add(&graph2);
         assert_eq!(gru.len(), 2);
 
-        let mut res_graphs= gru.find_by_relation("knows").unwrap();
+        let mut res_graphs = gru.find_by_relation("knows").unwrap();
         assert_eq!(res_graphs.len(), 1);
         assert_eq!(res_graphs[0].relation, "knows");
 
@@ -79,12 +78,13 @@ mod tests {
         assert_eq!(res_graphs[0].relation, "friend of");
         assert_eq!(res_graphs[1].relation, "friend of");
     }
-    
+
     #[test]
     #[serial]
     fn persistence() {
         let mut gru = Graphs::new("graphs-a");
-        let node1 = Node::new("a node");
+        let mut node1 = Node::new("a node");
+        node1.set_attr("foo", "bar");
         let node2 = Node::new("b node");
         let graph1 = Graph::new(&node1, "relation a-b", &node2);
         gru.add(&graph1);
@@ -103,8 +103,11 @@ mod tests {
             Ok(grphs) => {
                 assert_eq!(grphs.name, name);
                 assert_eq!(grphs.graphs[0].relation, graph1.relation);
+                assert_eq!(grphs.graphs[0].from.name, "a node");
+                assert_eq!(grphs.graphs[0].from.len_attr(), 1);
+                assert_eq!(grphs.graphs[0].from.get_attr("foo").unwrap(), "bar");
                 assert_eq!(grphs.graphs[1], graph2);
-            },
+            }
             Err(_) => panic!(),
         }
     }
@@ -118,17 +121,12 @@ mod tests {
         let alice_bob = Graph::new(&alice, "is friend of", &bob);
         my_graph.add(&alice_bob);
 
-        let alice_fred =
-            Graph::new(
-                &alice,
-                "is firend of",
-                &Node::new("Fred")
-            );
+        let alice_fred = Graph::new(&alice, "is firend of", &Node::new("Fred"));
         my_graph.add(&alice_fred);
 
         assert_eq!(my_graph.len(), 2);
 
-        let _ = my_graph.delete_graph_by_id(alice_bob.id); 
+        let _ = my_graph.delete_graph_by_id(alice_bob.id);
         assert_eq!(my_graph.len(), 1);
     }
 
@@ -136,16 +134,13 @@ mod tests {
     #[serial]
     fn delete_from_graph_fail() {
         let mut my_graph = Graphs::new("failing");
-        assert!(
-            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
-        my_graph.add(
-            &Graph::new(
-                &Node::new("Alice"),
-                "is friend",
-                &Node::new("Bob")
+        assert!(my_graph.delete_graph_by_id("foobar".to_string()).is_err());
+        my_graph.add(&Graph::new(
+            &Node::new("Alice"),
+            "is friend",
+            &Node::new("Bob"),
         ));
-        assert!(
-            my_graph.delete_graph_by_id("foobar".to_string()).is_err());
+        assert!(my_graph.delete_graph_by_id("foobar".to_string()).is_err());
     }
 
     #[test]
@@ -184,12 +179,20 @@ mod tests {
     fn graphs_stats() {
         let mut graphs = Graphs::new("friends-and-enemies");
 
-        let alice = Node::new("Alice");
-        let bob = Node::new("Bob");
+        let mut alice = Node::new("Alice");
+        let mut bob = Node::new("Bob");
         let fred = Node::new("Fred");
         let john = Node::new("John");
         let peter = Node::new("Peter");
-        
+
+        alice.set_attr("address", "Elm street");
+        alice.set_attr("email", "alice@mailinator.com");
+        alice.set_attr("age", 35);
+
+        bob.set_attr("address", "Talbot street");
+        bob.set_attr("email", "bob@mailinator.com");
+        bob.set_attr("age", 40);
+
         let relation_friend_of = "friend_of";
         let mut graph = Graph::new(&alice, relation_friend_of, &bob);
         graphs.add(&graph);
@@ -199,14 +202,16 @@ mod tests {
 
         graph = Graph::new(&alice, relation_friend_of, &john);
         graphs.add(&graph);
-        
+
         graph = Graph::new(&peter, relation_friend_of, &john);
         graphs.add(&graph);
 
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
         assert_eq!(stats.len, 4);
-        assert_eq!(stats.mem, 774);
+        assert_eq!(stats.total_nodes, 8);
+        assert_eq!(stats.total_attributes, 12);
+        assert_eq!(stats.mem, 1219);
         assert_eq!(stats.name, "friends-and-enemies");
     }
 
@@ -233,10 +238,10 @@ mod tests {
 
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
-    
+
         graphs.add(&Graph::new(&alice, "friend", &bob));
         graphs.add(&Graph::new(&bob, "friend", &alice));
-        
+
         assert_eq!(graphs.len(), 2);
         assert!(!graphs.is_empty());
     }
@@ -247,5 +252,27 @@ mod tests {
         assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
         assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
     }
-}
 
+    #[test]
+    #[serial]
+    fn attributes() {
+        let mut alice = Node::new("Alice");
+        assert_eq!(alice.len_attr(), 0);
+        assert!(alice.is_empty_attr());
+        alice.set_attr("address", "Elm Street");
+        assert_eq!(alice.get_attr("address").unwrap(), "Elm Street");
+        assert_eq!(alice.len_attr(), 1);
+        alice.set_attr("age", 34);
+        assert_eq!(alice.get_attr("age").unwrap(), "34");
+        let _ = alice.update_attr("age", 43);
+        assert_eq!(alice.get_attr("age").unwrap(), "43");
+        assert_eq!(alice.len_attr(), 2);
+        let attrs = alice.get_attr_keys();
+        assert!(attrs.contains(&&"age"));
+        assert!(attrs.contains(&&"address"));
+        assert!(alice.get_attr("phone").is_err());
+        let _ = alice.del_attr("age");
+        assert_eq!(alice.len_attr(), 1);
+        assert!(!alice.is_empty_attr());
+    }
+}
