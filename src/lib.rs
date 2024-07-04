@@ -18,6 +18,8 @@ use uuid::Uuid;
 
 const MAX_STACK_SIZE: usize = 10000;
 
+// TODO: Add a watchdog to check the amount of mem usage
+
 // TODO: add env config for level
 /// Enables logging providing a level
 ///
@@ -403,11 +405,18 @@ pub struct GraphsStats<'a> {
     /// name of the Graph
     pub name: &'a str,
     /// total attributes
-    pub total_attributes: usize,
+    pub total_attr: usize,
     /// total nodes
     pub total_nodes: usize,
+    /// unique relations
+    pub uniq_rel: usize,
 }
 
+// TODO: Graphs: return Graph(s) that matches an attribute node by key
+// TODO: Graphs: return Graph(s) that matches an attribute node by key and value
+// TODO: Graphs: return Graph(s) that matches an attribute node by like key
+// TODO: Graphs: return Graph(s) that matches an array of relations
+// TODO: Graphs: return Graph(s) that matches an array of relations on order
 impl Graphs {
     /// Creates a new collection of Graph elements
     ///
@@ -544,6 +553,36 @@ impl Graphs {
             error!("Any graph found for relation: {}", relation_name);
             Err("Any graph found for relation")
         }
+    }
+    
+    /// Returns an array with the unique relations in the Graphs
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{ Graphs, Node, Graph };
+    ///
+    /// let mut my_graph = Graphs::new("my graph");
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let fred = Node::new("Fred");
+    ///
+    /// my_graph.add(&Graph::new(&alice, "friend of", &bob));
+    /// my_graph.add(&Graph::new(&alice, "relative of", &fred));
+    /// my_graph.add(&Graph::new(&fred, "friend of", &bob));
+    /// my_graph.add(&Graph::new(&bob, "friend of", &alice));
+    /// my_graph.add(&Graph::new(&fred, "relative of", &alice));
+    /// 
+    /// let relations = my_graph.uniq_relations();
+    /// assert_eq!(relations, vec!["friend of", "relative of"]);
+    /// ```
+    pub fn uniq_relations(&self) -> Vec<&String> {
+        let mut uniq_rel = Vec::new();
+        for graph in self.graphs.iter() {
+             uniq_rel.push(&graph.relation);
+        }
+        uniq_rel.sort();
+        uniq_rel.dedup();
+        uniq_rel
     }
 
     /// Returns a Graph that provided id matches with Graph, or From, To Nodes
@@ -749,11 +788,26 @@ impl Graphs {
     ///         &Node::new("Bob")
     ///     )
     /// );
+    /// let mut fred = Node::new("Fred");
+    /// fred.set_attr("address", "Elm street");
+    /// fred.set_attr("phone", "555-555-555");
+    /// fred.set_attr("age", "25");
+    ///
+    /// my_graphs.add(
+    ///     &Graph::new(
+    ///         &fred,
+    ///         "relative of",
+    ///         &Node::new("Coco")
+    ///     )
+    /// );
     ///
     /// let stats = my_graphs.stats().unwrap();
-    /// assert_eq!(stats.mem, 271);
-    /// assert_eq!(stats.len, 1);
+    /// assert_eq!(stats.mem, 548);
+    /// assert_eq!(stats.len, 2);
     /// assert_eq!(stats.name, "memories");
+    /// assert_eq!(stats.total_attr, 3);
+    /// assert_eq!(stats.total_nodes, 4);
+    /// assert_eq!(stats.uniq_rel, 2);
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
@@ -768,10 +822,12 @@ impl Graphs {
             mem: bytes.len(),
             len: self.len(),
             name: &self.name,
-            total_attributes: attr_counter,
+            total_attr: attr_counter,
             total_nodes: self.len() * 2,
+            uniq_rel: self.uniq_relations().len(),
         };
         debug!("Graphs stats: {:#?}", stats);
         Ok(stats)
     }
 }
+
