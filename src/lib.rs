@@ -12,11 +12,11 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::fs::OpenOptions;
-use std::io::Read;
 use std::io::Write;
 use uuid::Uuid;
-
-const MAX_STACK_SIZE: usize = 10000;
+use dotenv::dotenv;
+use std::io::prelude::*;
+use std::io::BufReader;
 
 // TODO: Add a watchdog to check the amount of mem usage
 
@@ -762,13 +762,12 @@ impl Graphs {
     /// }
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
+        dotenv().ok();
         debug!("Loading persisted file {}", &file_name);
-        let mut read_file = File::open(file_name)?;
-        // TODO: change this fixed size buffer reading
-        // to something more flexible.
-        let mut buffer = [0; MAX_STACK_SIZE];
-        read_file.read(&mut buffer[..])?;
-        let readed_graph: Graphs = bincode::deserialize(&buffer)?;
+        let read_file = File::open(file_name)?;
+        let mut reader = BufReader::new(read_file);
+        reader.fill_buf()?;
+        let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
         debug!("Loaded persisted file with {} Graphs", readed_graph.len());
         Ok(readed_graph)
     }
