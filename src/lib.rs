@@ -4,9 +4,9 @@
 //!
 //! Possible to persists on file.
 
-pub mod node;
 pub mod graph;
 pub mod graphs;
+pub mod node;
 pub mod persistence;
 
 // TODO: add env config for level
@@ -21,4 +21,3 @@ pub mod persistence;
 pub fn enable_logging(level: log::Level) {
     simple_logger::init_with_level(level).unwrap();
 }
-

@@ -110,4 +110,3 @@ impl Graph {
         self.to = to_node.clone();
     }
 }
-

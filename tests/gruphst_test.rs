@@ -1,9 +1,9 @@
 use serial_test::serial;
 
 use gruphst::enable_logging;
-use gruphst::node::Node;
 use gruphst::graph::Graph;
 use gruphst::graphs::Graphs;
+use gruphst::node::Node;
 
 // TODO: refactor the tests
 
@@ -312,7 +312,7 @@ mod tests {
     #[serial]
     fn the_unique_relations() {
         let graphs = do_some_networking();
-        
+
         let unique_relations = graphs.uniq_relations();
         assert_eq!(unique_relations, vec!["friend of", "relative of"]);
     }

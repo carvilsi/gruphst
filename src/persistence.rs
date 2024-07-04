@@ -1,11 +1,11 @@
+use dotenv::dotenv;
 use log::{debug, info};
 use std::error::Error;
 use std::fs::File;
 use std::fs::OpenOptions;
-use std::io::Write;
-use dotenv::dotenv;
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::io::Write;
 
 use crate::graphs::Graphs;
 
@@ -74,7 +74,7 @@ impl Graphs {
     /// }
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
-        // reading limit of memory usage 
+        // reading limit of memory usage
         dotenv().ok();
         let max_mem: usize = match dotenv::var(GRUPHST_MAX_MEM_USAGE) {
             Ok(value) => {
@@ -82,11 +82,14 @@ impl Graphs {
                 debug!("max_mem usage set to {} MB", max);
                 max = max * 1024 * 1024;
                 max
-            },
+            }
             Err(_) => {
-                debug!("using default max_mem usage {}", DEFAULT_GRUPHST_MAX_MEM_USAGE); 
+                debug!(
+                    "using default max_mem usage {}",
+                    DEFAULT_GRUPHST_MAX_MEM_USAGE
+                );
                 DEFAULT_GRUPHST_MAX_MEM_USAGE
-            },
+            }
         };
         debug!("Loading persisted file {}", &file_name);
         let read_file = File::open(file_name)?;
@@ -94,11 +97,12 @@ impl Graphs {
         reader.fill_buf()?;
         // checks if trying to load a file over the limit of memory
         if reader.buffer().len() > max_mem {
-            return Err("Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var".into());
+            return Err(
+                "Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var".into(),
+            );
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
         debug!("Loaded persisted file with {} Graphs", readed_graph.len());
         Ok(readed_graph)
     }
 }
-

@@ -184,7 +184,7 @@ impl Graphs {
             Err("Any graph found for relation")
         }
     }
-    
+
     /// Returns an array with the unique relations in the Graphs
     ///
     /// # Examples
@@ -203,14 +203,14 @@ impl Graphs {
     /// my_graph.add(&Graph::new(&fred, "friend of", &bob));
     /// my_graph.add(&Graph::new(&bob, "friend of", &alice));
     /// my_graph.add(&Graph::new(&fred, "relative of", &alice));
-    /// 
+    ///
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
     /// ```
     pub fn uniq_relations(&self) -> Vec<&String> {
         let mut uniq_rel = Vec::new();
         for graph in self.graphs.iter() {
-             uniq_rel.push(&graph.relation);
+            uniq_rel.push(&graph.relation);
         }
         uniq_rel.sort();
         uniq_rel.dedup();
@@ -401,4 +401,3 @@ impl Graphs {
         Ok(stats)
     }
 }
-
