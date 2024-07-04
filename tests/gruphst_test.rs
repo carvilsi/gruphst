@@ -1,6 +1,9 @@
-use gruphst::enable_logging;
-use gruphst::{Graph, Graphs, Node};
 use serial_test::serial;
+
+use gruphst::enable_logging;
+use gruphst::node::Node;
+use gruphst::graph::Graph;
+use gruphst::graphs::Graphs;
 
 // TODO: refactor the tests
 
@@ -84,6 +87,7 @@ mod tests {
     #[test]
     #[serial]
     fn persistence() {
+        enable_logging(log::Level::Debug);
         let mut gru = Graphs::new("graphs-a");
         let mut node1 = Node::new("a node");
         node1.set_attr("foo", "bar");
