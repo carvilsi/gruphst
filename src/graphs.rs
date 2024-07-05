@@ -1,12 +1,41 @@
-use log::{debug, error};
+use log::{debug, error, warn, info, trace};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use uuid::Uuid;
 use std::thread;
+use std::process;
 
 use crate::graph::Graph;
 
+//const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
+const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 5 * 1024 * 1024;
+
 // TODO: Add a watchdog to check the amount of mem usage
+
+
+fn graphs_memory_watcher(graphs: &Graphs) {
+    println!("WTF!!!!!-----!!!!!!");
+    let g = graphs.clone();
+    thread::spawn(move || {
+        println!("---- WTH ---");
+        let mem = g.stats().unwrap().mem;
+        let mem_prss = (mem as f32 * 100_f32) / DEFAULT_GRUPHST_MAX_MEM_USAGE as f32;
+        trace!("memory preassure: {:.2}", mem_prss);
+        println!("memory preassure: {:.2}", mem_prss);
+        match mem_prss {
+            mem_prss if mem_prss < 70_f32 => debug!("memory ok: {:.2}", mem_prss),
+            mem_prss if mem_prss >= 80_f32 && mem_prss < 95_f32 => info!("memory high: {:.2}", mem_prss),
+            mem_prss if mem_prss >=95_f32 && mem_prss < 99_f32 => warn!("memory close to the limit: {:.2}", mem_prss),
+            mem_prss if mem_prss >=99_f32 => {
+                error!("memory usage critical: {:.2}", mem_prss);
+                error!("auto persisting current graphs: {}, and stoping execution", g.name);
+                let _ = g.persists();
+                process::exit(1);
+            },
+            _ => todo!(), 
+        }
+    });
+}
 
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -81,6 +110,7 @@ impl Graphs {
             self.id,
             self.len()
         );
+        graphs_memory_watcher(self);
         self.graphs.push(graph.clone());
     }
 
