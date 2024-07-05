@@ -16,7 +16,7 @@ const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 5 * 1024 * 1024;
 fn graphs_memory_watcher(graphs: &Graphs) {
     println!("WTF!!!!!-----!!!!!!");
     let g = graphs.clone();
-    thread::spawn(move || {
+    let l = thread::spawn(move || {
         println!("---- WTH ---");
         let mem = g.stats().unwrap().mem;
         let mem_prss = (mem as f32 * 100_f32) / DEFAULT_GRUPHST_MAX_MEM_USAGE as f32;
@@ -35,6 +35,7 @@ fn graphs_memory_watcher(graphs: &Graphs) {
             _ => todo!(), 
         }
     });
+    l.join().unwrap();
 }
 
 /// A colection of Graph
@@ -110,7 +111,9 @@ impl Graphs {
             self.id,
             self.len()
         );
+        println!("-- 0 --");
         graphs_memory_watcher(self);
+        println!("-- 1 --");
         self.graphs.push(graph.clone());
     }
 
