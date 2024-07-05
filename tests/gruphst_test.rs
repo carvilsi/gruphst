@@ -87,7 +87,6 @@ mod tests {
     #[test]
     #[serial]
     fn persistence() {
-        enable_logging(log::Level::Debug);
         let mut gru = Graphs::new("graphs-a");
         let mut node1 = Node::new("a node");
         node1.set_attr("foo", "bar");
