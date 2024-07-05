@@ -2,6 +2,7 @@ use log::{debug, error};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use uuid::Uuid;
+use std::thread;
 
 use crate::graph::Graph;
 
@@ -57,6 +58,30 @@ impl Graphs {
         };
         debug!("Created new Graphs: {:#?}", graphs);
         graphs
+    }
+
+    /// Adds a Graph element to the colection
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
+    /// ```
+    pub fn add(&mut self, graph: &Graph) {
+        debug!(
+            "Added new graph to Graphs [{}]
+            current length: {}",
+            self.id,
+            self.len()
+        );
+        self.graphs.push(graph.clone());
     }
 
     /// Retrieves the length of the Graphs
@@ -123,30 +148,6 @@ impl Graphs {
     pub fn update_name(&mut self, name: &str) {
         debug!("Update Graph [{}] with name: {}", self.id, name);
         self.name = name.to_string();
-    }
-
-    /// Adds a Graph element to the colection
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::new("my_graph");
-    /// my_graph.add(&alice_bob_graph);
-    /// ```
-    pub fn add(&mut self, graph: &Graph) {
-        debug!(
-            "Added new graph to Graphs [{}]
-            current length: {}",
-            self.id,
-            self.len()
-        );
-        self.graphs.push(graph.clone());
     }
 
     /// Returns a collection of Graps elements that matches the relation
