@@ -35,7 +35,7 @@ fn graphs_memory_watcher(graphs: &Graphs) {
             _ => todo!(), 
         }
     });
-    l.join().unwrap();
+    //l.join().unwrap();
 }
 
 /// A colection of Graph
@@ -112,9 +112,9 @@ impl Graphs {
             self.len()
         );
         println!("-- 0 --");
-        graphs_memory_watcher(self);
         println!("-- 1 --");
         self.graphs.push(graph.clone());
+        graphs_memory_watcher(self);
     }
 
     /// Retrieves the length of the Graphs
