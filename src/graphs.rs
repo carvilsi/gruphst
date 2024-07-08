@@ -5,8 +5,8 @@ use std::process;
 use std::thread;
 use uuid::Uuid;
 
-use crate::graph::Graph;
 use crate::config::get_max_mem_usage;
+use crate::graph::Graph;
 
 fn graphs_memory_watcher(graphs: &Graphs) {
     let g = graphs.clone();
@@ -262,7 +262,7 @@ impl Graphs {
             debug!(
                 "Founded {} graphs where an attribute key is '{}'",
                 graphs.len(),
-                attr_k 
+                attr_k
             );
             Ok(graphs)
         } else {
@@ -302,7 +302,7 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 3);
     /// ```
-    pub fn attr_equals_to<T> (&self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str> 
+    pub fn attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
@@ -315,7 +315,7 @@ impl Graphs {
             debug!(
                 "Founded {} graphs where an attribute key is '{}'",
                 graphs.len(),
-                attr_k 
+                attr_k
             );
             Ok(graphs)
         } else {

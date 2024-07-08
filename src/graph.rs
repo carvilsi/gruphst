@@ -129,11 +129,7 @@ impl Graph {
     /// assert!(graph.has_node_attr("city"));
     /// ```
     pub fn has_node_attr(&self, attr_k: &str) -> bool {
-        if self.from.has_attr(attr_k) || self.to.has_attr(attr_k) {
-            return true;
-        } else {
-            return false;
-        }
+        self.from.has_attr(attr_k) || self.to.has_attr(attr_k)
     }
 
     /// Checks if "from" or "to" node has an attribute and equal for value
@@ -156,14 +152,10 @@ impl Graph {
     /// assert!(graph.equals_node_attr("age", 42));
     /// assert!(!graph.equals_node_attr("age", 24));
     /// ```
-    pub fn equals_node_attr<T> (&self, attr_k: &str, attr_v: T) -> bool 
+    pub fn equals_node_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        if self.from.equals_attr(attr_k, attr_v.clone()) || self.to.equals_attr(attr_k, attr_v.clone()) {
-            return true;
-        } else {
-            return false;
-        }
+        self.from.equals_attr(attr_k, attr_v.clone()) || self.to.equals_attr(attr_k, attr_v.clone())
     }
 }

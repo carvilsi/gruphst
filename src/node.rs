@@ -115,7 +115,7 @@ impl Node {
     }
 
     /// Checks if an attribute key exists on a node
-    /// and the value matchs 
+    /// and the value matchs
     ///
     /// # Examples
     /// ```rust
@@ -129,7 +129,7 @@ impl Node {
     /// assert!(node.equals_attr("age", 42));
     /// assert!(!node.equals_attr("age", 24));
     /// ```
-    pub fn equals_attr<T> (&self, attr_k: &str, attr_v: T) -> bool
+    pub fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {
@@ -137,11 +137,11 @@ impl Node {
             Some(val) => {
                 let v = attr_v.clone();
                 *val == v.to_string()
-            },
+            }
             None => false,
         }
     }
-            
+
     /// Returns an Array containing all attribute keys
     ///
     /// # Examples
