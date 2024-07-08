@@ -4,8 +4,6 @@ use uuid::Uuid;
 
 use crate::node::Node;
 
-// TODO: Add a watchdog to check the amount of mem usage
-
 /// Representation of a Graph, relating two nodes
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Graph {

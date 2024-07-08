@@ -1,4 +1,3 @@
-use dotenv::dotenv;
 use log::{debug, info};
 use std::error::Error;
 use std::fs::File;
@@ -8,9 +7,7 @@ use std::io::BufReader;
 use std::io::Write;
 
 use crate::graphs::Graphs;
-
-const GRUPHST_MAX_MEM_USAGE: &str = "GRUPHST_MAX_MEM_USAGE";
-const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
+use crate::config::get_max_mem_usage;
 
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
@@ -74,27 +71,11 @@ impl Graphs {
     /// }
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
-        // reading limit of memory usage
-        dotenv().ok();
-        let max_mem: usize = match dotenv::var(GRUPHST_MAX_MEM_USAGE) {
-            Ok(value) => {
-                let mut max = value.parse().unwrap();
-                debug!("max_mem usage set to {} MB", max);
-                max = max * 1024 * 1024;
-                max
-            }
-            Err(_) => {
-                debug!(
-                    "using default max_mem usage {}",
-                    DEFAULT_GRUPHST_MAX_MEM_USAGE
-                );
-                DEFAULT_GRUPHST_MAX_MEM_USAGE
-            }
-        };
         debug!("Loading persisted file {}", &file_name);
         let read_file = File::open(file_name)?;
         let mut reader = BufReader::new(read_file);
         reader.fill_buf()?;
+        let max_mem = get_max_mem_usage();
         // checks if trying to load a file over the limit of memory
         if reader.buffer().len() > max_mem {
             return Err(

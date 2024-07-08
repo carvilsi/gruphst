@@ -8,7 +8,9 @@ pub mod graph;
 pub mod graphs;
 pub mod node;
 pub mod persistence;
+pub mod config;
 
+// TODO add a config handler 
 // TODO: add env config for level
 /// Enables logging providing a level
 ///
