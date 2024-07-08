@@ -10,18 +10,12 @@ use crate::graph::Graph;
 //const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
 const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 5 * 1024 * 1024;
 
-// TODO: Add a watchdog to check the amount of mem usage
-
-
 fn graphs_memory_watcher(graphs: &Graphs) {
-    println!("WTF!!!!!-----!!!!!!");
     let g = graphs.clone();
-    let l = thread::spawn(move || {
-        println!("---- WTH ---");
+    thread::spawn(move || {
         let mem = g.stats().unwrap().mem;
         let mem_prss = (mem as f32 * 100_f32) / DEFAULT_GRUPHST_MAX_MEM_USAGE as f32;
         trace!("memory preassure: {:.2}", mem_prss);
-        println!("memory preassure: {:.2}", mem_prss);
         match mem_prss {
             mem_prss if mem_prss < 70_f32 => debug!("memory ok: {:.2}", mem_prss),
             mem_prss if mem_prss >= 80_f32 && mem_prss < 95_f32 => info!("memory high: {:.2}", mem_prss),
@@ -35,7 +29,6 @@ fn graphs_memory_watcher(graphs: &Graphs) {
             _ => todo!(), 
         }
     });
-    //l.join().unwrap();
 }
 
 /// A colection of Graph
@@ -111,8 +104,6 @@ impl Graphs {
             self.id,
             self.len()
         );
-        println!("-- 0 --");
-        println!("-- 1 --");
         self.graphs.push(graph.clone());
         graphs_memory_watcher(self);
     }
