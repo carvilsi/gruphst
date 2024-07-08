@@ -10,15 +10,15 @@ pub mod node;
 pub mod persistence;
 pub mod config;
 
-// TODO add a config handler 
-// TODO: add env config for level
 /// Enables logging providing a level
 ///
 /// # Examples
 /// ```rust
 /// use gruphst::enable_logging;
+/// use gruphst::config::get_log_level;
 ///
-/// enable_logging(log::Level::Info);
+/// let log_level = get_log_level();
+/// enable_logging(log_level);
 /// ```
 pub fn enable_logging(level: log::Level) {
     simple_logger::init_with_level(level).unwrap();
