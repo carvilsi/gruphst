@@ -1,10 +1,10 @@
 use serial_test::serial;
 
+use gruphst::config::*;
 use gruphst::enable_logging;
 use gruphst::graph::Graph;
 use gruphst::graphs::Graphs;
 use gruphst::node::Node;
-use gruphst::config::*;
 
 // TODO: refactor the tests
 
@@ -319,7 +319,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn  configuration() {
+    fn configuration() {
         let config_mem = get_max_mem_usage();
 
         assert_eq!(config_mem, 50 * 1024 * 1024);

@@ -8,7 +8,7 @@ const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
 /// or setted environmental variable
 /// if not exists the default value is use.
 ///
-/// The GRUPHST_MAX_MEM_USAGE defines the limit of 
+/// The GRUPHST_MAX_MEM_USAGE defines the limit of
 /// memory used to store data, for in-memory mode and
 /// persistence.
 pub fn get_max_mem_usage() -> usize {
@@ -19,7 +19,7 @@ pub fn get_max_mem_usage() -> usize {
             debug!("max_mem usage set to {} MB", max);
             max = max * 1024 * 1024;
             max
-        },
+        }
         Err(_) => {
             debug!(
                 "using default max_mem usage {}",
@@ -36,7 +36,7 @@ const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Info;
 /// Read log level configuration from .env file
 /// or setted environmental variable
 /// if not exists returns default leve that is Info
-/// 
+///
 /// # Example
 /// ```rust
 /// use gruphst::config::get_log_level;
@@ -46,20 +46,18 @@ const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Info;
 pub fn get_log_level() -> log::Level {
     dotenv().ok();
     match dotenv::var(GRUPHST_LOG_LEVEL) {
-        Ok(value) => {
-            match value.to_lowercase().as_str() {
-                "trace" => log::Level::Trace,
-                "debug" => log::Level::Debug,
-                "info" => log::Level::Info,
-                "warn" | "warning" => log::Level::Warn,
-                "err" | "error" => log::Level::Error,
-                _ => {
-                    debug!(
-                        "unknown log configured value, using default: {}",
-                        DEFAULT_GRUPHST_LOG_LEVEL
-                    );
+        Ok(value) => match value.to_lowercase().as_str() {
+            "trace" => log::Level::Trace,
+            "debug" => log::Level::Debug,
+            "info" => log::Level::Info,
+            "warn" | "warning" => log::Level::Warn,
+            "err" | "error" => log::Level::Error,
+            _ => {
+                debug!(
+                    "unknown log configured value, using default: {}",
                     DEFAULT_GRUPHST_LOG_LEVEL
-                },
+                );
+                DEFAULT_GRUPHST_LOG_LEVEL
             }
         },
         Err(_) => {

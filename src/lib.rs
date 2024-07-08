@@ -4,11 +4,11 @@
 //!
 //! Possible to persists on file.
 
+pub mod config;
 pub mod graph;
 pub mod graphs;
 pub mod node;
 pub mod persistence;
-pub mod config;
 
 /// Enables logging providing a level
 ///

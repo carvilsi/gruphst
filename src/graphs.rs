@@ -1,9 +1,9 @@
-use log::{debug, error, warn, info, trace};
+use log::{debug, error, info, trace, warn};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use uuid::Uuid;
-use std::thread;
 use std::process;
+use std::thread;
+use uuid::Uuid;
 
 use crate::graph::Graph;
 
@@ -18,15 +18,22 @@ fn graphs_memory_watcher(graphs: &Graphs) {
         trace!("memory preassure: {:.2}", mem_prss);
         match mem_prss {
             mem_prss if mem_prss < 70_f32 => debug!("memory ok: {:.2}", mem_prss),
-            mem_prss if mem_prss >= 80_f32 && mem_prss < 95_f32 => info!("memory high: {:.2}", mem_prss),
-            mem_prss if mem_prss >=95_f32 && mem_prss < 99_f32 => warn!("memory close to the limit: {:.2}", mem_prss),
-            mem_prss if mem_prss >=99_f32 => {
+            mem_prss if (80_f32..95_f32).contains(&mem_prss) => {
+                info!("memory high: {:.2}", mem_prss)
+            }
+            mem_prss if (95_f32..99_f32).contains(&mem_prss) => {
+                warn!("memory close to the limit: {:.2}", mem_prss)
+            }
+            mem_prss if mem_prss >= 99_f32 => {
                 error!("memory usage critical: {:.2}", mem_prss);
-                error!("auto persisting current graphs: {}, and stoping execution", g.name);
+                error!(
+                    "auto persisting current graphs: {}, and stoping execution",
+                    g.name
+                );
                 let _ = g.persists();
                 process::exit(1);
-            },
-            _ => todo!(), 
+            }
+            _ => todo!(),
         }
     });
 }

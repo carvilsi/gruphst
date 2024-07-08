@@ -6,8 +6,8 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::Write;
 
-use crate::graphs::Graphs;
 use crate::config::get_max_mem_usage;
+use crate::graphs::Graphs;
 
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
