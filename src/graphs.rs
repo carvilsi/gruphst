@@ -6,15 +6,14 @@ use std::thread;
 use uuid::Uuid;
 
 use crate::graph::Graph;
-
-//const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
-const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 5 * 1024 * 1024;
+use crate::config::get_max_mem_usage;
 
 fn graphs_memory_watcher(graphs: &Graphs) {
     let g = graphs.clone();
     thread::spawn(move || {
+        let max_mem = get_max_mem_usage();
         let mem = g.stats().unwrap().mem;
-        let mem_prss = (mem as f32 * 100_f32) / DEFAULT_GRUPHST_MAX_MEM_USAGE as f32;
+        let mem_prss = (mem as f32 * 100_f32) / max_mem as f32;
         trace!("memory preassure: {:.2}", mem_prss);
         match mem_prss {
             mem_prss if mem_prss < 70_f32 => debug!("memory ok: {:.2}", mem_prss),
@@ -66,7 +65,6 @@ pub struct GraphsStats<'a> {
     pub uniq_rel: usize,
 }
 
-// TODO: Graphs: return Graph(s) that matches an attribute node by key
 // TODO: Graphs: return Graph(s) that matches an attribute node by key and value
 // TODO: Graphs: return Graph(s) that matches an attribute node by like key
 // TODO: Graphs: return Graph(s) that matches an array of relations
@@ -195,8 +193,16 @@ impl Graphs {
     /// let mut my_graph = Graphs::new("my_graph");
     /// my_graph.add(&alice_bob_graph);
     ///
+    /// let fred = Node::new("Fred");
+    /// my_graph.add(&Graph::new(&fred, "relative", &bob));
+    ///
     /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
     /// assert_eq!(result_graph.len(), 1);
+    /// assert_eq!(result_graph[0].relation, "friend of");
+    ///
+    /// let res_graph = my_graph.find_by_relation("relative").unwrap();
+    /// assert_eq!(res_graph.len(), 1);
+    /// assert_eq!(res_graph[0].relation, "relative");
     /// ```
     pub fn find_by_relation(&mut self, relation_name: &str) -> Result<Vec<&Graph>, &'static str> {
         let graphs = self
@@ -216,6 +222,108 @@ impl Graphs {
             Err("Any graph found for relation")
         }
     }
+
+    /// Returns a collection of graphs that matches an attribute node by key
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let mut alice = Node::new("Alice");
+    /// let mut bob = Node::new("Bob");
+    /// alice.set_attr("address", "Elm street");
+    /// alice.set_attr("phone", "555-555");
+    /// alice.set_attr("age", 25);
+    /// bob.set_attr("age", 25);
+    ///
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add(&bob_alice_graph);
+    ///
+    /// let mut fred = Node::new("Fred");
+    /// fred.set_attr("room", 5);
+    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
+    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    ///
+    /// let graphs_result = my_graph.has_graph_node_attr("room").unwrap();
+    ///
+    /// assert_eq!(graphs_result.len(), 2);
+    /// ```
+    pub fn has_graph_node_attr(&mut self, attr_k: &str) -> Result<Vec<&Graph>, &'static str> {
+        let graphs = self
+            .graphs
+            .iter()
+            .filter(|grph| grph.has_node_attr(attr_k))
+            .collect::<Vec<&Graph>>();
+        if !graphs.is_empty() {
+            debug!(
+                "Founded {} graphs where an attribute key is '{}'",
+                graphs.len(),
+                attr_k 
+            );
+            Ok(graphs)
+        } else {
+            error!("Any graph found for attribute: {}", attr_k);
+            Err("Any graph found for attribute")
+        }
+    }
+
+  //  /// Returns a collection of graphs that matches an attribute node by key
+  //  /// and value
+  //  ///
+  //  /// # Examples
+  //  /// ```rust
+  //  /// use gruphst::node::Node;
+  //  /// use gruphst::graph::Graph;
+  //  /// use gruphst::graphs::Graphs;
+  //  ///
+  //  /// let mut alice = Node::new("Alice");
+  //  /// let mut bob = Node::new("Bob");
+  //  /// alice.set_attr("address", "Elm street");
+  //  /// alice.set_attr("phone", "555-555");
+  //  /// alice.set_attr("age", 25);
+  //  /// bob.set_attr("age", 42);
+  //  ///
+  //  /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+  //  /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+  //  /// let mut my_graph = Graphs::new("my_graph");
+  //  /// my_graph.add(&alice_bob_graph);
+  //  /// my_graph.add(&bob_alice_graph);
+  //  ///
+  //  /// let mut fred = Node::new("Fred");
+  //  /// fred.set_attr("room", 5);
+  //  /// my_graph.add(&Graph::new(&fred, "colege", &bob));
+  //  /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+  //  ///
+  //  /// let graphs_result = my_graph.attr_equals_to("age", 42).unwrap();
+  //  ///
+  //  /// assert_eq!(graphs_result.len(), 1);
+  //  /// ```
+  //  pub fn attr_equals_to<T> (&mut self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str> 
+  //  where
+  //      T: std::fmt::Display + std::clone::Clone,
+  //  {
+  //      let graphs = self
+  //          .graphs
+  //          .iter()
+  //          .filter(|grph| grph.equals_node_attr(attr_k, attr_v.clone()))
+  //          .collect::<Vec<&Graph>>();
+  //      if !graphs.is_empty() {
+  //          debug!(
+  //              "Founded {} graphs where an attribute key is '{}'",
+  //              graphs.len(),
+  //              attr_k 
+  //          );
+  //          Ok(graphs)
+  //      } else {
+  //          error!("Any graph found for attribute: {}", attr_k);
+  //          Err("Any graph found for attribute")
+  //      }
+  //  }
 
     /// Returns an array with the unique relations in the Graphs
     ///
