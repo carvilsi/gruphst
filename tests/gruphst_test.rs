@@ -300,7 +300,7 @@ mod tests {
         let mut bob = Node::new("Bob");
         bob.set_attr("age", 42);
 
-        let mut fred = Node::new("Fred");
+        let fred = Node::new("Fred");
 
         graphs.add(&Graph::new(&alice, "friend of", &bob));
         graphs.add(&Graph::new(&bob, "friend of", &alice));
@@ -337,6 +337,6 @@ mod tests {
         let graphs = do_some_networking();
         let results = graphs.attr_equals_to("age", 42).unwrap();
 
-        assert_eq!(results.len(), 1);
+        assert_eq!(results.len(), 2);
     }
 }

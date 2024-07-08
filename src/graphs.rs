@@ -65,7 +65,6 @@ pub struct GraphsStats<'a> {
     pub uniq_rel: usize,
 }
 
-// TODO: Graphs: return Graph(s) that matches an attribute node by key and value
 // TODO: Graphs: return Graph(s) that matches an attribute node by like key
 // TODO: Graphs: return Graph(s) that matches an array of relations
 // TODO: Graphs: return Graph(s) that matches an array of relations on order
@@ -318,22 +317,6 @@ impl Graphs {
                 graphs.len(),
                 attr_k 
             );
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________!");
-            println!("WTH__________! {:#?}", graphs);
             Ok(graphs)
         } else {
             error!("Any graph found for attribute: {}", attr_k);
