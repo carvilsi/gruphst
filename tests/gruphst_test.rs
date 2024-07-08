@@ -297,8 +297,10 @@ mod tests {
         alice.set_attr("phone", "555-555-555");
         alice.set_attr("address", "Elm street");
 
-        let bob = Node::new("Bob");
-        let fred = Node::new("Fred");
+        let mut bob = Node::new("Bob");
+        bob.set_attr("age", 42);
+
+        let mut fred = Node::new("Fred");
 
         graphs.add(&Graph::new(&alice, "friend of", &bob));
         graphs.add(&Graph::new(&bob, "friend of", &alice));
@@ -327,5 +329,14 @@ mod tests {
         let config_log_level = get_log_level();
 
         assert_eq!(config_log_level, log::Level::Debug);
+    }
+
+    #[test]
+    #[serial]
+    fn equals_attributes() {
+        let graphs = do_some_networking();
+        let results = graphs.attr_equals_to("age", 42).unwrap();
+
+        assert_eq!(results.len(), 1);
     }
 }

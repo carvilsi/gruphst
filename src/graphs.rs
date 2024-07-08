@@ -272,58 +272,74 @@ impl Graphs {
         }
     }
 
-  //  /// Returns a collection of graphs that matches an attribute node by key
-  //  /// and value
-  //  ///
-  //  /// # Examples
-  //  /// ```rust
-  //  /// use gruphst::node::Node;
-  //  /// use gruphst::graph::Graph;
-  //  /// use gruphst::graphs::Graphs;
-  //  ///
-  //  /// let mut alice = Node::new("Alice");
-  //  /// let mut bob = Node::new("Bob");
-  //  /// alice.set_attr("address", "Elm street");
-  //  /// alice.set_attr("phone", "555-555");
-  //  /// alice.set_attr("age", 25);
-  //  /// bob.set_attr("age", 42);
-  //  ///
-  //  /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-  //  /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
-  //  /// let mut my_graph = Graphs::new("my_graph");
-  //  /// my_graph.add(&alice_bob_graph);
-  //  /// my_graph.add(&bob_alice_graph);
-  //  ///
-  //  /// let mut fred = Node::new("Fred");
-  //  /// fred.set_attr("room", 5);
-  //  /// my_graph.add(&Graph::new(&fred, "colege", &bob));
-  //  /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
-  //  ///
-  //  /// let graphs_result = my_graph.attr_equals_to("age", 42).unwrap();
-  //  ///
-  //  /// assert_eq!(graphs_result.len(), 1);
-  //  /// ```
-  //  pub fn attr_equals_to<T> (&mut self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str> 
-  //  where
-  //      T: std::fmt::Display + std::clone::Clone,
-  //  {
-  //      let graphs = self
-  //          .graphs
-  //          .iter()
-  //          .filter(|grph| grph.equals_node_attr(attr_k, attr_v.clone()))
-  //          .collect::<Vec<&Graph>>();
-  //      if !graphs.is_empty() {
-  //          debug!(
-  //              "Founded {} graphs where an attribute key is '{}'",
-  //              graphs.len(),
-  //              attr_k 
-  //          );
-  //          Ok(graphs)
-  //      } else {
-  //          error!("Any graph found for attribute: {}", attr_k);
-  //          Err("Any graph found for attribute")
-  //      }
-  //  }
+    /// Returns a collection of graphs that matches an attribute node by key
+    /// and value
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let mut alice = Node::new("Alice");
+    /// let mut bob = Node::new("Bob");
+    /// alice.set_attr("address", "Elm street");
+    /// alice.set_attr("phone", "555-555");
+    /// alice.set_attr("age", 25);
+    /// bob.set_attr("age", 42);
+    ///
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add(&bob_alice_graph);
+    ///
+    /// let mut fred = Node::new("Fred");
+    /// fred.set_attr("room", 5);
+    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
+    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    ///
+    /// let graphs_result = my_graph.attr_equals_to("age", 42).unwrap();
+    ///
+    /// assert_eq!(graphs_result.len(), 3);
+    /// ```
+    pub fn attr_equals_to<T> (&self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str> 
+    where
+        T: std::fmt::Display + std::clone::Clone,
+    {
+        let graphs = self
+            .graphs
+            .iter()
+            .filter(|grph| grph.equals_node_attr(attr_k, attr_v.clone()))
+            .collect::<Vec<&Graph>>();
+        if !graphs.is_empty() {
+            debug!(
+                "Founded {} graphs where an attribute key is '{}'",
+                graphs.len(),
+                attr_k 
+            );
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________!");
+            println!("WTH__________! {:#?}", graphs);
+            Ok(graphs)
+        } else {
+            error!("Any graph found for attribute: {}", attr_k);
+            Err("Any graph found for attribute")
+        }
+    }
 
     /// Returns an array with the unique relations in the Graphs
     ///
