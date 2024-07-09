@@ -11,7 +11,7 @@
 
 An in-memory graph database.
  
-Possible to persists on file (just because if something that we always expect from an in-memory databases).
+Possible to persists on file (just because is something that we always expect from an in-memory databases).
 
 Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
 

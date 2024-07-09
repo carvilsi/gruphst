@@ -1,6 +1,12 @@
-use gruphst::enable_logging;
-use gruphst::{Graph, Graphs, Node};
 use serial_test::serial;
+
+use gruphst::config::*;
+use gruphst::enable_logging;
+use gruphst::graph::Graph;
+use gruphst::graphs::Graphs;
+use gruphst::node::Node;
+
+// TODO: refactor the tests
 
 #[cfg(test)]
 mod tests {
@@ -193,26 +199,28 @@ mod tests {
         bob.set_attr("email", "bob@mailinator.com");
         bob.set_attr("age", 40);
 
-        let relation_friend_of = "friend_of";
+        let relation_friend_of = "friend of";
+        let relation_relative_of = "relative of";
         let mut graph = Graph::new(&alice, relation_friend_of, &bob);
         graphs.add(&graph);
 
-        graph = Graph::new(&alice, relation_friend_of, &fred);
+        graph = Graph::new(&alice, relation_relative_of, &fred);
         graphs.add(&graph);
 
         graph = Graph::new(&alice, relation_friend_of, &john);
         graphs.add(&graph);
 
-        graph = Graph::new(&peter, relation_friend_of, &john);
+        graph = Graph::new(&peter, relation_relative_of, &john);
         graphs.add(&graph);
 
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
         assert_eq!(stats.len, 4);
         assert_eq!(stats.total_nodes, 8);
-        assert_eq!(stats.total_attributes, 12);
-        assert_eq!(stats.mem, 1219);
+        assert_eq!(stats.total_attr, 12);
+        assert_eq!(stats.mem, 1223);
         assert_eq!(stats.name, "friends-and-enemies");
+        assert_eq!(stats.uniq_rel, 2);
     }
 
     #[test]
@@ -280,5 +288,55 @@ mod tests {
         alice.upsert_attr("phone", "556-554-553");
         assert_eq!(alice.get_attr("phone").unwrap(), "556-554-553");
         assert_eq!(alice.len_attr(), 2);
+    }
+
+    fn do_some_networking() -> Graphs {
+        let mut graphs = Graphs::new("my graphs");
+
+        let mut alice = Node::new("Alice");
+        alice.set_attr("phone", "555-555-555");
+        alice.set_attr("address", "Elm street");
+
+        let mut bob = Node::new("Bob");
+        bob.set_attr("age", 42);
+
+        let fred = Node::new("Fred");
+
+        graphs.add(&Graph::new(&alice, "friend of", &bob));
+        graphs.add(&Graph::new(&bob, "friend of", &alice));
+        graphs.add(&Graph::new(&fred, "relative of", &alice));
+        graphs.add(&Graph::new(&fred, "friend of", &alice));
+
+        graphs
+    }
+
+    #[test]
+    #[serial]
+    fn the_unique_relations() {
+        let graphs = do_some_networking();
+
+        let unique_relations = graphs.uniq_relations();
+        assert_eq!(unique_relations, vec!["friend of", "relative of"]);
+    }
+
+    #[test]
+    #[serial]
+    fn configuration() {
+        let config_mem = get_max_mem_usage();
+
+        assert_eq!(config_mem, 50 * 1024 * 1024);
+
+        let config_log_level = get_log_level();
+
+        assert_eq!(config_log_level, log::Level::Debug);
+    }
+
+    #[test]
+    #[serial]
+    fn equals_attributes() {
+        let graphs = do_some_networking();
+        let results = graphs.attr_equals_to("age", 42).unwrap();
+
+        assert_eq!(results.len(), 2);
     }
 }
