@@ -9,6 +9,8 @@ pub mod graph;
 pub mod graphs;
 pub mod node;
 mod persistence;
+mod stats;
+mod util;
 
 /// Enables logging providing a level
 ///
