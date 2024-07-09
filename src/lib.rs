@@ -2,13 +2,13 @@
 //!
 //! An in-memory graph database.
 //!
-//! Possible to persists on file.
+//! Possible to persists on file (just because is something that we always expect from an in-memory databases).
 
 pub mod config;
 pub mod graph;
 pub mod graphs;
 pub mod node;
-pub mod persistence;
+mod persistence;
 
 /// Enables logging providing a level
 ///
