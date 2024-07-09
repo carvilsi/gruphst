@@ -537,9 +537,9 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob)); 
-    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred)); 
-    /// my_graphs.add(&Graph::new(&alice, "knows", &fred)); 
+    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob));
+    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
+    /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
     ///
     /// let results = my_graphs.has_relation_in("is friend of").unwrap();
     ///
@@ -560,7 +560,7 @@ impl Graphs {
             Err("any node with relation in")
         }
     }
-    
+
     /// Retrieves all the nodes with outcoming relation
     ///
     /// # Examples
@@ -575,9 +575,9 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob)); 
-    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred)); 
-    /// my_graphs.add(&Graph::new(&alice, "knows", &fred)); 
+    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob));
+    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
+    /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
     ///
     /// let results = my_graphs.has_relation_out("is friend of").unwrap();
     ///
