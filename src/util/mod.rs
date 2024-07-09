@@ -6,7 +6,7 @@ use crate::config::get_max_mem_usage;
 use crate::graphs::Graphs;
 
 /// Watches the memory that is in use for Graphs
-/// 
+///
 /// Triggered on a new Graph addition or update.
 /// The limit is set on .env file or as environmental variable
 /// with GRUPHST_MAX_MEM_USAGE in MB.
