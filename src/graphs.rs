@@ -65,7 +65,6 @@ pub struct GraphsStats<'a> {
     pub uniq_rel: usize,
 }
 
-// TODO: Graphs: return Graph(s) that matches an attribute node by like key
 // TODO: Graphs: return Graph(s) that matches an array of relations
 // TODO: Graphs: return Graph(s) that matches an array of relations on order
 impl Graphs {
@@ -257,6 +256,55 @@ impl Graphs {
             .graphs
             .iter()
             .filter(|grph| grph.has_node_attr(attr_k))
+            .collect::<Vec<&Graph>>();
+        if !graphs.is_empty() {
+            debug!(
+                "Founded {} graphs where an attribute key is '{}'",
+                graphs.len(),
+                attr_k
+            );
+            Ok(graphs)
+        } else {
+            error!("Any graph found for attribute: {}", attr_k);
+            Err("Any graph found for attribute")
+        }
+    }
+
+    /// Returns a collection of graphs like an attribute node by key
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let mut alice = Node::new("Alice");
+    /// let mut bob = Node::new("Bob");
+    /// alice.set_attr("address", "Elm street");
+    /// alice.set_attr("phone", "555-555");
+    /// alice.set_attr("age", 25);
+    /// bob.set_attr("age", 25);
+    ///
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add(&bob_alice_graph);
+    ///
+    /// let mut fred = Node::new("Fred");
+    /// fred.set_attr("room", 5);
+    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
+    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    ///
+    /// let graphs_result = my_graph.like_graph_node_attr("rO").unwrap();
+    ///
+    /// assert_eq!(graphs_result.len(), 2);
+    /// ```
+    pub fn like_graph_node_attr(&mut self, attr_k: &str) -> Result<Vec<&Graph>, &'static str> {
+        let graphs = self
+            .graphs
+            .iter()
+            .filter(|grph| grph.like_node_attr(attr_k))
             .collect::<Vec<&Graph>>();
         if !graphs.is_empty() {
             debug!(

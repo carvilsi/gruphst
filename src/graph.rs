@@ -132,6 +132,30 @@ impl Graph {
         self.from.has_attr(attr_k) || self.to.has_attr(attr_k)
     }
 
+    /// Checks if "from" or "to" node has a like attribute
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    ///
+    /// let mut alice = Node::new("Alice");
+    /// alice.set_attr("Address", "Elm street");
+    /// alice.set_attr("age", 42);
+    ///
+    /// let mut bob = Node::new("Bob");
+    /// bob.set_attr("city", "Arkham");
+    ///
+    /// let graph = Graph::new(&alice, "knows", &bob);
+    ///
+    /// assert!(!graph.like_node_attr("ph"));
+    /// assert!(graph.like_node_attr("ag"));
+    /// assert!(graph.like_node_attr("cI"));
+    /// ```
+    pub fn like_node_attr(&self, attr_k: &str) -> bool {
+        self.from.like_attr(attr_k) || self.to.like_attr(attr_k)
+    }
+
     /// Checks if "from" or "to" node has an attribute and equal for value
     ///
     /// # Examples

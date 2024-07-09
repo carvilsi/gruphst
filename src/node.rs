@@ -114,6 +114,29 @@ impl Node {
         self.attr.contains_key(attr_k)
     }
 
+    /// Checks if an attribute key is like on a node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 42);
+    ///
+    /// assert!(!node.like_attr("ph"));
+    /// assert!(node.like_attr("ag"));
+    /// assert!(node.like_attr("adDr"));
+    /// ```
+    pub fn like_attr(&self, attr_k: &str) -> bool {
+        for key in self.attr.keys() {
+            if key.to_lowercase().contains(&attr_k.to_lowercase()) {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Checks if an attribute key exists on a node
     /// and the value matchs
     ///
