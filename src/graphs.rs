@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::graph::Graph;
+use crate::node::Node;
 use crate::util::graphs_memory_watcher;
 
 /// A colection of Graph
@@ -521,4 +522,20 @@ impl Graphs {
             Err("Graph not found")
         }
     }
+
+    pub fn has_relation_in(&self, relation_in: &str) -> Result<Vec<Node>, &'static str> {
+        let mut relations_in: Vec<Node> = Vec::new();
+        for graph in &self.graphs {
+            if graph.relation == relation_in && !relations_in.contains(&graph.to){
+                relations_in.push(graph.to.clone());
+            }
+        }
+        if !relations_in.is_empty() {
+            Ok(relations_in)
+        } else {
+            Err("any node with relation in")
+        }
+    }
+
+
 }
