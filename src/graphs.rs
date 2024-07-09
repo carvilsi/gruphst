@@ -65,8 +65,6 @@ pub struct GraphsStats<'a> {
     pub uniq_rel: usize,
 }
 
-// TODO: Graphs: return Graph(s) that matches an array of relations
-// TODO: Graphs: return Graph(s) that matches an array of relations on order
 impl Graphs {
     /// Creates a new collection of Graph elements
     ///
@@ -217,6 +215,49 @@ impl Graphs {
             Ok(graphs)
         } else {
             error!("Any graph found for relation: {}", relation_name);
+            Err("Any graph found for relation")
+        }
+    }
+
+    /// Returns a collection of Graps elements that matches the relations
+    /// in the array
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let mut my_graph = Graphs::new("my_graph");
+    /// my_graph.add(&alice_bob_graph);
+    ///
+    /// let fred = Node::new("Fred");
+    /// my_graph.add(&Graph::new(&fred, "relative", &bob));
+    ///
+    /// let relations = vec!["friend of", "relative", "knows"];
+    /// let result_graph = my_graph.find_by_relations(relations).unwrap();
+    /// assert_eq!(result_graph.len(), 2);
+    /// assert_eq!(result_graph[0].relation, "friend of");
+    /// assert_eq!(result_graph[1].relation, "relative");
+    /// ```
+    pub fn find_by_relations(&mut self, relations: Vec<&str>) -> Result<Vec<&Graph>, &'static str> {
+        let graphs = self
+            .graphs
+            .iter()
+            .filter(|grph| relations.contains(&grph.relation.as_str()))
+            .collect::<Vec<&Graph>>();
+        if !graphs.is_empty() {
+            debug!(
+                "Founded {} graphs with '{:#?}' relations",
+                graphs.len(),
+                relations
+            );
+            Ok(graphs)
+        } else {
+            error!("Any graph found for relations: {:#?}", relations);
             Err("Any graph found for relation")
         }
     }
