@@ -11,6 +11,14 @@ const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
 /// The GRUPHST_MAX_MEM_USAGE defines the limit of
 /// memory used to store data, for in-memory mode and
 /// persistence.
+///
+/// # Example
+/// ```rust
+/// use gruphst::config::get_max_mem_usage;
+///
+/// let max_mem = get_max_mem_usage();
+/// ```
+
 pub fn get_max_mem_usage() -> usize {
     dotenv().ok();
     match dotenv::var(GRUPHST_MAX_MEM_USAGE) {

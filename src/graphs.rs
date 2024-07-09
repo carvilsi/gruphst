@@ -8,6 +8,13 @@ use uuid::Uuid;
 use crate::config::get_max_mem_usage;
 use crate::graph::Graph;
 
+/// Watches the memory that is in use for Graphs
+/// 
+/// Triggered on a new Graph addition or update.
+/// The limit is set on .env file or as environmental variable
+/// with GRUPHST_MAX_MEM_USAGE in MB.
+/// In case that the memory is close to the configured max value,
+/// the data will be persisted on fs, and the process will exit.
 fn graphs_memory_watcher(graphs: &Graphs) {
     let g = graphs.clone();
     thread::spawn(move || {
@@ -560,6 +567,7 @@ impl Graphs {
             self.graphs.remove(i);
             debug!("Graph to update found it at index: {i}");
             self.graphs.push(graph_to_update.clone());
+            graphs_memory_watcher(self);
             Ok(())
         } else {
             error!(
