@@ -523,10 +523,34 @@ impl Graphs {
         }
     }
 
+    /// Retrieves all the nodes with incoming relation
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let mut my_graphs = Graphs::new("my-graphs");
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let fred = Node::new("Fred");
+    ///
+    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob)); 
+    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred)); 
+    /// my_graphs.add(&Graph::new(&alice, "knows", &fred)); 
+    ///
+    /// let results = my_graphs.has_relation_in("is friend of").unwrap();
+    ///
+    /// assert_eq!(results.len(), 2);
+    /// assert_eq!(results[0].name, "Bob");
+    /// assert_eq!(results[1].name, "Fred");
+    /// ```
     pub fn has_relation_in(&self, relation_in: &str) -> Result<Vec<Node>, &'static str> {
         let mut relations_in: Vec<Node> = Vec::new();
         for graph in &self.graphs {
-            if graph.relation == relation_in && !relations_in.contains(&graph.to){
+            if graph.relation == relation_in && !relations_in.contains(&graph.to) {
                 relations_in.push(graph.to.clone());
             }
         }
@@ -536,6 +560,42 @@ impl Graphs {
             Err("any node with relation in")
         }
     }
-
-
+    
+    /// Retrieves all the nodes with outcoming relation
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::graphs::Graphs;
+    ///
+    /// let mut my_graphs = Graphs::new("my-graphs");
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let fred = Node::new("Fred");
+    ///
+    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob)); 
+    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred)); 
+    /// my_graphs.add(&Graph::new(&alice, "knows", &fred)); 
+    ///
+    /// let results = my_graphs.has_relation_out("is friend of").unwrap();
+    ///
+    /// assert_eq!(results.len(), 2);
+    /// assert_eq!(results[0].name, "Alice");
+    /// assert_eq!(results[1].name, "Bob");
+    /// ```
+    pub fn has_relation_out(&self, relation_out: &str) -> Result<Vec<Node>, &'static str> {
+        let mut relations_out: Vec<Node> = Vec::new();
+        for graph in &self.graphs {
+            if graph.relation == relation_out && !relations_out.contains(&graph.from) {
+                relations_out.push(graph.from.clone());
+            }
+        }
+        if !relations_out.is_empty() {
+            Ok(relations_out)
+        } else {
+            Err("any node with relation out")
+        }
+    }
 }

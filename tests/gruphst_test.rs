@@ -339,4 +339,25 @@ mod tests {
 
         assert_eq!(results.len(), 2);
     }
+
+    #[test]
+    #[serial]
+    fn relation_in() {
+        let graphs = do_some_networking();
+        let results = graphs.has_relation_in("friend of");
+        assert_eq!(results.clone().unwrap().len(), 2);
+        assert_eq!(results.clone().unwrap()[0].name, "Bob");
+        assert_eq!(results.unwrap()[1].name, "Alice");
+    }
+
+    #[test]
+    #[serial]
+    fn relation_out() {
+        let graphs = do_some_networking();
+        let results = graphs.has_relation_out("friend of");
+        assert_eq!(results.clone().unwrap().len(), 3);
+        assert_eq!(results.clone().unwrap()[0].name, "Alice");
+        assert_eq!(results.clone().unwrap()[1].name, "Bob");
+        assert_eq!(results.unwrap()[2].name, "Fred");
+    }
 }
