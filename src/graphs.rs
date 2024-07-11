@@ -1,6 +1,7 @@
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use std::collections::HashMap;
 
 use crate::graph::Graph;
 use crate::node::Node;
@@ -9,9 +10,9 @@ use crate::util::graphs_memory_watcher;
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
-    /// The collection of Graph
-    pub graphs: Vec<Graph>,
-    /// Name for the collection
+    /// The collections of Graph
+    pub vault: HashMap<String, Vec<Graph>>,
+    /// Name for the current collection
     pub name: String,
     /// The uuid for the collection
     pub id: String,
@@ -24,19 +25,29 @@ impl Graphs {
     /// ```rust
     /// use gruphst::graphs::Graphs;
     ///
-    /// let my_graph = Graphs::new("my_graph");
+    /// let my_graph = Graphs::init("my_graph");
     /// ```
-    pub fn new(name: &str) -> Self {
+    pub fn init(name: &str) -> Self {
+        let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
+        vault.insert(String::from(name), vec![]);
         let graphs = Graphs {
             name: String::from(name),
-            id: Uuid::new_v4().to_string(),
-            graphs: vec![],
+            id: Uuid::new_v4().to_string(), 
+            vault,
         };
         debug!("Created new Graphs: {:#?}", graphs);
         graphs
     }
 
-    /// Adds a Graph element to the colection
+    // TODO: add test and documentation
+    pub fn new(&mut self, name: &str) -> &mut Graphs {
+        self.vault.insert(String::from(name), vec![]);
+        self.name = name.to_string();
+        debug!("Created new Graphs: {:#?}", self);
+        self
+    }
+
+    /// Adds a Graph element to the current colection
     ///
     /// # Examples
     /// ```rust
@@ -47,18 +58,35 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     /// ```
     pub fn add(&mut self, graph: &Graph) {
         debug!(
-            "Added new graph to Graphs [{}]
+            "Added new graph to Graphs [{}, {}]
             current length: {}",
             self.id,
+            self.name,
             self.len()
         );
-        self.graphs.push(graph.clone());
-        graphs_memory_watcher(self);
+        if let Some(v) = self.vault.get_mut(self.name.as_str()) {
+            v.push(graph.clone());
+            graphs_memory_watcher(self);
+        } else {
+            error!("no graph element {} at vault", self.name);
+        }
+    }
+
+    /// Retrieves the collection of graphs
+    /// the default one or by name
+    // TODO: Add a test and documentation
+    pub fn get(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);        
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            Ok(graphs.clone())
+        } else {
+            Err("no graphs found on vault")
+        }
     }
 
     /// Retrieves the length of the Graphs
@@ -69,7 +97,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut graphs = Graphs::new("lengths");
+    /// let mut graphs = Graphs::init("lengths");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     ///
@@ -79,12 +107,17 @@ impl Graphs {
     /// assert_eq!(graphs.len(), 2);
     /// ```
     pub fn len(&self) -> usize {
+        let mut length = 0;
+        for (_graphs_name, graphs) in self.vault.iter() {
+            length += graphs.len();
+        }
         debug!(
-            "Requested length for graphs, current length: {}",
-            self.graphs.len()
+            "Requested length for vault, current length: {}",
+            length 
         );
-        self.graphs.len()
+        length
     }
+    // TODO: add a method to deal with total amount of different Graphs
 
     /// Checks if the Graphs is empty
     ///
@@ -94,7 +127,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut graphs = Graphs::new("lengths");
+    /// let mut graphs = Graphs::init("lengths");
     ///
     /// assert!(graphs.is_empty());
     ///
@@ -116,7 +149,7 @@ impl Graphs {
     /// ```rust
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// assert_eq!(my_graph.name, "my_graph");
     ///
     /// my_graph.update_name("graphy");
@@ -138,7 +171,7 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     ///
     /// let fred = Node::new("Fred");
@@ -152,22 +185,26 @@ impl Graphs {
     /// assert_eq!(res_graph.len(), 1);
     /// assert_eq!(res_graph[0].relation, "relative");
     /// ```
-    pub fn find_by_relation(&mut self, relation_name: &str) -> Result<Vec<&Graph>, &'static str> {
-        let graphs = self
-            .graphs
-            .iter()
-            .filter(|grph| grph.relation == relation_name)
-            .collect::<Vec<&Graph>>();
-        if !graphs.is_empty() {
-            debug!(
-                "Founded {} graphs with '{}' relation name",
-                graphs.len(),
-                relation_name
-            );
-            Ok(graphs)
+    pub fn find_by_relation(&mut self, relation_name: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            let graphs = graphs
+                .iter()
+                .filter(|grph| grph.relation == relation_name)
+                .collect::<Vec<&Graph>>();
+            if !graphs.is_empty() {
+                debug!(
+                    "Founded {} graphs with '{}' relation name",
+                    graphs.len(),
+                    relation_name
+                );
+                Ok(graphs)
+            } else {
+                error!("Any graph found for relation: {}", relation_name);
+                Err("Any graph found for relation")
+            }
         } else {
-            error!("Any graph found for relation: {}", relation_name);
-            Err("Any graph found for relation")
+            Err("no graphs found on vault")
         }
     }
 
@@ -183,7 +220,7 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     ///
     /// let fred = Node::new("Fred");
@@ -195,22 +232,26 @@ impl Graphs {
     /// assert_eq!(result_graph[0].relation, "friend of");
     /// assert_eq!(result_graph[1].relation, "relative");
     /// ```
-    pub fn find_by_relations(&mut self, relations: Vec<&str>) -> Result<Vec<&Graph>, &'static str> {
-        let graphs = self
-            .graphs
-            .iter()
-            .filter(|grph| relations.contains(&grph.relation.as_str()))
-            .collect::<Vec<&Graph>>();
-        if !graphs.is_empty() {
-            debug!(
-                "Founded {} graphs with '{:#?}' relations",
-                graphs.len(),
-                relations
-            );
-            Ok(graphs)
+    pub fn find_by_relations(&mut self, relations: Vec<&str>, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            let graphs = graphs
+                .iter()
+                .filter(|grph| relations.contains(&grph.relation.as_str()))
+                .collect::<Vec<&Graph>>();
+            if !graphs.is_empty() {
+                debug!(
+                    "Founded {} graphs with '{:#?}' relations",
+                    graphs.len(),
+                    relations
+                );
+                Ok(graphs)
+            } else {
+                error!("Any graph found for relations: {:#?}", relations);
+                Err("Any graph found for relation")
+            }
         } else {
-            error!("Any graph found for relations: {:#?}", relations);
-            Err("Any graph found for relation")
+            Err("graphs not found on vault")
         }
     }
 
@@ -231,7 +272,7 @@ impl Graphs {
     ///
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     /// my_graph.add(&bob_alice_graph);
     ///
@@ -244,22 +285,26 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
-    pub fn has_graph_node_attr(&mut self, attr_k: &str) -> Result<Vec<&Graph>, &'static str> {
-        let graphs = self
-            .graphs
-            .iter()
-            .filter(|grph| grph.has_node_attr(attr_k))
-            .collect::<Vec<&Graph>>();
-        if !graphs.is_empty() {
-            debug!(
-                "Founded {} graphs where an attribute key is '{}'",
-                graphs.len(),
-                attr_k
-            );
-            Ok(graphs)
+    pub fn has_graph_node_attr(&mut self, attr_k: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            let graphs = graphs
+                .iter()
+                .filter(|grph| grph.has_node_attr(attr_k))
+                .collect::<Vec<&Graph>>();
+            if !graphs.is_empty() {
+                debug!(
+                    "Founded {} graphs where an attribute key is '{}'",
+                    graphs.len(),
+                    attr_k
+                );
+                Ok(graphs)
+            } else {
+                error!("Any graph found for attribute: {}", attr_k);
+                Err("Any graph found for attribute")
+            }
         } else {
-            error!("Any graph found for attribute: {}", attr_k);
-            Err("Any graph found for attribute")
+            Err("no graphs found on vault")
         }
     }
 
@@ -280,7 +325,7 @@ impl Graphs {
     ///
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     /// my_graph.add(&bob_alice_graph);
     ///
@@ -293,22 +338,26 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
-    pub fn like_graph_node_attr(&mut self, attr_k: &str) -> Result<Vec<&Graph>, &'static str> {
-        let graphs = self
-            .graphs
-            .iter()
-            .filter(|grph| grph.like_node_attr(attr_k))
-            .collect::<Vec<&Graph>>();
-        if !graphs.is_empty() {
-            debug!(
-                "Founded {} graphs where an attribute key is '{}'",
-                graphs.len(),
-                attr_k
-            );
-            Ok(graphs)
+    pub fn like_graph_node_attr(&mut self, attr_k: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            let graphs = graphs
+                .iter()
+                .filter(|grph| grph.like_node_attr(attr_k))
+                .collect::<Vec<&Graph>>();
+            if !graphs.is_empty() {
+                debug!(
+                    "Founded {} graphs where an attribute key is '{}'",
+                    graphs.len(),
+                    attr_k
+                );
+                Ok(graphs)
+            } else {
+                error!("Any graph found for attribute: {}", attr_k);
+                Err("Any graph found for attribute")
+            }
         } else {
-            error!("Any graph found for attribute: {}", attr_k);
-            Err("Any graph found for attribute")
+            Err("no graphs on vault")
         }
     }
 
@@ -330,7 +379,7 @@ impl Graphs {
     ///
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::new("my_graph");
+    /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     /// my_graph.add(&bob_alice_graph);
     ///
@@ -343,25 +392,30 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 3);
     /// ```
-    pub fn attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> Result<Vec<&Graph>, &'static str>
+    // TODO: add a method to find attr on all graphs
+    pub fn attr_equals_to<T>(&self, attr_k: &str, attr_v: T, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let graphs = self
-            .graphs
-            .iter()
-            .filter(|grph| grph.equals_node_attr(attr_k, attr_v.clone()))
-            .collect::<Vec<&Graph>>();
-        if !graphs.is_empty() {
-            debug!(
-                "Founded {} graphs where an attribute key is '{}'",
-                graphs.len(),
-                attr_k
-            );
-            Ok(graphs)
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            let graphs = graphs
+                .iter()
+                .filter(|grph| grph.equals_node_attr(attr_k, attr_v.clone()))
+                .collect::<Vec<&Graph>>();
+            if !graphs.is_empty() {
+                debug!(
+                    "Founded {} graphs where an attribute key is '{}'",
+                    graphs.len(),
+                    attr_k
+                );
+                Ok(graphs)
+            } else {
+                error!("Any graph found for attribute: {}", attr_k);
+                Err("Any graph found for attribute")
+            }
         } else {
-            error!("Any graph found for attribute: {}", attr_k);
-            Err("Any graph found for attribute")
+            Err("no graphs on vault")
         }
     }
 
@@ -373,7 +427,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graph = Graphs::new("my graph");
+    /// let mut my_graph = Graphs::init("my graph");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
@@ -387,16 +441,35 @@ impl Graphs {
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
     /// ```
+    // TODO: implement uniq relations for all the graphs
+    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
+        let mut uniq_rel = Vec::new();
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            for graph in graphs.iter() {
+                uniq_rel.push(&graph.relation);
+            }
+            uniq_rel.sort();
+            uniq_rel.dedup();
+            uniq_rel
+        } else {
+            // TODO: return an error if any graph????
+            error!("no graphs in vault");
+            uniq_rel
+        }
+    }
+    
     pub fn uniq_relations(&self) -> Vec<&String> {
         let mut uniq_rel = Vec::new();
-        for graph in self.graphs.iter() {
-            uniq_rel.push(&graph.relation);
+        for (_graphs_name, graphs) in &self.vault {
+            for graph in graphs.iter() {
+                uniq_rel.push(&graph.relation);
+            }
+            uniq_rel.sort();
+            uniq_rel.dedup();
         }
-        uniq_rel.sort();
-        uniq_rel.dedup();
         uniq_rel
     }
-
     /// Returns a Graph that provided id matches with Graph, or From, To Nodes
     ///
     /// # Examples
@@ -406,7 +479,7 @@ impl Graphs {
     /// use gruphst::graphs::Graphs;
     ///
     ///
-    /// let mut my_graph = Graphs::new("friends");
+    /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
@@ -420,17 +493,21 @@ impl Graphs {
     /// let res = my_graph.find_by_id(&bob_node_id);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
-    pub fn find_by_id(&mut self, id: &str) -> Result<&mut Graph, &'static str> {
-        let graph = self
-            .graphs
-            .iter_mut()
-            .find(|graph| graph.id == id || graph.from.id == id || graph.to.id == id);
-        if graph.is_some() {
-            debug!("Founded Graph by id: {:#?}", graph);
-            Ok(graph.unwrap())
+    pub fn find_by_id(&mut self, id: &str, graphs_name: Option<&str>) -> Result<&mut Graph, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get_mut(&current_graph) {
+            let graph = graphs
+                .iter_mut()
+                .find(|graph| graph.id == id || graph.from.id == id || graph.to.id == id);
+            if graph.is_some() {
+                debug!("Founded Graph by id: {:#?}", graph);
+                Ok(graph.unwrap())
+            } else {
+                error!("Graph with id [{}] not found", id);
+                Err("Graph not found")
+            }
         } else {
-            error!("Graph with id [{}] not found", id);
-            Err("Graph not found")
+            Err("no graphs found at vault")
         }
     }
 
@@ -442,7 +519,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graph = Graphs::new("friends");
+    /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
@@ -457,15 +534,20 @@ impl Graphs {
     /// my_graph.delete_graph_by_id(alice_bob.id);
     /// assert_eq!(my_graph.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(&mut self, id: String) -> Result<(), &'static str> {
-        let index = self.graphs.iter().position(|graph| graph.id == id);
-        if index.is_some() {
-            debug!("Delete graph: {}", id);
-            self.graphs.remove(index.unwrap());
-            Ok(())
+    pub fn delete_graph_by_id(&mut self, id: String, graphs_name: Option<&str>) -> Result<(), &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get_mut(&current_graph) {
+            let index = graphs.iter().position(|graph| graph.id == id);
+            if index.is_some() {
+                debug!("Delete graph: {}", id);
+                graphs.remove(index.unwrap());
+                Ok(())
+            } else {
+                error!("Graph [{}] to delete not found", id);
+                Err("Graph to delete not found")
+            }
         } else {
-            error!("Graph [{}] to delete not found", id);
-            Err("Graph to delete not found")
+            Err("no graphs found at vault")
         }
     }
 
@@ -478,7 +560,7 @@ impl Graphs {
     /// use gruphst::graphs::Graphs;
     ///
     ///
-    /// let mut my_graphs = Graphs::new("my-graphs");
+    /// let mut my_graphs = Graphs::init("my-graphs");
     ///
     /// let alice_node = Node::new("Alice");
     /// let bob_node = Node::new("Bob");
@@ -501,25 +583,28 @@ impl Graphs {
     /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(&mut self, graph_to_update: &Graph) -> Result<(), &'static str> {
+    pub fn update_graph(&mut self, graph_to_update: &Graph, graphs_name: Option<&str>) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
-        let index = self
-            .graphs
-            .iter()
-            .position(|graph| graph.id == graph_to_update.id);
-        if index.is_some() {
-            let i = index.unwrap();
-            self.graphs.remove(i);
-            debug!("Graph to update found it at index: {i}");
-            self.graphs.push(graph_to_update.clone());
-            graphs_memory_watcher(self);
-            Ok(())
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get_mut(&current_graph) {
+            let index = graphs
+                .iter()
+                .position(|graph| graph.id == graph_to_update.id);
+            if index.is_some() {
+                let i = index.unwrap();
+                graphs.remove(i);
+                debug!("Graph to update found it at index: {i}");
+                graphs.push(graph_to_update.clone());
+                graphs_memory_watcher(self);
+                Ok(())
+            } else {
+                // TODO: reformat this!
+                error!("Graph to update with id: [{}] not found",
+                    graph_to_update.id);
+                Err("graph to update not found")
+            }
         } else {
-            error!(
-                "Graph to update with id: [{}] not found",
-                graph_to_update.id
-            );
-            Err("Graph not found")
+            Err("no graphs in vault")
         }
     }
 
@@ -531,7 +616,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graphs = Graphs::new("my-graphs");
+    /// let mut my_graphs = Graphs::init("my-graphs");
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
@@ -547,12 +632,17 @@ impl Graphs {
     /// assert_eq!(results[0].name, "Bob");
     /// assert_eq!(results[1].name, "Fred");
     /// ```
-    pub fn has_relation_in(&self, relation_in: &str) -> Result<Vec<Node>, &'static str> {
+    pub fn has_relation_in(&self, relation_in: &str, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
         let mut relations_in: Vec<Node> = Vec::new();
-        for graph in &self.graphs {
-            if graph.relation == relation_in && !relations_in.contains(&graph.to) {
-                relations_in.push(graph.to.clone());
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+           for graph in graphs {
+                if graph.relation == relation_in && !relations_in.contains(&graph.from) {
+                    relations_in.push(graph.to.clone());
+                }
             }
+        } else {
+            return Err("no current graph in vault");
         }
         if !relations_in.is_empty() {
             Ok(relations_in)
@@ -569,7 +659,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graphs = Graphs::new("my-graphs");
+    /// let mut my_graphs = Graphs::init("my-graphs");
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
@@ -585,17 +675,31 @@ impl Graphs {
     /// assert_eq!(results[0].name, "Alice");
     /// assert_eq!(results[1].name, "Bob");
     /// ```
-    pub fn has_relation_out(&self, relation_out: &str) -> Result<Vec<Node>, &'static str> {
+    pub fn has_relation_out(&self, relation_out: &str, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
         let mut relations_out: Vec<Node> = Vec::new();
-        for graph in &self.graphs {
-            if graph.relation == relation_out && !relations_out.contains(&graph.from) {
-                relations_out.push(graph.from.clone());
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+           for graph in graphs {
+                if graph.relation == relation_out && !relations_out.contains(&graph.from) {
+                    relations_out.push(graph.from.clone());
+                }
             }
+        } else {
+            return Err("no current graph in vault");
         }
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
             Err("any node with relation out")
         }
+    }
+
+    /// Retrieves the current graphs or returns the option one
+    fn select_graphs_name(&self, graphs_name: Option<&str>) -> String {
+        let mut current_graph = self.name.clone();
+        if let Some(gn) = graphs_name {
+            current_graph = gn.to_string();
+        }
+        current_graph.to_string()
     }
 }

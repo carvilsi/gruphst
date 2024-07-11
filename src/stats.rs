@@ -7,8 +7,10 @@ use std::error::Error;
 pub struct GraphsStats<'a> {
     /// memory used by Graphs in bytes
     pub mem: usize,
-    /// length of the Graphs
+    /// length of the Graph's vault
     pub len: usize,
+    /// total graphs
+    pub total_graphs: usize,
     /// name of the Graph
     pub name: &'a str,
     /// total attributes
@@ -29,7 +31,7 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graphs = Graphs::new("memories");
+    /// let mut my_graphs = Graphs::init("memories");
     /// my_graphs.add(
     ///     &Graph::new(
     ///         &Node::new("Alice"),
@@ -62,9 +64,11 @@ impl Graphs {
         let bytes = bincode::serialize(self)?;
         // lets count the amount of attributes in the graph
         let mut attr_counter = 0;
-        for graph in self.graphs.iter() {
-            attr_counter += graph.from.len_attr();
-            attr_counter += graph.to.len_attr();
+        for (_graph_name, graphs) in self.vault.iter() {
+            for graph in graphs {
+                attr_counter += graph.from.len_attr();
+                attr_counter += graph.to.len_attr();
+            }
         }
 
         let stats = GraphsStats {
@@ -74,6 +78,7 @@ impl Graphs {
             total_attr: attr_counter,
             total_nodes: self.len() * 2,
             uniq_rel: self.uniq_relations().len(),
+            total_graphs: self.vault.len(),
         };
         debug!("Graphs stats: {:#?}", stats);
         Ok(stats)
