@@ -21,11 +21,11 @@ mod tests {
     #[test]
     fn find_in_graphs_failing() {
         let mut my_graph = Graphs::init("failing");
-        my_graph.add(&Graph::new(
+        my_graph.add_graph(&Graph::new(
             &Node::new("Alice"),
             "is friend",
             &Node::new("Bob"),
-        ));
+        ), None);
         assert!(my_graph.find_by_id("foobarid", None).is_err());
         assert!(my_graph.find_by_relation("lol", None).is_err());
     }
@@ -58,13 +58,13 @@ mod tests {
         let node1 = Node::new("a node");
         let node2 = Node::new("b node");
         let graph1 = Graph::new(&node1, "friend of", &node2);
-        gru.add(&graph1);
+        gru.add_graph(&graph1, None);
         assert_eq!(gru.len(), 1);
 
         let node3 = Node::new("c node");
         let node4 = Node::new("d node");
         let graph2 = Graph::new(&node3, "knows", &node4);
-        gru.add(&graph2);
+        gru.add_graph(&graph2, None);
         assert_eq!(gru.len(), 2);
 
         let mut res_graphs = gru.find_by_relation("knows", None).unwrap();
@@ -76,7 +76,7 @@ mod tests {
 
         let node5 = Node::new("e node");
         let graph3 = Graph::new(&node1, "friend of", &node5);
-        gru.add(&graph3);
+        gru.add_graph(&graph3, None);
 
         res_graphs = gru.find_by_relation("friend of", None).unwrap();
         assert_eq!(res_graphs.len(), 2);
@@ -92,12 +92,12 @@ mod tests {
         node1.set_attr("foo", "bar");
         let node2 = Node::new("b node");
         let graph1 = Graph::new(&node1, "relation a-b", &node2);
-        gru.add(&graph1);
+        gru.add_graph(&graph1, None);
 
         let node3 = Node::new("c node");
         let node4 = Node::new("d node");
         let graph2 = Graph::new(&node3, "relation c-d", &node4);
-        gru.add(&graph2);
+        gru.add_graph(&graph2, None);
 
         let _ = gru.persists();
 
@@ -106,7 +106,7 @@ mod tests {
         let grphs = Graphs::load(&file_name);
         match grphs {
             Ok(grphs) => {
-                let graphs = grphs.get(Some(name.as_str())).unwrap();
+                let graphs = grphs.get_graphs(Some(name.as_str())).unwrap();
                 assert_eq!(grphs.name, name);
                 assert_eq!(graphs[0].relation, graph1.relation);
                 assert_eq!(graphs[0].from.name, "a node");
@@ -125,10 +125,10 @@ mod tests {
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
         let alice_bob = Graph::new(&alice, "is friend of", &bob);
-        my_graph.add(&alice_bob);
+        my_graph.add_graph(&alice_bob, None);
 
         let alice_fred = Graph::new(&alice, "is firend of", &Node::new("Fred"));
-        my_graph.add(&alice_fred);
+        my_graph.add_graph(&alice_fred, None);
 
         assert_eq!(my_graph.len(), 2);
 
@@ -143,11 +143,11 @@ mod tests {
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());
-        my_graph.add(&Graph::new(
+        my_graph.add_graph(&Graph::new(
             &Node::new("Alice"),
             "is friend",
             &Node::new("Bob"),
-        ));
+        ), None);
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());
@@ -206,16 +206,16 @@ mod tests {
         let relation_friend_of = "friend of";
         let relation_relative_of = "relative of";
         let mut graph = Graph::new(&alice, relation_friend_of, &bob);
-        graphs.add(&graph);
+        graphs.add_graph(&graph, None);
 
         graph = Graph::new(&alice, relation_relative_of, &fred);
-        graphs.add(&graph);
+        graphs.add_graph(&graph, None);
 
         graph = Graph::new(&alice, relation_friend_of, &john);
-        graphs.add(&graph);
+        graphs.add_graph(&graph, None);
 
         graph = Graph::new(&peter, relation_relative_of, &john);
-        graphs.add(&graph);
+        graphs.add_graph(&graph, None);
 
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
@@ -235,7 +235,7 @@ mod tests {
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
         let alice_bob = Graph::new(&alice, "friend of", &bob);
-        grphs.add(&alice_bob);
+        grphs.add_graph(&alice_bob, None);
 
         let bob_alice = Graph::new(&bob, "friend of", &alice);
         assert!(grphs.update_graph(&bob_alice, None).is_err());
@@ -251,8 +251,8 @@ mod tests {
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
 
-        graphs.add(&Graph::new(&alice, "friend", &bob));
-        graphs.add(&Graph::new(&bob, "friend", &alice));
+        graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
+        graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
 
         assert_eq!(graphs.len(), 2);
         assert!(!graphs.is_empty());
@@ -306,10 +306,10 @@ mod tests {
 
         let fred = Node::new("Fred");
 
-        graphs.add(&Graph::new(&alice, "friend of", &bob));
-        graphs.add(&Graph::new(&bob, "friend of", &alice));
-        graphs.add(&Graph::new(&fred, "relative of", &alice));
-        graphs.add(&Graph::new(&fred, "friend of", &alice));
+        graphs.add_graph(&Graph::new(&alice, "friend of", &bob), None);
+        graphs.add_graph(&Graph::new(&bob, "friend of", &alice), None);
+        graphs.add_graph(&Graph::new(&fred, "relative of", &alice), None);
+        graphs.add_graph(&Graph::new(&fred, "friend of", &alice), None);
 
         graphs
     }

@@ -59,29 +59,57 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
     /// ```
-    // TODO: add possible to add to graphs
-    pub fn add(&mut self, graph: &Graph) {
-        debug!(
-            "Added new graph to Graphs [{}, {}]
-            current length: {}",
-            self.id,
-            self.name,
-            self.len()
-        );
-        if let Some(v) = self.vault.get_mut(self.name.as_str()) {
+    pub fn add_graph(&mut self, graph: &Graph, graphs_name: Option<&str>) {
+        let current_graph = self.select_graphs_name(graphs_name);
+        if let Some(v) = self.vault.get_mut(&current_graph) {
             v.push(graph.clone());
+            debug!(
+                "Added new graph to Graphs [{}, {}]
+                current length: {}",
+                self.id,
+                current_graph,
+                self.len()
+            );
             graphs_memory_watcher(self);
         } else {
-            error!("no graph element {} at vault", self.name);
+            error!("no graph element {} at vault", current_graph);
         }
     }
 
     /// Retrieves the collection of graphs
     /// the default one or by name
-    // TODO: Add a test and documentation
-    pub fn get(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// use gruphst::graph::Graph;
+    /// use gruphst::node::Node;
+    ///
+    /// let mut the_graphs = Graphs::init("init graph");
+    /// 
+    /// let graph = Graph::new(
+    ///     &Node::new("alice"),
+    ///     "knows",
+    ///     &Node::new("bob"));
+    /// the_graphs.add_graph(&graph, None);
+    ///
+    /// assert_eq!(the_graphs.name, "init graph");
+    /// let default_graph = the_graphs.get_graphs(None).unwrap();
+    /// assert_eq!(default_graph[0].id, graph.id);
+    ///
+    /// the_graphs.new("new one");
+    /// let graph1 = Graph::new(
+    ///     &Node::new("bilbo"),
+    ///     "relative",
+    ///     &Node::new("frodo")
+    /// );
+    /// the_graphs.add_graph(&graph1, Some("new one"));
+    /// assert_eq!(the_graphs.name, "new one");
+    /// let other_graph = the_graphs.get_graphs(Some("new one")).unwrap();
+    /// assert_eq!(other_graph[0].id, graph1.id);
+    /// ```
+    pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
         let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             Ok(graphs.clone())
@@ -102,8 +130,8 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     ///
-    /// graphs.add(&Graph::new(&alice, "friend", &bob));
-    /// graphs.add(&Graph::new(&bob, "friend", &alice));
+    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
     ///
     /// assert_eq!(graphs.len(), 2);
     /// ```
@@ -132,8 +160,8 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     ///
-    /// graphs.add(&Graph::new(&alice, "friend", &bob));
-    /// graphs.add(&Graph::new(&bob, "friend", &alice));
+    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
     ///
     /// assert!(!graphs.is_empty());
     /// ```
@@ -170,10 +198,10 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
     ///
     /// let fred = Node::new("Fred");
-    /// my_graph.add(&Graph::new(&fred, "relative", &bob));
+    /// my_graph.add_graph(&Graph::new(&fred, "relative", &bob), None);
     ///
     /// let result_graph = my_graph.find_by_relation("friend of", None).unwrap();
     /// assert_eq!(result_graph.len(), 1);
@@ -223,10 +251,10 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
     ///
     /// let fred = Node::new("Fred");
-    /// my_graph.add(&Graph::new(&fred, "relative", &bob));
+    /// my_graph.add_graph(&Graph::new(&fred, "relative", &bob), None);
     ///
     /// let relations = vec!["friend of", "relative", "knows"];
     /// let result_graph = my_graph.find_by_relations(relations, None).unwrap();
@@ -279,13 +307,13 @@ impl Graphs {
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
-    /// my_graph.add(&bob_alice_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
+    /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
-    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.has_graph_node_attr("room", None).unwrap();
     ///
@@ -336,13 +364,13 @@ impl Graphs {
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
-    /// my_graph.add(&bob_alice_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
+    /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
-    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.like_graph_node_attr("rO", None).unwrap();
     ///
@@ -394,13 +422,13 @@ impl Graphs {
     /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
     /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add(&alice_bob_graph);
-    /// my_graph.add(&bob_alice_graph);
+    /// my_graph.add_graph(&alice_bob_graph, None);
+    /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add(&Graph::new(&fred, "colege", &bob));
-    /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
+    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.attr_equals_to("age", 42, None).unwrap();
     ///
@@ -469,11 +497,11 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graph.add(&Graph::new(&alice, "friend of", &bob));
-    /// my_graph.add(&Graph::new(&alice, "relative of", &fred));
-    /// my_graph.add(&Graph::new(&fred, "friend of", &bob));
-    /// my_graph.add(&Graph::new(&bob, "friend of", &alice));
-    /// my_graph.add(&Graph::new(&fred, "relative of", &alice));
+    /// my_graph.add_graph(&Graph::new(&alice, "friend of", &bob), None);
+    /// my_graph.add_graph(&Graph::new(&alice, "relative of", &fred), None);
+    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &bob), None);
+    /// my_graph.add_graph(&Graph::new(&bob, "friend of", &alice), None);
+    /// my_graph.add_graph(&Graph::new(&fred, "relative of", &alice), None);
     ///
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
@@ -503,11 +531,11 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
-    /// my_graph.add(&alice_bob);
+    /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let alice_fred =
     ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
-    /// my_graph.add(&alice_fred);
+    /// my_graph.add_graph(&alice_fred, None);
     ///
     /// let bob_node_id = bob.id;
     /// let res = my_graph.find_by_id(&bob_node_id, None);
@@ -547,11 +575,11 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
-    /// my_graph.add(&alice_bob);
+    /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let alice_fred =
     ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
-    /// my_graph.add(&alice_fred);
+    /// my_graph.add_graph(&alice_fred, None);
     ///
     /// assert_eq!(my_graph.len(), 2);
     ///
@@ -594,16 +622,16 @@ impl Graphs {
     /// let bob_node = Node::new("Bob");
     /// let alice_bob_graph =
     ///     Graph::new(&alice_node, "best friends", &bob_node);
-    /// my_graphs.add(&alice_bob_graph);
+    /// my_graphs.add_graph(&alice_bob_graph, None);
     ///
     /// let fred_node = Node::new("Fred");
     /// let mut alice_fred_graph =
     ///     Graph::new(&alice_node, "super friends", &fred_node);
-    /// my_graphs.add(&alice_fred_graph);
+    /// my_graphs.add_graph(&alice_fred_graph, None);
     ///
     /// assert_eq!(my_graphs.len(), 2);
     ///
-    /// let graphs = my_graphs.get(Some(&my_graphs.name)).unwrap();
+    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.name)).unwrap();
     /// assert_eq!(graphs[1].relation, "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
@@ -658,9 +686,9 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob));
-    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
-    /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
+    /// my_graphs.add_graph(&Graph::new(&alice, "is friend of", &bob), None);
+    /// my_graphs.add_graph(&Graph::new(&bob, "is friend of", &fred), None);
+    /// my_graphs.add_graph(&Graph::new(&alice, "knows", &fred), None);
     ///
     /// let results = my_graphs.has_relation_in("is friend of", None).unwrap();
     ///
@@ -705,9 +733,9 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add(&Graph::new(&alice, "is friend of", &bob));
-    /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
-    /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
+    /// my_graphs.add_graph(&Graph::new(&alice, "is friend of", &bob), None);
+    /// my_graphs.add_graph(&Graph::new(&bob, "is friend of", &fred), None);
+    /// my_graphs.add_graph(&Graph::new(&alice, "knows", &fred), None);
     ///
     /// let results = my_graphs.has_relation_out("is friend of", None).unwrap();
     ///

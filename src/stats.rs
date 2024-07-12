@@ -32,24 +32,24 @@ impl Graphs {
     /// use gruphst::graphs::Graphs;
     ///
     /// let mut my_graphs = Graphs::init("memories");
-    /// my_graphs.add(
+    /// my_graphs.add_graph(
     ///     &Graph::new(
     ///         &Node::new("Alice"),
     ///         "recalls friendship with",
     ///         &Node::new("Bob")
-    ///     )
+    ///     ), None
     /// );
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("address", "Elm street");
     /// fred.set_attr("phone", "555-555-555");
     /// fred.set_attr("age", "25");
     ///
-    /// my_graphs.add(
+    /// my_graphs.add_graph(
     ///     &Graph::new(
     ///         &fred,
     ///         "relative of",
     ///         &Node::new("Coco")
-    ///     )
+    ///     ), None
     /// );
     ///
     /// let stats = my_graphs.stats().unwrap();
