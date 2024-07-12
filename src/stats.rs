@@ -8,7 +8,7 @@ pub struct GraphsStats<'a> {
     /// memory used by Graphs in bytes
     pub mem: usize,
     /// length of the Graph's vault
-    pub len: usize,
+    pub len_graphs: usize,
     /// total graphs
     pub total_graphs: usize,
     /// name of the Graph
@@ -54,11 +54,12 @@ impl Graphs {
     ///
     /// let stats = my_graphs.stats().unwrap();
     /// assert_eq!(stats.mem, 572);
-    /// assert_eq!(stats.len, 2);
+    /// assert_eq!(stats.len_graphs, 2);
     /// assert_eq!(stats.name, "memories");
     /// assert_eq!(stats.total_attr, 3);
     /// assert_eq!(stats.total_nodes, 4);
     /// assert_eq!(stats.uniq_rel, 2);
+    /// assert_eq!(stats.total_graphs, 1);
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         let bytes = bincode::serialize(self)?;
@@ -73,7 +74,7 @@ impl Graphs {
 
         let stats = GraphsStats {
             mem: bytes.len(),
-            len: self.len(),
+            len_graphs: self.len(),
             name: &self.name,
             total_attr: attr_counter,
             total_nodes: self.len() * 2,

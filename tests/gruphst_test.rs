@@ -217,14 +217,18 @@ mod tests {
         graph = Graph::new(&peter, relation_relative_of, &john);
         graphs.add_graph(&graph, None);
 
+        graphs.new("only relatives");
+        graphs.add_graph(&graph, None);
+
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
-        assert_eq!(stats.len, 4);
-        assert_eq!(stats.total_nodes, 8);
+        assert_eq!(stats.len_graphs, 5);
+        assert_eq!(stats.total_nodes, 10);
         assert_eq!(stats.total_attr, 12);
-        assert_eq!(stats.mem, 1258);
-        assert_eq!(stats.name, "friends-and-enemies");
+        assert_eq!(stats.mem, 1475);
+        assert_eq!(stats.name, "only relatives");
         assert_eq!(stats.uniq_rel, 2);
+        assert_eq!(stats.total_graphs, 2);
     }
 
     #[test]

@@ -39,7 +39,16 @@ impl Graphs {
         graphs
     }
 
-    // TODO: add test and documentation
+    /// Creates a new element to Graphs vault
+    /// 
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// 
+    /// let first_graph = Graphs::init("first graph");
+    /// let first_graph_id = first_graph.id;
+    /// 
+    /// ```
     pub fn new(&mut self, name: &str) -> &mut Graphs {
         self.vault.insert(String::from(name), vec![]);
         self.name = name.to_string();
@@ -118,7 +127,7 @@ impl Graphs {
         }
     }
 
-    /// Retrieves the length of the Graphs
+    /// Retrieves the length of the Graphs for whole vault
     ///
     /// # Examples
     /// ```rust
@@ -143,7 +152,22 @@ impl Graphs {
         debug!("Requested length for vault, current length: {}", length);
         length
     }
-    // TODO: add a method to deal with total amount of different Graphs
+    
+    /// Retrieves the length of vault
+    /// 
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// 
+    /// let mut graphs = Graphs::init("graph 0");
+    /// assert_eq!(graphs.len_graphs(), 1);
+    /// 
+    /// graphs.new("graph 1");
+    /// assert_eq!(graphs.len_graphs(), 2);
+    /// ```
+    pub fn len_graphs(&self) -> usize {
+        self.vault.len()
+    }
 
     /// Checks if the Graphs is empty
     ///
