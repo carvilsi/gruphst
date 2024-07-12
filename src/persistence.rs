@@ -64,7 +64,7 @@ impl Graphs {
     /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
-    ///         let graphs = loaded_graphs.get(Some(name)).unwrap();
+    ///         let graphs = loaded_graphs.get(Some(&name)).unwrap();
     ///         assert_eq!(loaded_graphs.name, name);
     ///         assert_eq!(graphs[0].relation, alice_bob.relation);
     ///     },

@@ -61,6 +61,7 @@ impl Graphs {
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add(&alice_bob_graph);
     /// ```
+    // TODO: add possible to add to graphs
     pub fn add(&mut self, graph: &Graph) {
         debug!(
             "Added new graph to Graphs [{}, {}]
@@ -177,11 +178,11 @@ impl Graphs {
     /// let fred = Node::new("Fred");
     /// my_graph.add(&Graph::new(&fred, "relative", &bob));
     ///
-    /// let result_graph = my_graph.find_by_relation("friend of").unwrap();
+    /// let result_graph = my_graph.find_by_relation("friend of", None).unwrap();
     /// assert_eq!(result_graph.len(), 1);
     /// assert_eq!(result_graph[0].relation, "friend of");
     ///
-    /// let res_graph = my_graph.find_by_relation("relative").unwrap();
+    /// let res_graph = my_graph.find_by_relation("relative", None).unwrap();
     /// assert_eq!(res_graph.len(), 1);
     /// assert_eq!(res_graph[0].relation, "relative");
     /// ```
@@ -227,7 +228,7 @@ impl Graphs {
     /// my_graph.add(&Graph::new(&fred, "relative", &bob));
     ///
     /// let relations = vec!["friend of", "relative", "knows"];
-    /// let result_graph = my_graph.find_by_relations(relations).unwrap();
+    /// let result_graph = my_graph.find_by_relations(relations, None).unwrap();
     /// assert_eq!(result_graph.len(), 2);
     /// assert_eq!(result_graph[0].relation, "friend of");
     /// assert_eq!(result_graph[1].relation, "relative");
@@ -281,7 +282,7 @@ impl Graphs {
     /// my_graph.add(&Graph::new(&fred, "colege", &bob));
     /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
     ///
-    /// let graphs_result = my_graph.has_graph_node_attr("room").unwrap();
+    /// let graphs_result = my_graph.has_graph_node_attr("room", None).unwrap();
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
@@ -334,7 +335,7 @@ impl Graphs {
     /// my_graph.add(&Graph::new(&fred, "colege", &bob));
     /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
     ///
-    /// let graphs_result = my_graph.like_graph_node_attr("rO").unwrap();
+    /// let graphs_result = my_graph.like_graph_node_attr("rO", None).unwrap();
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
@@ -388,7 +389,7 @@ impl Graphs {
     /// my_graph.add(&Graph::new(&fred, "colege", &bob));
     /// my_graph.add(&Graph::new(&fred, "friend of", &alice));
     ///
-    /// let graphs_result = my_graph.attr_equals_to("age", 42).unwrap();
+    /// let graphs_result = my_graph.attr_equals_to("age", 42, None).unwrap();
     ///
     /// assert_eq!(graphs_result.len(), 3);
     /// ```
@@ -419,6 +420,25 @@ impl Graphs {
         }
     }
 
+    
+    // TODO: add uniq relations for all the graphs doc-test
+    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
+        let mut uniq_rel = Vec::new();
+        let current_graph = self.select_graphs_name(graphs_name); 
+        if let Some(graphs) = self.vault.get(&current_graph) {
+            for graph in graphs.iter() {
+                uniq_rel.push(&graph.relation);
+            }
+            uniq_rel.sort();
+            uniq_rel.dedup();
+            uniq_rel
+        } else {
+            // TODO: return an error if any graph????
+            error!("no graphs in vault");
+            uniq_rel
+        }
+    }
+    
     /// Returns an array with the unique relations in the Graphs
     ///
     /// # Examples
@@ -441,24 +461,6 @@ impl Graphs {
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
     /// ```
-    // TODO: implement uniq relations for all the graphs
-    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
-        let mut uniq_rel = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name); 
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            for graph in graphs.iter() {
-                uniq_rel.push(&graph.relation);
-            }
-            uniq_rel.sort();
-            uniq_rel.dedup();
-            uniq_rel
-        } else {
-            // TODO: return an error if any graph????
-            error!("no graphs in vault");
-            uniq_rel
-        }
-    }
-    
     pub fn uniq_relations(&self) -> Vec<&String> {
         let mut uniq_rel = Vec::new();
         for (_graphs_name, graphs) in &self.vault {
@@ -470,6 +472,7 @@ impl Graphs {
         }
         uniq_rel
     }
+
     /// Returns a Graph that provided id matches with Graph, or From, To Nodes
     ///
     /// # Examples
@@ -490,7 +493,7 @@ impl Graphs {
     /// my_graph.add(&alice_fred);
     ///
     /// let bob_node_id = bob.id;
-    /// let res = my_graph.find_by_id(&bob_node_id);
+    /// let res = my_graph.find_by_id(&bob_node_id, None);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
     pub fn find_by_id(&mut self, id: &str, graphs_name: Option<&str>) -> Result<&mut Graph, &'static str> {
@@ -531,7 +534,7 @@ impl Graphs {
     ///
     /// assert_eq!(my_graph.len(), 2);
     ///
-    /// my_graph.delete_graph_by_id(alice_bob.id);
+    /// my_graph.delete_graph_by_id(alice_bob.id, None);
     /// assert_eq!(my_graph.len(), 1);
     /// ```
     pub fn delete_graph_by_id(&mut self, id: String, graphs_name: Option<&str>) -> Result<(), &'static str> {
@@ -574,13 +577,15 @@ impl Graphs {
     /// my_graphs.add(&alice_fred_graph);
     ///
     /// assert_eq!(my_graphs.len(), 2);
-    /// assert_eq!(my_graphs.graphs[1].relation, "super friends");
+    ///
+    /// let graphs = my_graphs.get(Some(&my_graphs.name)).unwrap();
+    /// assert_eq!(graphs[1].relation, "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
-    /// my_graphs.update_graph(&alice_fred_graph);
+    /// my_graphs.update_graph(&alice_fred_graph, None);
     ///
     /// assert_eq!(my_graphs.len(), 2);
-    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id);
+    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id, None);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
     pub fn update_graph(&mut self, graph_to_update: &Graph, graphs_name: Option<&str>) -> Result<(), &'static str> {
@@ -626,7 +631,7 @@ impl Graphs {
     /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
     /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
     ///
-    /// let results = my_graphs.has_relation_in("is friend of").unwrap();
+    /// let results = my_graphs.has_relation_in("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
     /// assert_eq!(results[0].name, "Bob");
@@ -637,7 +642,7 @@ impl Graphs {
         let current_graph = self.select_graphs_name(graphs_name); 
         if let Some(graphs) = self.vault.get(&current_graph) {
            for graph in graphs {
-                if graph.relation == relation_in && !relations_in.contains(&graph.from) {
+                if graph.relation == relation_in && !relations_in.contains(&graph.to) {
                     relations_in.push(graph.to.clone());
                 }
             }
@@ -669,7 +674,7 @@ impl Graphs {
     /// my_graphs.add(&Graph::new(&bob, "is friend of", &fred));
     /// my_graphs.add(&Graph::new(&alice, "knows", &fred));
     ///
-    /// let results = my_graphs.has_relation_out("is friend of").unwrap();
+    /// let results = my_graphs.has_relation_out("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
     /// assert_eq!(results[0].name, "Alice");

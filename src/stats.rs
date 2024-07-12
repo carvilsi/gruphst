@@ -53,7 +53,7 @@ impl Graphs {
     /// );
     ///
     /// let stats = my_graphs.stats().unwrap();
-    /// assert_eq!(stats.mem, 548);
+    /// assert_eq!(stats.mem, 572);
     /// assert_eq!(stats.len, 2);
     /// assert_eq!(stats.name, "memories");
     /// assert_eq!(stats.total_attr, 3);
