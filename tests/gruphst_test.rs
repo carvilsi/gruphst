@@ -21,11 +21,10 @@ mod tests {
     #[test]
     fn find_in_graphs_failing() {
         let mut my_graph = Graphs::init("failing");
-        my_graph.add_graph(&Graph::new(
-            &Node::new("Alice"),
-            "is friend",
-            &Node::new("Bob"),
-        ), None);
+        my_graph.add_graph(
+            &Graph::new(&Node::new("Alice"), "is friend", &Node::new("Bob")),
+            None,
+        );
         assert!(my_graph.find_by_id("foobarid", None).is_err());
         assert!(my_graph.find_by_relation("lol", None).is_err());
     }
@@ -143,11 +142,10 @@ mod tests {
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());
-        my_graph.add_graph(&Graph::new(
-            &Node::new("Alice"),
-            "is friend",
-            &Node::new("Bob"),
-        ), None);
+        my_graph.add_graph(
+            &Graph::new(&Node::new("Alice"), "is friend", &Node::new("Bob")),
+            None,
+        );
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());

@@ -40,14 +40,14 @@ impl Graphs {
     }
 
     /// Creates a new element to Graphs vault
-    /// 
+    ///
     /// # Examples
     /// ```rust
     /// use gruphst::graphs::Graphs;
-    /// 
+    ///
     /// let first_graph = Graphs::init("first graph");
     /// let first_graph_id = first_graph.id;
-    /// 
+    ///
     /// ```
     pub fn new(&mut self, name: &str) -> &mut Graphs {
         self.vault.insert(String::from(name), vec![]);
@@ -96,7 +96,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     ///
     /// let mut the_graphs = Graphs::init("init graph");
-    /// 
+    ///
     /// let graph = Graph::new(
     ///     &Node::new("alice"),
     ///     "knows",
@@ -152,16 +152,16 @@ impl Graphs {
         debug!("Requested length for vault, current length: {}", length);
         length
     }
-    
+
     /// Retrieves the length of vault
-    /// 
+    ///
     /// # Examples
     /// ```rust
     /// use gruphst::graphs::Graphs;
-    /// 
+    ///
     /// let mut graphs = Graphs::init("graph 0");
     /// assert_eq!(graphs.len_graphs(), 1);
-    /// 
+    ///
     /// graphs.new("graph 1");
     /// assert_eq!(graphs.len_graphs(), 2);
     /// ```
