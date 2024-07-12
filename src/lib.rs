@@ -9,7 +9,6 @@ pub mod graph;
 pub mod graphs;
 pub mod node;
 mod persistence;
-mod query;
 mod stats;
 mod util;
 

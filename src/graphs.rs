@@ -6,6 +6,8 @@ use uuid::Uuid;
 use crate::graph::Graph;
 use crate::util::graphs_memory_watcher;
 
+mod query;
+
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
