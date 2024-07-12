@@ -1,7 +1,7 @@
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 use crate::graph::Graph;
 use crate::node::Node;
@@ -32,7 +32,7 @@ impl Graphs {
         vault.insert(String::from(name), vec![]);
         let graphs = Graphs {
             name: String::from(name),
-            id: Uuid::new_v4().to_string(), 
+            id: Uuid::new_v4().to_string(),
             vault,
         };
         debug!("Created new Graphs: {:#?}", graphs);
@@ -82,7 +82,7 @@ impl Graphs {
     /// the default one or by name
     // TODO: Add a test and documentation
     pub fn get(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);        
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             Ok(graphs.clone())
         } else {
@@ -112,10 +112,7 @@ impl Graphs {
         for (_graphs_name, graphs) in self.vault.iter() {
             length += graphs.len();
         }
-        debug!(
-            "Requested length for vault, current length: {}",
-            length 
-        );
+        debug!("Requested length for vault, current length: {}", length);
         length
     }
     // TODO: add a method to deal with total amount of different Graphs
@@ -186,8 +183,12 @@ impl Graphs {
     /// assert_eq!(res_graph.len(), 1);
     /// assert_eq!(res_graph[0].relation, "relative");
     /// ```
-    pub fn find_by_relation(&mut self, relation_name: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn find_by_relation(
+        &mut self,
+        relation_name: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -233,8 +234,12 @@ impl Graphs {
     /// assert_eq!(result_graph[0].relation, "friend of");
     /// assert_eq!(result_graph[1].relation, "relative");
     /// ```
-    pub fn find_by_relations(&mut self, relations: Vec<&str>, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn find_by_relations(
+        &mut self,
+        relations: Vec<&str>,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -286,8 +291,12 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
-    pub fn has_graph_node_attr(&mut self, attr_k: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn has_graph_node_attr(
+        &mut self,
+        attr_k: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -339,8 +348,12 @@ impl Graphs {
     ///
     /// assert_eq!(graphs_result.len(), 2);
     /// ```
-    pub fn like_graph_node_attr(&mut self, attr_k: &str, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn like_graph_node_attr(
+        &mut self,
+        attr_k: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<&Graph>, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -394,11 +407,16 @@ impl Graphs {
     /// assert_eq!(graphs_result.len(), 3);
     /// ```
     // TODO: add a method to find attr on all graphs
-    pub fn attr_equals_to<T>(&self, attr_k: &str, attr_v: T, graphs_name: Option<&str>) -> Result<Vec<&Graph>, &'static str>
+    pub fn attr_equals_to<T>(
+        &self,
+        attr_k: &str,
+        attr_v: T,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<&Graph>, &'static str>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_graph = self.select_graphs_name(graphs_name); 
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -420,11 +438,10 @@ impl Graphs {
         }
     }
 
-    
     // TODO: add uniq relations for all the graphs doc-test
     pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
         let mut uniq_rel = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name); 
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs.iter() {
                 uniq_rel.push(&graph.relation);
@@ -438,7 +455,7 @@ impl Graphs {
             uniq_rel
         }
     }
-    
+
     /// Returns an array with the unique relations in the Graphs
     ///
     /// # Examples
@@ -463,7 +480,7 @@ impl Graphs {
     /// ```
     pub fn uniq_relations(&self) -> Vec<&String> {
         let mut uniq_rel = Vec::new();
-        for (_graphs_name, graphs) in &self.vault {
+        for graphs in self.vault.values() {
             for graph in graphs.iter() {
                 uniq_rel.push(&graph.relation);
             }
@@ -496,8 +513,12 @@ impl Graphs {
     /// let res = my_graph.find_by_id(&bob_node_id, None);
     /// assert_eq!(res.unwrap().to.id, bob_node_id);
     /// ```
-    pub fn find_by_id(&mut self, id: &str, graphs_name: Option<&str>) -> Result<&mut Graph, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn find_by_id(
+        &mut self,
+        id: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<&mut Graph, &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs
                 .iter_mut()
@@ -537,8 +558,12 @@ impl Graphs {
     /// my_graph.delete_graph_by_id(alice_bob.id, None);
     /// assert_eq!(my_graph.len(), 1);
     /// ```
-    pub fn delete_graph_by_id(&mut self, id: String, graphs_name: Option<&str>) -> Result<(), &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name); 
+    pub fn delete_graph_by_id(
+        &mut self,
+        id: String,
+        graphs_name: Option<&str>,
+    ) -> Result<(), &'static str> {
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let index = graphs.iter().position(|graph| graph.id == id);
             if index.is_some() {
@@ -588,9 +613,13 @@ impl Graphs {
     /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id, None);
     /// assert_eq!(updated_graph.unwrap().relation, "besties");
     /// ```
-    pub fn update_graph(&mut self, graph_to_update: &Graph, graphs_name: Option<&str>) -> Result<(), &'static str> {
+    pub fn update_graph(
+        &mut self,
+        graph_to_update: &Graph,
+        graphs_name: Option<&str>,
+    ) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
-        let current_graph = self.select_graphs_name(graphs_name); 
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let index = graphs
                 .iter()
@@ -604,8 +633,10 @@ impl Graphs {
                 Ok(())
             } else {
                 // TODO: reformat this!
-                error!("Graph to update with id: [{}] not found",
-                    graph_to_update.id);
+                error!(
+                    "Graph to update with id: [{}] not found",
+                    graph_to_update.id
+                );
                 Err("graph to update not found")
             }
         } else {
@@ -637,11 +668,15 @@ impl Graphs {
     /// assert_eq!(results[0].name, "Bob");
     /// assert_eq!(results[1].name, "Fred");
     /// ```
-    pub fn has_relation_in(&self, relation_in: &str, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
+    pub fn has_relation_in(
+        &self,
+        relation_in: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<Node>, &'static str> {
         let mut relations_in: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name); 
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
-           for graph in graphs {
+            for graph in graphs {
                 if graph.relation == relation_in && !relations_in.contains(&graph.to) {
                     relations_in.push(graph.to.clone());
                 }
@@ -680,11 +715,15 @@ impl Graphs {
     /// assert_eq!(results[0].name, "Alice");
     /// assert_eq!(results[1].name, "Bob");
     /// ```
-    pub fn has_relation_out(&self, relation_out: &str, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
+    pub fn has_relation_out(
+        &self,
+        relation_out: &str,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<Node>, &'static str> {
         let mut relations_out: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name); 
+        let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
-           for graph in graphs {
+            for graph in graphs {
                 if graph.relation == relation_out && !relations_out.contains(&graph.from) {
                     relations_out.push(graph.from.clone());
                 }

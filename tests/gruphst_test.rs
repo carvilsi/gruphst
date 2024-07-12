@@ -140,13 +140,17 @@ mod tests {
     #[serial]
     fn delete_from_graph_fail() {
         let mut my_graph = Graphs::init("failing");
-        assert!(my_graph.delete_graph_by_id("foobar".to_string(), None).is_err());
+        assert!(my_graph
+            .delete_graph_by_id("foobar".to_string(), None)
+            .is_err());
         my_graph.add(&Graph::new(
             &Node::new("Alice"),
             "is friend",
             &Node::new("Bob"),
         ));
-        assert!(my_graph.delete_graph_by_id("foobar".to_string(), None).is_err());
+        assert!(my_graph
+            .delete_graph_by_id("foobar".to_string(), None)
+            .is_err());
     }
 
     #[test]
@@ -325,7 +329,7 @@ mod tests {
         let config_mem = get_max_mem_usage();
 
         assert_eq!(config_mem, 50 * 1024 * 1024);
-        
+
         let config_log_level = get_log_level();
 
         assert_eq!(config_log_level, log::Level::Debug);
