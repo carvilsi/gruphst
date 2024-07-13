@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
 
-mod query;
 mod attributes;
+mod query;
 
 /// Representation of a Node
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

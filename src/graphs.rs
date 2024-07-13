@@ -6,8 +6,8 @@ use uuid::Uuid;
 use crate::graph::Graph;
 use crate::util::graphs_memory_watcher;
 
-mod query;
 mod persistence;
+mod query;
 mod stats;
 
 /// A colection of Graph
