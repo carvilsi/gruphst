@@ -7,6 +7,8 @@ use crate::graph::Graph;
 use crate::util::graphs_memory_watcher;
 
 mod query;
+mod persistence;
+mod stats;
 
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -374,7 +376,7 @@ impl Graphs {
     }
 
     /// Retrieves the current graphs or returns the option one
-    pub fn select_graphs_name(&self, graphs_name: Option<&str>) -> String {
+    fn select_graphs_name(&self, graphs_name: Option<&str>) -> String {
         let mut current_graph = self.name.clone();
         if let Some(gn) = graphs_name {
             current_graph = gn.to_string();
