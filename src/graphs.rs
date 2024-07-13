@@ -130,72 +130,6 @@ impl Graphs {
         }
     }
 
-    /// Retrieves the length of the Graphs for whole vault
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let mut graphs = Graphs::init("lengths");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    ///
-    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
-    ///
-    /// assert_eq!(graphs.len(), 2);
-    /// ```
-    pub fn len(&self) -> usize {
-        let mut length = 0;
-        for (_graphs_name, graphs) in self.vault.iter() {
-            length += graphs.len();
-        }
-        debug!("Requested length for vault, current length: {}", length);
-        length
-    }
-
-    /// Retrieves the length of vault
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let mut graphs = Graphs::init("graph 0");
-    /// assert_eq!(graphs.len_graphs(), 1);
-    ///
-    /// graphs.new("graph 1");
-    /// assert_eq!(graphs.len_graphs(), 2);
-    /// ```
-    pub fn len_graphs(&self) -> usize {
-        self.vault.len()
-    }
-
-    /// Checks if the Graphs is empty
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let mut graphs = Graphs::init("lengths");
-    ///
-    /// assert!(graphs.is_empty());
-    ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    ///
-    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
-    ///
-    /// assert!(!graphs.is_empty());
-    /// ```
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
     /// Updates the name of the Graphs
     ///
     /// # Examples
@@ -212,58 +146,6 @@ impl Graphs {
     pub fn update_name(&mut self, name: &str) {
         debug!("Update Graph [{}] with name: {}", self.id, name);
         self.name = name.to_string();
-    }
-
-    // TODO: add uniq relations for all the graphs doc-test
-    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
-        let mut uniq_rel = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            for graph in graphs.iter() {
-                uniq_rel.push(&graph.relation);
-            }
-            uniq_rel.sort();
-            uniq_rel.dedup();
-            uniq_rel
-        } else {
-            // TODO: return an error if any graph????
-            error!("no graphs in vault");
-            uniq_rel
-        }
-    }
-
-    /// Returns an array with the unique relations in the Graphs
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let mut my_graph = Graphs::init("my graph");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let fred = Node::new("Fred");
-    ///
-    /// my_graph.add_graph(&Graph::new(&alice, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&alice, "relative of", &fred), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&bob, "friend of", &alice), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "relative of", &alice), None);
-    ///
-    /// let relations = my_graph.uniq_relations();
-    /// assert_eq!(relations, vec!["friend of", "relative of"]);
-    /// ```
-    pub fn uniq_relations(&self) -> Vec<&String> {
-        let mut uniq_rel = Vec::new();
-        for graphs in self.vault.values() {
-            for graph in graphs.iter() {
-                uniq_rel.push(&graph.relation);
-            }
-            uniq_rel.sort();
-            uniq_rel.dedup();
-        }
-        uniq_rel
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -374,7 +256,10 @@ impl Graphs {
             Err("no graphs in vault")
         }
     }
+}
 
+// A bundle for util functions
+impl Graphs {
     /// Retrieves the current graphs or returns the option one
     fn select_graphs_name(&self, graphs_name: Option<&str>) -> String {
         let mut current_graph = self.name.clone();

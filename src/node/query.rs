@@ -98,4 +98,35 @@ impl Node {
             None => false,
         }
     }
+
+    /// Retrieves the lenght of attributes for a Node
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 25);
+    /// assert_eq!(node.len_attr(), 2);
+    /// ```
+    pub fn len_attr(&self) -> usize {
+        self.attr.len()
+    }
+
+    /// Checks if attributes for a Node is empty
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// assert!(node.is_empty_attr());
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 25);
+    /// assert!(!node.is_empty_attr());
+    /// ```
+    pub fn is_empty_attr(&self) -> bool {
+        self.len_attr() == 0
+    }
 }
