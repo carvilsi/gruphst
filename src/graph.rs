@@ -11,7 +11,7 @@ mod query;
 pub struct Graph {
     /// A Graph has an uuid
     pub id: String,
-    /// A name fot the relation
+    /// A name for the relation
     pub relation: String,
     /// Origin node
     pub from: Node,

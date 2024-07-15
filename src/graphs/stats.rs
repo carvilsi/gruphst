@@ -103,7 +103,7 @@ impl Graphs {
         }
     }
 
-    /// Returns an array with the unique relations in the Graphs
+    /// Returns an array with the unique relations in the default Graphs
     ///
     /// # Examples
     /// ```rust
