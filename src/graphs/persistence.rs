@@ -18,11 +18,11 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graph = Graphs::new("friends");
+    /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
-    /// my_graph.add(&alice_bob);
+    /// my_graph.add_graph(&alice_bob, None);
     ///
     /// my_graph.persists();
     /// ```
@@ -51,11 +51,11 @@ impl Graphs {
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
     ///
-    /// let mut my_graph = Graphs::new("friends");
+    /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
-    /// my_graph.add(&alice_bob);
+    /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let _ = my_graph.persists();
     ///
@@ -64,8 +64,9 @@ impl Graphs {
     /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
+    ///         let graphs = loaded_graphs.get_graphs(Some(&name)).unwrap();
     ///         assert_eq!(loaded_graphs.name, name);
-    ///         assert_eq!(loaded_graphs.graphs[0].relation, alice_bob.relation);
+    ///         assert_eq!(graphs[0].relation, alice_bob.relation);
     ///     },
     ///     Err(_) => panic!(),
     /// }
