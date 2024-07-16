@@ -1,6 +1,7 @@
 use crate::graphs::Graphs;
 use log::{debug, error};
 use std::error::Error;
+use crate::QueryAttr;
 
 /// Represents stats data from the Graphs
 #[derive(Debug)]

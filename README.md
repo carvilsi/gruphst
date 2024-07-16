@@ -34,7 +34,7 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.3.0"`
+`gruphst = "0.5.0"`
 
 
 ## Nodes

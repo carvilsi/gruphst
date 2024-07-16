@@ -3,6 +3,7 @@ use log::{debug, error};
 use crate::graph::Graph;
 use crate::graphs::Graphs;
 use crate::node::Node;
+use crate::CUR;
 
 impl Graphs {
     /// Returns a collection of Graps elements that matches the relation
@@ -317,7 +318,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs
                 .iter_mut()
-                .find(|graph| graph.id == id || graph.from.id == id || graph.to.id == id);
+                .find(|graph| graph.id == id || graph.from.get_id() == id || graph.to.get_id() == id);
             if graph.is_some() {
                 debug!("Founded Graph by id: {:#?}", graph);
                 Ok(graph.unwrap())

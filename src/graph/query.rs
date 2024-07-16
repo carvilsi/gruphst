@@ -1,4 +1,5 @@
 use crate::graph::Graph;
+use crate::QueryAttr;
 
 impl Graph {
     /// Checks if "from" or "to" node has an attribute

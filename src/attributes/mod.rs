@@ -1,8 +1,19 @@
+use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use log::{debug, warn};
 
-use crate::node::Node;
+use crate::RUDAttr;
 
-impl Node {
+mod query;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Attributes {
+    attr: HashMap<String, String>,
+    id: String,
+}
+
+impl RUDAttr for Attributes {
     /// Set attributes for a Node
     ///
     /// # Examples
@@ -12,7 +23,7 @@ impl Node {
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
     /// ```
-    pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
@@ -23,7 +34,7 @@ impl Node {
         );
     }
 
-    /// Returns an Array containing all attribute keys
+    /// Get attribute for a Node
     ///
     /// # Examples
     /// ```rust
@@ -31,21 +42,24 @@ impl Node {
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 44);
-    /// let keys = node.get_attr_keys();
-    /// assert!(keys.contains(&&"Address"));
-    /// assert!(keys.contains(&&"age"));
+    /// let attr = node.get_attr("Address").unwrap();
+    /// assert_eq!(attr, "Elm street");
     /// ```
-    pub fn get_attr_keys(&self) -> Vec<&str> {
-        let mut key_vec = Vec::new();
-        for key in self.attr.keys() {
-            key_vec.push(key.as_str());
+    fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
+        let res = self.attr.get(attr_k);
+        match res {
+            Some(res) => {
+                debug!(
+                    "retrieved attribute value '{}' for '{}' for node [{}]",
+                    res, attr_k, self.id
+                );
+                Ok(res)
+            }
+            None => {
+                warn!("attribute '{}' not found", attr_k);
+                Err("attribute not found")
+            }
         }
-        debug!(
-            "requested array of attributes for {} node {:#?}",
-            self.id, key_vec
-        );
-        key_vec
     }
 
     /// Updates the value of an attribute
@@ -63,7 +77,7 @@ impl Node {
     /// node.update_attr("age", 55);
     /// assert_eq!(node.get_attr("age").unwrap(), "55");
     /// ```
-    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
@@ -94,7 +108,7 @@ impl Node {
     /// node.upsert_attr("age", 55);
     /// assert_eq!(node.get_attr("age").unwrap(), "55");
     /// ```
-    pub fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
@@ -116,7 +130,7 @@ impl Node {
         }
     }
 
-    /// Deletes an attribute for a Node
+    /// Deletes an attribute
     ///
     /// # Examples
     /// ```rust
@@ -129,7 +143,7 @@ impl Node {
     /// node.del_attr("Address");
     /// assert!(node.is_empty_attr());
     /// ```
-    pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
+    fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.attr.remove(v);
         match res {
             Some(_) => {
@@ -141,5 +155,38 @@ impl Node {
                 Err("attribute not found for remove")
             }
         }
+    }
+}
+
+impl Attributes {
+    pub fn new() -> Self {
+        Attributes {
+            attr: HashMap::new(),
+            id: Uuid::new_v4().to_string(),
+        }
+    }
+    /// Returns an Array containing all attribute keys
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    ///
+    /// let mut node = Node::new("Alice");
+    /// node.set_attr("Address", "Elm street");
+    /// node.set_attr("age", 44);
+    /// let keys = node.get_attr_keys();
+    /// assert!(keys.contains(&&"Address"));
+    /// assert!(keys.contains(&&"age"));
+    /// ```
+    pub fn get_attr_keys(&self) -> Vec<&str> {
+        let mut key_vec = Vec::new();
+        for key in self.attr.keys() {
+            key_vec.push(key.as_str());
+        }
+        debug!(
+            "requested array of attributes for {} node {:#?}",
+            self.id, key_vec
+        );
+        key_vec
     }
 }
