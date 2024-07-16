@@ -18,7 +18,7 @@ pub trait CUR {
     fn get_id(&self) -> String;
     fn get_name(&self) -> String;
     fn set_name(&mut self, name: &str);
-    fn get_attr(&self) -> Attributes;
+    fn get_attributes(&self) -> Attributes;
 }
 
 pub trait RUDAttr {
@@ -27,6 +27,7 @@ pub trait RUDAttr {
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str> where T: std::fmt::Display;
     fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T) where T: std::fmt::Display;
     fn del_attr(&mut self, v: &str) -> Result<(), &'static str>; 
+    fn get_attr_keys(&self) -> Vec<&str>;
 }
 
 pub trait QueryAttr {

@@ -40,7 +40,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| grph.relation == relation_name)
+                .filter(|grph| grph.get_relation() == relation_name)
                 .collect::<Vec<&Graph>>();
             if !graphs.is_empty() {
                 debug!(
@@ -91,7 +91,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| relations.contains(&grph.relation.as_str()))
+                .filter(|grph| relations.contains(&grph.get_relation().as_str()))
                 .collect::<Vec<&Graph>>();
             if !graphs.is_empty() {
                 debug!(
@@ -318,7 +318,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs
                 .iter_mut()
-                .find(|graph| graph.id == id || graph.from.get_id() == id || graph.to.get_id() == id);
+                .find(|graph| graph.get_id() == id || graph.get_from_node().get_id() == id || graph.get_to_node().get_id() == id);
             if graph.is_some() {
                 debug!("Founded Graph by id: {:#?}", graph);
                 Ok(graph.unwrap())
@@ -364,8 +364,8 @@ impl Graphs {
         let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
-                if graph.relation == relation_in && !relations_in.contains(&graph.to) {
-                    relations_in.push(graph.to.clone());
+                if graph.get_relation() == relation_in && !relations_in.contains(&graph.get_to_node()) {
+                    relations_in.push(graph.get_to_node().clone());
                 }
             }
         } else {
@@ -411,8 +411,8 @@ impl Graphs {
         let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
-                if graph.relation == relation_out && !relations_out.contains(&graph.from) {
-                    relations_out.push(graph.from.clone());
+                if graph.get_relation() == relation_out && !relations_out.contains(&graph.get_from_node()) {
+                    relations_out.push(graph.get_from_node().clone());
                 }
             }
         } else {

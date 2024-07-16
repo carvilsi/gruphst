@@ -4,7 +4,9 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use crate::graph::Graph;
+use crate::attributes::Attributes;
 use crate::util::graphs_memory_watcher;
+use crate::CUR;
 
 mod persistence;
 mod query;
@@ -14,11 +16,41 @@ mod stats;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
     /// The collections of Graph
-    pub vault: HashMap<String, Vec<Graph>>,
+    vault: HashMap<String, Vec<Graph>>,
     /// Name for the current collection
-    pub name: String,
+    name: String,
     /// The uuid for the collection
-    pub id: String,
+    id: String,
+}
+
+impl CUR for Graphs {
+    fn new(name: &str) -> Self {
+        let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
+        vault.insert(String::from(name), vec![]);
+        let graphs = Graphs {
+            name: String::from(name),
+            id: Uuid::new_v4().to_string(),
+            vault,
+        };
+        debug!("Created new Graphs: {:#?}", graphs);
+        graphs
+    }
+
+    fn get_id(&self) -> String {
+        self.id.clone()
+    }
+
+    fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn set_name(&mut self, name: &str) {
+        self.name = name.to_string()
+    }
+
+    fn get_attributes(&self) -> Attributes {
+        todo!()
+    }
 }
 
 impl Graphs {
@@ -31,15 +63,7 @@ impl Graphs {
     /// let my_graph = Graphs::init("my_graph");
     /// ```
     pub fn init(name: &str) -> Self {
-        let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
-        vault.insert(String::from(name), vec![]);
-        let graphs = Graphs {
-            name: String::from(name),
-            id: Uuid::new_v4().to_string(),
-            vault,
-        };
-        debug!("Created new Graphs: {:#?}", graphs);
-        graphs
+        
     }
 
     /// Creates a new element to Graphs vault
@@ -178,7 +202,7 @@ impl Graphs {
     ) -> Result<(), &'static str> {
         let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
-            let index = graphs.iter().position(|graph| graph.id == id);
+            let index = graphs.iter().position(|graph| graph.get_id() == id);
             if index.is_some() {
                 debug!("Delete graph: {}", id);
                 graphs.remove(index.unwrap());
@@ -236,7 +260,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let index = graphs
                 .iter()
-                .position(|graph| graph.id == graph_to_update.id);
+                .position(|graph| graph.get_id() == graph_to_update.get_id());
             if index.is_some() {
                 let i = index.unwrap();
                 graphs.remove(i);
@@ -248,7 +272,7 @@ impl Graphs {
                 // TODO: reformat this!
                 error!(
                     "Graph to update with id: [{}] not found",
-                    graph_to_update.id
+                    graph_to_update.get_id()
                 );
                 Err("graph to update not found")
             }

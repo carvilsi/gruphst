@@ -156,15 +156,7 @@ impl RUDAttr for Attributes {
             }
         }
     }
-}
 
-impl Attributes {
-    pub fn new() -> Self {
-        Attributes {
-            attr: HashMap::new(),
-            id: Uuid::new_v4().to_string(),
-        }
-    }
     /// Returns an Array containing all attribute keys
     ///
     /// # Examples
@@ -178,7 +170,7 @@ impl Attributes {
     /// assert!(keys.contains(&&"Address"));
     /// assert!(keys.contains(&&"age"));
     /// ```
-    pub fn get_attr_keys(&self) -> Vec<&str> {
+    fn get_attr_keys(&self) -> Vec<&str> {
         let mut key_vec = Vec::new();
         for key in self.attr.keys() {
             key_vec.push(key.as_str());
@@ -189,4 +181,14 @@ impl Attributes {
         );
         key_vec
     }
+}
+
+impl Attributes {
+    pub fn new() -> Self {
+        Attributes {
+            attr: HashMap::new(),
+            id: Uuid::new_v4().to_string(),
+        }
+    }
+    
 }

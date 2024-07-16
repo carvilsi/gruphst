@@ -50,7 +50,7 @@ impl CUR for Node {
         self.name = name.to_string();
     }
 
-    fn get_attr(&self) -> Attributes {
+    fn get_attributes(&self) -> Attributes {
         self.attr.clone()
     }
 }
@@ -83,5 +83,9 @@ impl RUDAttr for Node {
     
     fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         self.attr.del_attr(v)
+    }
+    
+    fn get_attr_keys(&self) -> Vec<&str> {
+        self.attr.get_attr_keys() 
     }
 }

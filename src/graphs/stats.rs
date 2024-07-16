@@ -1,6 +1,7 @@
 use crate::graphs::Graphs;
 use log::{debug, error};
 use std::error::Error;
+
 use crate::QueryAttr;
 
 /// Represents stats data from the Graphs
@@ -68,8 +69,8 @@ impl Graphs {
         let mut attr_counter = 0;
         for (_graph_name, graphs) in self.vault.iter() {
             for graph in graphs {
-                attr_counter += graph.from.len_attr();
-                attr_counter += graph.to.len_attr();
+                attr_counter += graph.get_from_node().len_attr();
+                attr_counter += graph.get_to_node().len_attr();
             }
         }
 
@@ -87,12 +88,12 @@ impl Graphs {
     }
 
     // TODO: add uniq relations for all the graphs doc-test
-    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<&String> {
+    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<String> {
         let mut uniq_rel = Vec::new();
         let current_graph = self.select_graphs_name(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs.iter() {
-                uniq_rel.push(&graph.relation);
+                uniq_rel.push(graph.get_relation());
             }
             uniq_rel.sort();
             uniq_rel.dedup();
@@ -126,11 +127,11 @@ impl Graphs {
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
     /// ```
-    pub fn uniq_relations(&self) -> Vec<&String> {
+    pub fn uniq_relations(&self) -> Vec<String> {
         let mut uniq_rel = Vec::new();
         for graphs in self.vault.values() {
             for graph in graphs.iter() {
-                uniq_rel.push(&graph.relation);
+                uniq_rel.push(graph.get_relation());
             }
             uniq_rel.sort();
             uniq_rel.dedup();
