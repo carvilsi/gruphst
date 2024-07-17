@@ -1,12 +1,13 @@
 use super::Attributes;
-use crate::QueryAttr;
+use crate::QueryAttribute;
 
-impl QueryAttr for Attributes {
+impl QueryAttribute for Attributes {
     /// Checks if an attribute key exists
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -24,6 +25,7 @@ impl QueryAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -48,6 +50,7 @@ impl QueryAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -75,6 +78,7 @@ impl QueryAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -90,6 +94,7 @@ impl QueryAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// assert!(node.is_empty_attr());

@@ -17,17 +17,18 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// my_graph.persists();
     /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{}.grphst", self.name.replace(' ', "_"));
+        let file_name = format!("{}.grphst", self.get_name().replace(' ', "_"));
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -50,23 +51,24 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let _ = my_graph.persists();
     ///
-    /// let name = my_graph.name;
+    /// let name = my_graph.get_name();
     /// let file_name = format!("{}.grphst", name);
     /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
     ///         let graphs = loaded_graphs.get_graphs(Some(&name)).unwrap();
-    ///         assert_eq!(loaded_graphs.name, name);
-    ///         assert_eq!(graphs[0].relation, alice_bob.relation);
+    ///         assert_eq!(loaded_graphs.get_name(), name);
+    ///         assert_eq!(graphs[0].get_relation(), alice_bob.get_relation());
     ///     },
     ///     Err(_) => panic!(),
     /// }

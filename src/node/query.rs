@@ -1,7 +1,7 @@
 use super::Node;
-use crate::QueryAttr;
+use crate::QueryAttribute;
 
-impl QueryAttr for Node {
+impl QueryAttribute for Node {
     fn has_attr(&self, attr_k: &str) -> bool {
         self.attr.has_attr(attr_k)
     }
@@ -11,16 +11,17 @@ impl QueryAttr for Node {
     }
 
     fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
-    where T: std::fmt::Display + std::clone::Clone
+    where
+        T: std::fmt::Display + std::clone::Clone,
     {
         self.attr.equals_attr(attr_k, attr_v)
     }
 
     fn len_attr(&self) -> usize {
-        self.attr.len_attr() 
+        self.attr.len_attr()
     }
 
     fn is_empty_attr(&self) -> bool {
-        self.attr.is_empty_attr() 
+        self.attr.is_empty_attr()
     }
 }

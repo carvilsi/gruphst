@@ -1,9 +1,9 @@
 use crate::graphs::Graphs;
 use log::{debug, error};
-use std::error::Error;
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 
-use crate::QueryAttr;
+use crate::QueryAttribute;
 
 /// Represents stats data from the Graphs
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -75,10 +75,11 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graphs = Graphs::init("memories");
     /// my_graphs.add_graph(
-    ///     &Graph::new(
+    ///     &Graph::create(
     ///         &Node::new("Alice"),
     ///         "recalls friendship with",
     ///         &Node::new("Bob")
@@ -90,7 +91,7 @@ impl Graphs {
     /// fred.set_attr("age", "25");
     ///
     /// my_graphs.add_graph(
-    ///     &Graph::new(
+    ///     &Graph::create(
     ///         &fred,
     ///         "relative of",
     ///         &Node::new("Coco")
@@ -98,13 +99,12 @@ impl Graphs {
     /// );
     ///
     /// let stats = my_graphs.stats().unwrap();
-    /// assert_eq!(stats.mem, 572);
-    /// assert_eq!(stats.len_graphs, 2);
-    /// assert_eq!(stats.name, "memories");
-    /// assert_eq!(stats.total_attr, 3);
-    /// assert_eq!(stats.total_nodes, 4);
-    /// assert_eq!(stats.uniq_rel, 2);
-    /// assert_eq!(stats.total_graphs, 1);
+    /// assert_eq!(stats.get_mem(), 856);
+    /// assert_eq!(stats.get_len_graphs(), 2);
+    /// assert_eq!(stats.get_total_attr(), 3);
+    /// assert_eq!(stats.get_total_nodes(), 4);
+    /// assert_eq!(stats.get_uniq_rel(), 2);
+    /// assert_eq!(stats.get_total_graphs(), 1);
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         get_stats(self)
@@ -135,17 +135,18 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("my graph");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graph.add_graph(&Graph::new(&alice, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&alice, "relative of", &fred), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&bob, "friend of", &alice), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "relative of", &alice), None);
+    /// my_graph.add_graph(&Graph::create(&alice, "friend of", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&alice, "relative of", &fred), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "friend of", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&bob, "friend of", &alice), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "relative of", &alice), None);
     ///
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
@@ -169,13 +170,14 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut graphs = Graphs::init("lengths");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     ///
-    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
+    /// graphs.add_graph(&Graph::create(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Graph::create(&bob, "friend", &alice), None);
     ///
     /// assert_eq!(graphs.len(), 2);
     /// ```
@@ -193,11 +195,12 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut graphs = Graphs::init("graph 0");
     /// assert_eq!(graphs.len_graphs(), 1);
     ///
-    /// graphs.new("graph 1");
+    /// graphs.insert("graph 1");
     /// assert_eq!(graphs.len_graphs(), 2);
     /// ```
     pub fn len_graphs(&self) -> usize {
@@ -211,6 +214,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut graphs = Graphs::init("lengths");
     ///
@@ -219,8 +223,8 @@ impl Graphs {
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     ///
-    /// graphs.add_graph(&Graph::new(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::new(&bob, "friend", &alice), None);
+    /// graphs.add_graph(&Graph::create(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Graph::create(&bob, "friend", &alice), None);
     ///
     /// assert!(!graphs.is_empty());
     /// ```
@@ -231,24 +235,24 @@ impl Graphs {
 
 /// private function to generate stats
 fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
-        let bytes = bincode::serialize(grphs)?;
-        // lets count the amount of attributes in the graph
-        let mut attr_counter = 0;
-        for (_graph_name, graphs) in grphs.vault.iter() {
-            for graph in graphs {
-                attr_counter += graph.get_from_node().len_attr();
-                attr_counter += graph.get_to_node().len_attr();
-            }
+    let bytes = bincode::serialize(grphs)?;
+    // lets count the amount of attributes in the graph
+    let mut attr_counter = 0;
+    for (_graph_name, graphs) in grphs.vault.iter() {
+        for graph in graphs {
+            attr_counter += graph.get_from_node().len_attr();
+            attr_counter += graph.get_to_node().len_attr();
         }
-
-        let stats = GraphsStats {
-            mem: bytes.len(),
-            len_graphs: grphs.len(),
-            total_attr: attr_counter,
-            total_nodes: grphs.len() * 2,
-            uniq_rel: grphs.uniq_relations().len(),
-            total_graphs: grphs.vault.len(),
-        };
-        debug!("Graphs stats: {:#?}", stats);
-        Ok(stats)
     }
+
+    let stats = GraphsStats {
+        mem: bytes.len(),
+        len_graphs: grphs.len(),
+        total_attr: attr_counter,
+        total_nodes: grphs.len() * 2,
+        uniq_rel: grphs.uniq_relations().len(),
+        total_graphs: grphs.vault.len(),
+    };
+    debug!("Graphs stats: {:#?}", stats);
+    Ok(stats)
+}

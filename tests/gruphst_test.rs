@@ -5,9 +5,11 @@ use gruphst::enable_logging;
 use gruphst::graph::Graph;
 use gruphst::graphs::Graphs;
 use gruphst::node::Node;
-use gruphst::QueryAttr;
-use gruphst::CUR;
-use gruphst::RUDAttr;
+// use gruphst::QueryAttr;
+// use gruphst::CUR;
+// use gruphst::RUDAttr;
+
+use gruphst::*;
 
 // TODO: refactor the tests
 
@@ -23,17 +25,10 @@ mod tests {
 
     #[test]
     fn find_in_graphs_failing() {
-        let mut my_graph = Graphs::insert("failing");
+        let mut my_graph = Graphs::init("failing");
         let mut graph = Graph::new("");
-        graph.add_relation(
-            &Node::new("Alice"),
-            "is friend",
-            &Node::new("Bob")
-        ); 
-        my_graph.add_graph(
-            &graph,
-            None,
-        );
+        graph.add_relation(&Node::new("Alice"), "is friend", &Node::new("Bob"));
+        my_graph.add_graph(&graph, None);
         assert!(my_graph.find_by_relation("lol", None).is_err());
     }
 
@@ -59,7 +54,7 @@ mod tests {
     #[test]
     #[serial]
     fn find_in_graphs() {
-        let mut gru = Graphs::insert("graphs-a");
+        let mut gru = Graphs::init("graphs-a");
         assert_eq!(gru.get_name(), "graphs-a");
 
         let node1 = Node::new("a node");
@@ -94,7 +89,7 @@ mod tests {
     #[test]
     #[serial]
     fn persistence() {
-        let mut gru = Graphs::insert("graphs-a");
+        let mut gru = Graphs::init("graphs-a");
         let mut node1 = Node::new("a node");
         node1.set_attr("foo", "bar");
         let node2 = Node::new("b node");
@@ -128,7 +123,7 @@ mod tests {
     #[test]
     #[serial]
     fn delete_from_graph() {
-        let mut my_graph = Graphs::insert("friends");
+        let mut my_graph = Graphs::init("friends");
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
         let alice_bob = Graph::create(&alice, "is friend of", &bob);
@@ -146,7 +141,7 @@ mod tests {
     #[test]
     #[serial]
     fn delete_from_graph_fail() {
-        let mut my_graph = Graphs::insert("failing");
+        let mut my_graph = Graphs::init("failing");
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());
@@ -193,7 +188,7 @@ mod tests {
     #[test]
     #[serial]
     fn graphs_stats() {
-        let mut graphs = Graphs::insert("friends-and-enemies");
+        let mut graphs = Graphs::init("friends-and-enemies");
 
         let mut alice = Node::new("Alice");
         let mut bob = Node::new("Bob");
@@ -223,17 +218,15 @@ mod tests {
         graph = Graph::create(&peter, relation_relative_of, &john);
         graphs.add_graph(&graph, None);
 
-        graphs = Graphs::insert("only relatives");
+        graphs.insert("only relatives");
         graphs.add_graph(&graph, None);
-        println!("{:#?}", graphs);
 
         // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
         let stats = graphs.stats().unwrap();
-        println!("{:#?}", stats);
         assert_eq!(stats.get_len_graphs(), 5);
         assert_eq!(stats.get_total_nodes(), 10);
         assert_eq!(stats.get_total_attr(), 12);
-        assert_eq!(stats.get_mem(), 1475);
+        assert_eq!(stats.get_mem(), 2179);
         assert_eq!(stats.get_uniq_rel(), 2);
         assert_eq!(stats.get_total_graphs(), 2);
     }
@@ -241,7 +234,7 @@ mod tests {
     #[test]
     #[serial]
     fn update_graph_fail() {
-        let mut grphs = Graphs::insert("foobar");
+        let mut grphs = Graphs::init("foobar");
 
         let alice = Node::new("Alice");
         let bob = Node::new("Bob");
@@ -255,7 +248,7 @@ mod tests {
     #[test]
     #[serial]
     fn lengths_of_graphs() {
-        let mut graphs = Graphs::insert("lengths");
+        let mut graphs = Graphs::init("lengths");
 
         assert!(graphs.is_empty());
 
@@ -306,7 +299,7 @@ mod tests {
     }
 
     fn do_some_networking() -> Graphs {
-        let mut graphs = Graphs::insert("my graphs");
+        let mut graphs = Graphs::init("my graphs");
 
         let mut alice = Node::new("Alice");
         alice.set_attr("phone", "555-555-555");

@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::attributes::Attributes;
-use crate::CUR;
-use crate::RUDAttr;
+use crate::CURNodeGraph;
+use crate::RUDAttribute;
 
 mod query;
 
@@ -19,12 +19,13 @@ pub struct Node {
     attr: Attributes,
 }
 
-impl CUR for Node {
+impl CURNodeGraph for Node {
     /// Creates a Node with the given name, the id is generated
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let node = Node::new("alice node");
     /// ```
@@ -37,15 +38,15 @@ impl CUR for Node {
         debug!("The created node: {:#?}", &node);
         node
     }
-    
+
     fn get_id(&self) -> String {
         self.id.clone()
     }
-    
+
     fn get_name(&self) -> String {
         self.name.clone()
     }
-    
+
     fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
@@ -55,10 +56,10 @@ impl CUR for Node {
     }
 }
 
-impl RUDAttr for Node {
-    fn set_attr<T> (&mut self, key: &str, val: T)
+impl RUDAttribute for Node {
+    fn set_attr<T>(&mut self, key: &str, val: T)
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.set_attr(key, val);
     }
@@ -66,26 +67,26 @@ impl RUDAttr for Node {
     fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
         self.attr.get_attr(key)
     }
-    
+
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.update_attr(attr_k, attr_v)
     }
-    
+
     fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.upsert_attr(attr_k, attr_v)
     }
-    
+
     fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         self.attr.del_attr(v)
     }
-    
+
     fn get_attr_keys(&self) -> Vec<&str> {
-        self.attr.get_attr_keys() 
+        self.attr.get_attr_keys()
     }
 }

@@ -2,7 +2,7 @@ use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{attributes::Attributes, node::Node, RUDAttr, CUR};
+use crate::{attributes::Attributes, node::Node, CURNodeGraph, RUDAttribute};
 
 mod query;
 
@@ -21,19 +21,19 @@ pub struct Graph {
     attr: Attributes,
 }
 
-impl CUR for Graph {
-    fn new(_name: &str) -> Self {
+impl CURNodeGraph for Graph {
+    fn new(name: &str) -> Self {
         Graph {
             id: Uuid::new_v4().to_string(),
-            relation: "".to_string(),
-            from: Node::new(""), 
-            to: Node::new(""), 
-            attr: Attributes::new(), 
-        } 
+            relation: name.to_string(),
+            from: Node::new(""),
+            to: Node::new(""),
+            attr: Attributes::new(),
+        }
     }
 
     fn get_id(&self) -> String {
-        self.id.clone() 
+        self.id.clone()
     }
 
     fn get_name(&self) -> String {
@@ -56,24 +56,25 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph =
-    ///     Graph::new(&alice, "friend of", &bob);
+    ///     Graph::create(&alice, "friend of", &bob);
     /// ```
     pub fn add_relation(&mut self, from: &Node, relation: &str, to: &Node) {
-            self.relation = String::from(relation);
-            self.from = from.clone();
-            self.to = to.clone();
+        self.relation = String::from(relation);
+        self.from = from.clone();
+        self.to = to.clone();
         debug!("Added relation to Graph: {:#?}", self);
     }
 
     pub fn create(from: &Node, relation: &str, to: &Node) -> Self {
-            let mut g = Graph::new(relation);
-            g.from = from.clone();
-            g.to = to.clone();
-            g
+        let mut g = Graph::new(relation);
+        g.from = from.clone();
+        g.to = to.clone();
+        g
     }
 
     /// Updates the relation for the Graph
@@ -82,16 +83,17 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let mut alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let mut alice_bob_graph = Graph::create(&alice, "friend of", &bob);
     ///
-    /// assert_eq!(alice_bob_graph.relation, "friend of");
+    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
     ///
     /// alice_bob_graph.update_relation("best friends");
-    /// assert_eq!(alice_bob_graph.relation, "best friends");
+    /// assert_eq!(alice_bob_graph.get_relation(), "best friends");
     /// ```
     pub fn update_relation(&mut self, relation: &str) {
         debug!("Updated Graph [{}] with Relation: {}", self.id, relation);
@@ -104,16 +106,17 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     ///
     /// let mut alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
-    /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.from.name, "alice node");
-    /// assert_eq!(graph.to.name, "bob node");
-    /// alice_node.update_name("alice");
+    /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
+    /// assert_eq!(graph.get_from_node().get_name(), "alice node");
+    /// assert_eq!(graph.get_to_node().get_name(), "bob node");
+    /// alice_node.set_name("alice");
     /// graph.update_from(&alice_node);
-    /// assert_eq!(graph.from.name, "alice");
+    /// assert_eq!(graph.get_from_node().get_name(), "alice");
     /// ```
     pub fn update_from(&mut self, from_node: &Node) {
         debug!("Updated Graph [{}] from Node: {:#?}", self.id, from_node);
@@ -126,17 +129,18 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     ///
     /// let alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
-    /// let mut graph = Graph::new(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.from.name, "alice node");
-    /// assert_eq!(graph.to.name, "bob node");
+    /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
+    /// assert_eq!(graph.get_from_node().get_name(), "alice node");
+    /// assert_eq!(graph.get_to_node().get_name(), "bob node");
     /// let fred_node = Node::new("fred node");
     /// graph.update_to(&fred_node);
-    /// assert_eq!(graph.to.name, "fred node");
-    /// assert_ne!(graph.to.id, bob_node.id);
+    /// assert_eq!(graph.get_to_node().get_name(), "fred node");
+    /// assert_ne!(graph.get_to_node().get_id(), bob_node.get_id());
     /// ```
     pub fn update_to(&mut self, to_node: &Node) {
         debug!("Updated Graph [{}] to Node: {:#?}", self.id, to_node);
@@ -156,10 +160,10 @@ impl Graph {
     }
 }
 
-impl RUDAttr for Graph {
-    fn set_attr<T> (&mut self, key: &str, val: T)
+impl RUDAttribute for Graph {
+    fn set_attr<T>(&mut self, key: &str, val: T)
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.set_attr(key, val);
     }
@@ -167,28 +171,26 @@ impl RUDAttr for Graph {
     fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
         self.attr.get_attr(key)
     }
-    
+
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.update_attr(attr_k, attr_v)
     }
-    
+
     fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
-        T: std::fmt::Display
+        T: std::fmt::Display,
     {
         self.attr.upsert_attr(attr_k, attr_v)
     }
-    
+
     fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         self.attr.del_attr(v)
     }
-    
+
     fn get_attr_keys(&self) -> Vec<&str> {
-        self.attr.get_attr_keys() 
+        self.attr.get_attr_keys()
     }
-
-
 }

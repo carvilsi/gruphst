@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use crate::graph::Graph;
 use crate::util::graphs_memory_watcher;
-use crate::CUR;
+use crate::CURNodeGraph;
 
 mod persistence;
 mod query;
@@ -25,7 +25,7 @@ pub struct Graphs {
 impl Graphs {
     /// Inserts a new Graph into the Graphs vault
     // TODO: add the possibility to add a Graph on init
-    pub fn insert(name: &str) -> Self {
+    pub fn init(name: &str) -> Self {
         let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
         vault.insert(String::from(name), vec![]);
         let graphs = Graphs {
@@ -37,6 +37,13 @@ impl Graphs {
         graphs
     }
 
+    /// Creates a new entry on Graphs valut
+    pub fn insert(&mut self, name: &str) {
+        self.vault.insert(String::from(name), vec![]);
+        self.name = String::from(name);
+        self.stats = self.stats().unwrap();
+        debug!("Insertered new entry to Graphs valut: {:#?}", self);
+    }
     pub fn get_name(&self) -> String {
         self.name.clone()
     }
@@ -58,10 +65,11 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// ```
@@ -88,29 +96,30 @@ impl Graphs {
     /// use gruphst::graphs::Graphs;
     /// use gruphst::graph::Graph;
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut the_graphs = Graphs::init("init graph");
     ///
-    /// let graph = Graph::new(
+    /// let graph = Graph::create(
     ///     &Node::new("alice"),
     ///     "knows",
     ///     &Node::new("bob"));
     /// the_graphs.add_graph(&graph, None);
     ///
-    /// assert_eq!(the_graphs.name, "init graph");
+    /// assert_eq!(the_graphs.get_name(), "init graph");
     /// let default_graph = the_graphs.get_graphs(None).unwrap();
-    /// assert_eq!(default_graph[0].id, graph.id);
+    /// assert_eq!(default_graph[0].get_id(), graph.get_id());
     ///
-    /// the_graphs.new("new one");
-    /// let graph1 = Graph::new(
+    /// the_graphs.insert("new one");
+    /// let graph1 = Graph::create(
     ///     &Node::new("bilbo"),
     ///     "relative",
     ///     &Node::new("frodo")
     /// );
     /// the_graphs.add_graph(&graph1, Some("new one"));
-    /// assert_eq!(the_graphs.name, "new one");
+    /// assert_eq!(the_graphs.get_name(), "new one");
     /// let other_graph = the_graphs.get_graphs(Some("new one")).unwrap();
-    /// assert_eq!(other_graph[0].id, graph1.id);
+    /// assert_eq!(other_graph[0].get_id(), graph1.get_id());
     /// ```
     pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
         let current_graph = self.select_graphs_name(graphs_name);
@@ -126,12 +135,13 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("my_graph");
-    /// assert_eq!(my_graph.name, "my_graph");
+    /// assert_eq!(my_graph.get_name(), "my_graph");
     ///
     /// my_graph.update_name("graphy");
-    /// assert_eq!(my_graph.name, "graphy");
+    /// assert_eq!(my_graph.get_name(), "graphy");
     /// ```
     // TODO: This must deal with multiple vaults
     pub fn update_name(&mut self, name: &str) {
@@ -146,20 +156,21 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let alice_fred =
-    ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
+    ///     Graph::create(&alice, "is firend of", &Node::new("Fred"));
     /// my_graph.add_graph(&alice_fred, None);
     ///
     /// assert_eq!(my_graph.len(), 2);
     ///
-    /// my_graph.delete_graph_by_id(alice_bob.id, None);
+    /// my_graph.delete_graph_by_id(alice_bob.get_id(), None);
     /// assert_eq!(my_graph.len(), 1);
     /// ```
     pub fn delete_graph_by_id(
@@ -190,6 +201,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     ///
     /// let mut my_graphs = Graphs::init("my-graphs");
@@ -197,25 +209,25 @@ impl Graphs {
     /// let alice_node = Node::new("Alice");
     /// let bob_node = Node::new("Bob");
     /// let alice_bob_graph =
-    ///     Graph::new(&alice_node, "best friends", &bob_node);
+    ///     Graph::create(&alice_node, "best friends", &bob_node);
     /// my_graphs.add_graph(&alice_bob_graph, None);
     ///
     /// let fred_node = Node::new("Fred");
     /// let mut alice_fred_graph =
-    ///     Graph::new(&alice_node, "super friends", &fred_node);
+    ///     Graph::create(&alice_node, "super friends", &fred_node);
     /// my_graphs.add_graph(&alice_fred_graph, None);
     ///
     /// assert_eq!(my_graphs.len(), 2);
     ///
-    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.name)).unwrap();
-    /// assert_eq!(graphs[1].relation, "super friends");
+    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.get_name())).unwrap();
+    /// assert_eq!(graphs[1].get_relation(), "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
     /// my_graphs.update_graph(&alice_fred_graph, None);
     ///
     /// assert_eq!(my_graphs.len(), 2);
-    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.id, None);
-    /// assert_eq!(updated_graph.unwrap().relation, "besties");
+    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.get_id(), None);
+    /// assert_eq!(updated_graph.unwrap().get_relation(), "besties");
     /// ```
     pub fn update_graph(
         &mut self,

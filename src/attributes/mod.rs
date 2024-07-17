@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use log::{debug, warn};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use uuid::Uuid;
 
-use crate::RUDAttr;
+use crate::RUDAttribute;
 
 mod query;
 
@@ -13,12 +13,19 @@ pub struct Attributes {
     id: String,
 }
 
-impl RUDAttr for Attributes {
+impl Default for Attributes {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl RUDAttribute for Attributes {
     /// Set attributes for a Node
     ///
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -39,6 +46,7 @@ impl RUDAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -67,6 +75,7 @@ impl RUDAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -97,6 +106,7 @@ impl RUDAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -135,6 +145,7 @@ impl RUDAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// assert!(node.is_empty_attr());
@@ -162,6 +173,7 @@ impl RUDAttr for Attributes {
     /// # Examples
     /// ```rust
     /// use gruphst::node::Node;
+    /// use crate::gruphst::*;
     ///
     /// let mut node = Node::new("Alice");
     /// node.set_attr("Address", "Elm street");
@@ -190,5 +202,4 @@ impl Attributes {
             id: Uuid::new_v4().to_string(),
         }
     }
-    
 }
