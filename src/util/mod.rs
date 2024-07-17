@@ -16,7 +16,7 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
     let g = graphs.clone();
     thread::spawn(move || {
         let max_mem = get_max_mem_usage();
-        let mem = g.stats().unwrap().mem;
+        let mem = g.stats().unwrap().get_mem();
         let mem_prss = (mem as f32 * 100_f32) / max_mem as f32;
         trace!("memory preassure: {:.2}", mem_prss);
         match mem_prss {
@@ -31,7 +31,7 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
                 error!("memory usage critical: {:.2}", mem_prss);
                 error!(
                     "auto persisting current graphs: {}, and stoping execution",
-                    g.name
+                    g.get_name()
                 );
                 let _ = g.persists();
                 process::exit(1);

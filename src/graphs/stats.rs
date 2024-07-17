@@ -1,26 +1,69 @@
 use crate::graphs::Graphs;
 use log::{debug, error};
 use std::error::Error;
+use serde::{Deserialize, Serialize};
 
 use crate::QueryAttr;
 
 /// Represents stats data from the Graphs
-#[derive(Debug)]
-pub struct GraphsStats<'a> {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GraphsStats {
     /// memory used by Graphs in bytes
-    pub mem: usize,
+    mem: usize,
     /// length of the Graph's vault
-    pub len_graphs: usize,
+    len_graphs: usize,
     /// total graphs
-    pub total_graphs: usize,
-    /// name of the Graph
-    pub name: &'a str,
+    total_graphs: usize,
     /// total attributes
-    pub total_attr: usize,
+    total_attr: usize,
     /// total nodes
-    pub total_nodes: usize,
+    total_nodes: usize,
     /// unique relations
-    pub uniq_rel: usize,
+    uniq_rel: usize,
+}
+
+impl GraphsStats {
+    pub fn init() -> Self {
+        GraphsStats {
+            mem: 64,
+            len_graphs: 0,
+            total_graphs: 0,
+            total_attr: 0,
+            total_nodes: 0,
+            uniq_rel: 0,
+        }
+    }
+
+    pub fn get_mem(&self) -> usize {
+        self.mem
+    }
+
+    pub fn get_len_graphs(&self) -> usize {
+        self.len_graphs
+    }
+
+    pub fn get_total_graphs(&self) -> usize {
+        self.total_graphs
+    }
+
+    pub fn get_total_attr(&self) -> usize {
+        self.total_attr
+    }
+
+    pub fn get_total_nodes(&self) -> usize {
+        self.total_nodes
+    }
+
+    pub fn get_uniq_rel(&self) -> usize {
+        self.uniq_rel
+    }
+
+    pub fn generate_stats(graphs: &Graphs) -> Self {
+        match get_stats(graphs) {
+            Ok(stats) => stats,
+            Err(_) => panic!("not possible to generate stats for graphs"),
+        }
+    }
 }
 
 impl Graphs {
@@ -64,27 +107,7 @@ impl Graphs {
     /// assert_eq!(stats.total_graphs, 1);
     /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
-        let bytes = bincode::serialize(self)?;
-        // lets count the amount of attributes in the graph
-        let mut attr_counter = 0;
-        for (_graph_name, graphs) in self.vault.iter() {
-            for graph in graphs {
-                attr_counter += graph.get_from_node().len_attr();
-                attr_counter += graph.get_to_node().len_attr();
-            }
-        }
-
-        let stats = GraphsStats {
-            mem: bytes.len(),
-            len_graphs: self.len(),
-            name: &self.name,
-            total_attr: attr_counter,
-            total_nodes: self.len() * 2,
-            uniq_rel: self.uniq_relations().len(),
-            total_graphs: self.vault.len(),
-        };
-        debug!("Graphs stats: {:#?}", stats);
-        Ok(stats)
+        get_stats(self)
     }
 
     // TODO: add uniq relations for all the graphs doc-test
@@ -205,3 +228,27 @@ impl Graphs {
         self.len() == 0
     }
 }
+
+/// private function to generate stats
+fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
+        let bytes = bincode::serialize(grphs)?;
+        // lets count the amount of attributes in the graph
+        let mut attr_counter = 0;
+        for (_graph_name, graphs) in grphs.vault.iter() {
+            for graph in graphs {
+                attr_counter += graph.get_from_node().len_attr();
+                attr_counter += graph.get_to_node().len_attr();
+            }
+        }
+
+        let stats = GraphsStats {
+            mem: bytes.len(),
+            len_graphs: grphs.len(),
+            total_attr: attr_counter,
+            total_nodes: grphs.len() * 2,
+            uniq_rel: grphs.uniq_relations().len(),
+            total_graphs: grphs.vault.len(),
+        };
+        debug!("Graphs stats: {:#?}", stats);
+        Ok(stats)
+    }

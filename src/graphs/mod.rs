@@ -1,10 +1,9 @@
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
+use stats::GraphsStats;
 use std::collections::HashMap;
-use uuid::Uuid;
 
 use crate::graph::Graph;
-use crate::attributes::Attributes;
 use crate::util::graphs_memory_watcher;
 use crate::CUR;
 
@@ -19,70 +18,39 @@ pub struct Graphs {
     vault: HashMap<String, Vec<Graph>>,
     /// Name for the current collection
     name: String,
-    /// The uuid for the collection
-    id: String,
+    /// Some attributes to handle metada for Graphs
+    stats: GraphsStats,
 }
 
-impl CUR for Graphs {
-    fn new(name: &str) -> Self {
+impl Graphs {
+    /// Inserts a new Graph into the Graphs vault
+    // TODO: add the possibility to add a Graph on init
+    pub fn insert(name: &str) -> Self {
         let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
         vault.insert(String::from(name), vec![]);
         let graphs = Graphs {
             name: String::from(name),
-            id: Uuid::new_v4().to_string(),
             vault,
+            stats: GraphsStats::init(),
         };
         debug!("Created new Graphs: {:#?}", graphs);
         graphs
     }
 
-    fn get_id(&self) -> String {
-        self.id.clone()
-    }
-
-    fn get_name(&self) -> String {
+    pub fn get_name(&self) -> String {
         self.name.clone()
     }
 
-    fn set_name(&mut self, name: &str) {
+    pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string()
     }
 
-    fn get_attributes(&self) -> Attributes {
-        todo!()
+    pub fn get_stats(&self) -> GraphsStats {
+        self.stats.clone()
     }
 }
 
 impl Graphs {
-    /// Creates a new collection of Graph elements
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let my_graph = Graphs::init("my_graph");
-    /// ```
-    pub fn init(name: &str) -> Self {
-        
-    }
-
-    /// Creates a new element to Graphs vault
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::graphs::Graphs;
-    ///
-    /// let first_graph = Graphs::init("first graph");
-    /// let first_graph_id = first_graph.id;
-    ///
-    /// ```
-    pub fn new(&mut self, name: &str) -> &mut Graphs {
-        self.vault.insert(String::from(name), vec![]);
-        self.name = name.to_string();
-        debug!("Created new Graphs: {:#?}", self);
-        self
-    }
-
     /// Adds a Graph element to the current colection
     ///
     /// # Examples
@@ -102,9 +70,8 @@ impl Graphs {
         if let Some(v) = self.vault.get_mut(&current_graph) {
             v.push(graph.clone());
             debug!(
-                "Added new graph to Graphs [{}, {}]
+                "Added new graph to Graphs [{}]
                 current length: {}",
-                self.id,
                 current_graph,
                 self.len()
             );
@@ -168,7 +135,7 @@ impl Graphs {
     /// ```
     // TODO: This must deal with multiple vaults
     pub fn update_name(&mut self, name: &str) {
-        debug!("Update Graph [{}] with name: {}", self.id, name);
+        debug!("Update Graph with name: {}", name);
         self.name = name.to_string();
     }
 
