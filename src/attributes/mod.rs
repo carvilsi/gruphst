@@ -202,4 +202,8 @@ impl Attributes {
             id: Uuid::new_v4().to_string(),
         }
     }
+
+    pub fn get_id(&self) -> String {
+        self.id.clone()
+    }
 }
