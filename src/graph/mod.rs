@@ -179,6 +179,10 @@ impl Graph {
     pub fn get_relation(&self) -> String {
         self.relation.clone()
     }
+
+    pub fn set_relation(&mut self, relation_label: &str) {
+        self.relation = relation_label.to_string();
+    }
 }
 
 impl RUDAttribute for Graph {

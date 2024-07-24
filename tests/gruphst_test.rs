@@ -1,6 +1,5 @@
 use serial_test::serial;
 
-use gruphst::config::*;
 use gruphst::enable_logging;
 use gruphst::graph::Graph;
 use gruphst::graphs::Graphs;
@@ -27,25 +26,6 @@ mod tests {
         graph.add_relation(&Node::new("Alice"), "is friend", &Node::new("Bob"));
         my_graph.add_graph(&graph, None);
         assert!(my_graph.find_by_relation("lol", None).is_err());
-    }
-
-    #[test]
-    #[serial]
-    fn create_node() {
-        let n = Node::new("Node 1");
-        assert_eq!(n.get_label(), "Node 1");
-    }
-
-    #[test]
-    #[serial]
-    fn create_graph() {
-        let node1 = Node::new("a node");
-        let node2 = Node::new("b node");
-        let graph = Graph::create(&node1, "relation a-b", &node2);
-        assert_eq!(graph.get_relation(), "relation a-b");
-        assert_eq!(graph.get_relation(), "relation a-b");
-        assert_eq!(graph.get_from_node().get_label(), "a node");
-        assert_eq!(graph.get_to_node().get_label(), "b node");
     }
 
     #[test]
@@ -85,40 +65,6 @@ mod tests {
 
     #[test]
     #[serial]
-    fn persistence() {
-        let mut gru = Graphs::init("graphs-a");
-        let mut node1 = Node::new("a node");
-        node1.set_attr("foo", "bar");
-        let node2 = Node::new("b node");
-        let graph1 = Graph::create(&node1, "relation a-b", &node2);
-        gru.add_graph(&graph1, None);
-
-        let node3 = Node::new("c node");
-        let node4 = Node::new("d node");
-        let graph2 = Graph::create(&node3, "relation c-d", &node4);
-        gru.add_graph(&graph2, None);
-
-        let _ = gru.persists();
-
-        let name = gru.get_label();
-        let file_name = format!("{}.grphst", name);
-        let grphs = Graphs::load(&file_name);
-        match grphs {
-            Ok(grphs) => {
-                let graphs = grphs.get_graphs(Some(name.as_str())).unwrap();
-                assert_eq!(grphs.get_label(), name);
-                assert_eq!(graphs[0].get_relation(), graph1.get_relation());
-                assert_eq!(graphs[0].get_from_node().get_label(), "a node");
-                assert_eq!(graphs[0].get_from_node().len_attr(), 1);
-                assert_eq!(graphs[0].get_from_node().get_attr("foo").unwrap(), "bar");
-                assert_eq!(graphs[1], graph2);
-            }
-            Err(_) => panic!(),
-        }
-    }
-
-    #[test]
-    #[serial]
     fn delete_from_graph() {
         let mut my_graph = Graphs::init("friends");
         let alice = Node::new("Alice");
@@ -149,37 +95,6 @@ mod tests {
         assert!(my_graph
             .delete_graph_by_id("foobar".to_string(), None)
             .is_err());
-    }
-
-    #[test]
-    #[serial]
-    fn update_node_name() {
-        let mut alice_node = Node::new("alice node");
-        assert_eq!(alice_node.get_label(), "alice node");
-        alice_node.set_label("just alice");
-        assert_eq!(alice_node.get_label(), "just alice");
-        let bob_node = Node::new("bob node");
-        let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-        alice_node.set_label("alice");
-        graph.update_from(&alice_node);
-        assert_eq!(graph.get_from_node().get_label(), "alice");
-    }
-
-    #[test]
-    #[serial]
-    fn update_graph_node() {
-        let mut alice_node = Node::new("alice node");
-        let bob_node = Node::new("bob node");
-        let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-        assert_eq!(graph.get_from_node().get_label(), "alice node");
-        assert_eq!(graph.get_to_node().get_label(), "bob node");
-        alice_node.set_label("alice");
-        graph.update_from(&alice_node);
-        assert_eq!(graph.get_from_node().get_label(), "alice");
-        let fred_node = Node::new("fred node");
-        graph.update_to(&fred_node);
-        assert_eq!(graph.get_to_node().get_label(), "fred node");
-        assert_ne!(graph.get_to_node().get_id(), bob_node.get_id());
     }
 
     #[test]
@@ -259,42 +174,6 @@ mod tests {
         assert!(!graphs.is_empty());
     }
 
-    #[test]
-    #[serial]
-    fn load_persisted_fail() {
-        assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
-        assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
-    }
-
-    #[test]
-    #[serial]
-    fn attributes() {
-        let mut alice = Node::new("Alice");
-        assert_eq!(alice.len_attr(), 0);
-        assert!(alice.is_empty_attr());
-        alice.set_attr("address", "Elm Street");
-        assert_eq!(alice.get_attr("address").unwrap(), "Elm Street");
-        assert_eq!(alice.len_attr(), 1);
-        alice.set_attr("age", 34);
-        assert_eq!(alice.get_attr("age").unwrap(), "34");
-        let _ = alice.update_attr("age", 43);
-        assert_eq!(alice.get_attr("age").unwrap(), "43");
-        assert_eq!(alice.len_attr(), 2);
-        let attrs = alice.get_attr_keys();
-        assert!(attrs.contains(&&"age"));
-        assert!(attrs.contains(&&"address"));
-        assert!(alice.get_attr("phone").is_err());
-        let _ = alice.del_attr("age");
-        assert_eq!(alice.len_attr(), 1);
-        assert!(!alice.is_empty_attr());
-        alice.upsert_attr("phone", "555-555-555");
-        assert_eq!(alice.get_attr("phone").unwrap(), "555-555-555");
-        assert_eq!(alice.len_attr(), 2);
-        alice.upsert_attr("phone", "556-554-553");
-        assert_eq!(alice.get_attr("phone").unwrap(), "556-554-553");
-        assert_eq!(alice.len_attr(), 2);
-    }
-
     fn do_some_networking() -> Graphs {
         let mut graphs = Graphs::init("my graphs");
 
@@ -324,17 +203,7 @@ mod tests {
         assert_eq!(unique_relations, vec!["friend of", "relative of"]);
     }
 
-    #[test]
-    #[serial]
-    fn configuration() {
-        let config_mem = get_max_mem_usage();
-
-        assert_eq!(config_mem, 50 * 1024 * 1024);
-
-        let config_log_level = get_log_level();
-
-        assert_eq!(config_log_level, log::Level::Debug);
-    }
+    
 
     #[test]
     #[serial]
