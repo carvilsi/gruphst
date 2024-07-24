@@ -31,7 +31,7 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
                 error!("memory usage critical: {:.2}", mem_prss);
                 error!(
                     "auto persisting current graphs: {}, and stoping execution",
-                    g.get_name()
+                    g.get_label()
                 );
                 let _ = g.persists();
                 process::exit(1);

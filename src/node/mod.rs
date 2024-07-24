@@ -14,13 +14,13 @@ pub struct Node {
     /// A Node consists on a uuid as identifier
     id: String,
     /// And a name
-    name: String,
+    label: String,
     /// The attributes for a node
     attr: Attributes,
 }
 
 impl CURNodeGraph for Node {
-    /// Creates a Node with the given name, the id is generated
+    /// Creates a Node with the given label, the id is generated
     ///
     /// # Examples
     /// ```rust
@@ -29,9 +29,9 @@ impl CURNodeGraph for Node {
     ///
     /// let node = Node::new("alice node");
     /// ```
-    fn new(name: &str) -> Self {
+    fn new(label: &str) -> Self {
         let node = Node {
-            name: String::from(name),
+            label: String::from(label),
             id: Uuid::new_v4().to_string(),
             attr: Attributes::new(),
         };
@@ -43,12 +43,12 @@ impl CURNodeGraph for Node {
         self.id.clone()
     }
 
-    fn get_name(&self) -> String {
-        self.name.clone()
+    fn get_label(&self) -> String {
+        self.label.clone()
     }
 
-    fn set_name(&mut self, name: &str) {
-        self.name = name.to_string();
+    fn set_label(&mut self, label: &str) {
+        self.label = label.to_string();
     }
 
     fn get_attributes(&self) -> Attributes {

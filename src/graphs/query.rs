@@ -37,7 +37,7 @@ impl Graphs {
         relation_name: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -89,7 +89,7 @@ impl Graphs {
         relations: Vec<&str>,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -147,7 +147,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -205,7 +205,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -269,7 +269,7 @@ impl Graphs {
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -320,7 +320,7 @@ impl Graphs {
         id: &str,
         graphs_name: Option<&str>,
     ) -> Result<&mut Graph, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs.iter_mut().find(|graph| {
                 graph.get_id() == id
@@ -361,8 +361,8 @@ impl Graphs {
     /// let results = my_graphs.has_relation_in("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].get_name(), "Bob");
-    /// assert_eq!(results[1].get_name(), "Fred");
+    /// assert_eq!(results[0].get_label(), "Bob");
+    /// assert_eq!(results[1].get_label(), "Fred");
     /// ```
     pub fn has_relation_in(
         &self,
@@ -370,7 +370,7 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Node>, &'static str> {
         let mut relations_in: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_in
@@ -411,8 +411,8 @@ impl Graphs {
     /// let results = my_graphs.has_relation_out("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].get_name(), "Alice");
-    /// assert_eq!(results[1].get_name(), "Bob");
+    /// assert_eq!(results[0].get_label(), "Alice");
+    /// assert_eq!(results[1].get_label(), "Bob");
     /// ```
     pub fn has_relation_out(
         &self,
@@ -420,7 +420,7 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Node>, &'static str> {
         let mut relations_out: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_out

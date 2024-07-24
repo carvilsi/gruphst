@@ -113,7 +113,7 @@ impl Graphs {
     // TODO: add uniq relations for all the graphs doc-test
     pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<String> {
         let mut uniq_rel = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs.iter() {
                 uniq_rel.push(graph.get_relation());

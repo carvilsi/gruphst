@@ -5,9 +5,6 @@ use gruphst::enable_logging;
 use gruphst::graph::Graph;
 use gruphst::graphs::Graphs;
 use gruphst::node::Node;
-// use gruphst::QueryAttr;
-// use gruphst::CUR;
-// use gruphst::RUDAttr;
 
 use gruphst::*;
 
@@ -36,7 +33,7 @@ mod tests {
     #[serial]
     fn create_node() {
         let n = Node::new("Node 1");
-        assert_eq!(n.get_name(), "Node 1");
+        assert_eq!(n.get_label(), "Node 1");
     }
 
     #[test]
@@ -47,15 +44,15 @@ mod tests {
         let graph = Graph::create(&node1, "relation a-b", &node2);
         assert_eq!(graph.get_relation(), "relation a-b");
         assert_eq!(graph.get_relation(), "relation a-b");
-        assert_eq!(graph.get_from_node().get_name(), "a node");
-        assert_eq!(graph.get_to_node().get_name(), "b node");
+        assert_eq!(graph.get_from_node().get_label(), "a node");
+        assert_eq!(graph.get_to_node().get_label(), "b node");
     }
 
     #[test]
     #[serial]
     fn find_in_graphs() {
         let mut gru = Graphs::init("graphs-a");
-        assert_eq!(gru.get_name(), "graphs-a");
+        assert_eq!(gru.get_label(), "graphs-a");
 
         let node1 = Node::new("a node");
         let node2 = Node::new("b node");
@@ -103,15 +100,15 @@ mod tests {
 
         let _ = gru.persists();
 
-        let name = gru.get_name();
+        let name = gru.get_label();
         let file_name = format!("{}.grphst", name);
         let grphs = Graphs::load(&file_name);
         match grphs {
             Ok(grphs) => {
                 let graphs = grphs.get_graphs(Some(name.as_str())).unwrap();
-                assert_eq!(grphs.get_name(), name);
+                assert_eq!(grphs.get_label(), name);
                 assert_eq!(graphs[0].get_relation(), graph1.get_relation());
-                assert_eq!(graphs[0].get_from_node().get_name(), "a node");
+                assert_eq!(graphs[0].get_from_node().get_label(), "a node");
                 assert_eq!(graphs[0].get_from_node().len_attr(), 1);
                 assert_eq!(graphs[0].get_from_node().get_attr("foo").unwrap(), "bar");
                 assert_eq!(graphs[1], graph2);
@@ -158,14 +155,14 @@ mod tests {
     #[serial]
     fn update_node_name() {
         let mut alice_node = Node::new("alice node");
-        assert_eq!(alice_node.get_name(), "alice node");
-        alice_node.set_name("just alice");
-        assert_eq!(alice_node.get_name(), "just alice");
+        assert_eq!(alice_node.get_label(), "alice node");
+        alice_node.set_label("just alice");
+        assert_eq!(alice_node.get_label(), "just alice");
         let bob_node = Node::new("bob node");
         let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-        alice_node.set_name("alice");
+        alice_node.set_label("alice");
         graph.update_from(&alice_node);
-        assert_eq!(graph.get_from_node().get_name(), "alice");
+        assert_eq!(graph.get_from_node().get_label(), "alice");
     }
 
     #[test]
@@ -174,14 +171,14 @@ mod tests {
         let mut alice_node = Node::new("alice node");
         let bob_node = Node::new("bob node");
         let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-        assert_eq!(graph.get_from_node().get_name(), "alice node");
-        assert_eq!(graph.get_to_node().get_name(), "bob node");
-        alice_node.set_name("alice");
+        assert_eq!(graph.get_from_node().get_label(), "alice node");
+        assert_eq!(graph.get_to_node().get_label(), "bob node");
+        alice_node.set_label("alice");
         graph.update_from(&alice_node);
-        assert_eq!(graph.get_from_node().get_name(), "alice");
+        assert_eq!(graph.get_from_node().get_label(), "alice");
         let fred_node = Node::new("fred node");
         graph.update_to(&fred_node);
-        assert_eq!(graph.get_to_node().get_name(), "fred node");
+        assert_eq!(graph.get_to_node().get_label(), "fred node");
         assert_ne!(graph.get_to_node().get_id(), bob_node.get_id());
     }
 
@@ -354,8 +351,8 @@ mod tests {
         let graphs = do_some_networking();
         let results = graphs.has_relation_in("friend of", None);
         assert_eq!(results.clone().unwrap().len(), 2);
-        assert_eq!(results.clone().unwrap()[0].get_name(), "Bob");
-        assert_eq!(results.unwrap()[1].get_name(), "Alice");
+        assert_eq!(results.clone().unwrap()[0].get_label(), "Bob");
+        assert_eq!(results.unwrap()[1].get_label(), "Alice");
     }
 
     #[test]
@@ -364,8 +361,8 @@ mod tests {
         let graphs = do_some_networking();
         let results = graphs.has_relation_out("friend of", None);
         assert_eq!(results.clone().unwrap().len(), 3);
-        assert_eq!(results.clone().unwrap()[0].get_name(), "Alice");
-        assert_eq!(results.clone().unwrap()[1].get_name(), "Bob");
-        assert_eq!(results.unwrap()[2].get_name(), "Fred");
+        assert_eq!(results.clone().unwrap()[0].get_label(), "Alice");
+        assert_eq!(results.clone().unwrap()[1].get_label(), "Bob");
+        assert_eq!(results.unwrap()[2].get_label(), "Fred");
     }
 }

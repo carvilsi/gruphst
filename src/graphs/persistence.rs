@@ -28,7 +28,7 @@ impl Graphs {
     /// my_graph.persists();
     /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{}.grphst", self.get_name().replace(' ', "_"));
+        let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -61,13 +61,13 @@ impl Graphs {
     ///
     /// let _ = my_graph.persists();
     ///
-    /// let name = my_graph.get_name();
+    /// let name = my_graph.get_label();
     /// let file_name = format!("{}.grphst", name);
     /// let loaded_graphs = Graphs::load(&file_name);
     /// match loaded_graphs {
     ///     Ok(loaded_graphs) => {
     ///         let graphs = loaded_graphs.get_graphs(Some(&name)).unwrap();
-    ///         assert_eq!(loaded_graphs.get_name(), name);
+    ///         assert_eq!(loaded_graphs.get_label(), name);
     ///         assert_eq!(graphs[0].get_relation(), alice_bob.get_relation());
     ///     },
     ///     Err(_) => panic!(),

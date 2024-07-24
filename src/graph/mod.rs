@@ -11,7 +11,7 @@ mod query;
 pub struct Graph {
     /// A Graph has an uuid
     id: String,
-    /// A name for the relation
+    /// A label for the relation
     relation: String,
     /// Origin node
     from: Node,
@@ -22,10 +22,10 @@ pub struct Graph {
 }
 
 impl CURNodeGraph for Graph {
-    fn new(name: &str) -> Self {
+    fn new(label: &str) -> Self {
         Graph {
             id: Uuid::new_v4().to_string(),
-            relation: name.to_string(),
+            relation: label.to_string(),
             from: Node::new(""),
             to: Node::new(""),
             attr: Attributes::new(),
@@ -36,12 +36,12 @@ impl CURNodeGraph for Graph {
         self.id.clone()
     }
 
-    fn get_name(&self) -> String {
+    fn get_label(&self) -> String {
         self.relation.clone()
     }
 
-    fn set_name(&mut self, name: &str) {
-        self.relation = name.to_string()
+    fn set_label(&mut self, label: &str) {
+        self.relation = label.to_string()
     }
 
     fn get_attributes(&self) -> Attributes {
@@ -129,11 +129,11 @@ impl Graph {
     /// let mut alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
     /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.get_from_node().get_name(), "alice node");
-    /// assert_eq!(graph.get_to_node().get_name(), "bob node");
-    /// alice_node.set_name("alice");
+    /// assert_eq!(graph.get_from_node().get_label(), "alice node");
+    /// assert_eq!(graph.get_to_node().get_label(), "bob node");
+    /// alice_node.set_label("alice");
     /// graph.update_from(&alice_node);
-    /// assert_eq!(graph.get_from_node().get_name(), "alice");
+    /// assert_eq!(graph.get_from_node().get_label(), "alice");
     /// ```
     pub fn update_from(&mut self, from_node: &Node) {
         debug!("Updated Graph [{}] from Node: {:#?}", self.id, from_node);
@@ -152,11 +152,11 @@ impl Graph {
     /// let alice_node = Node::new("alice node");
     /// let bob_node = Node::new("bob node");
     /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.get_from_node().get_name(), "alice node");
-    /// assert_eq!(graph.get_to_node().get_name(), "bob node");
+    /// assert_eq!(graph.get_from_node().get_label(), "alice node");
+    /// assert_eq!(graph.get_to_node().get_label(), "bob node");
     /// let fred_node = Node::new("fred node");
     /// graph.update_to(&fred_node);
-    /// assert_eq!(graph.get_to_node().get_name(), "fred node");
+    /// assert_eq!(graph.get_to_node().get_label(), "fred node");
     /// assert_ne!(graph.get_to_node().get_id(), bob_node.get_id());
     /// ```
     pub fn update_to(&mut self, to_node: &Node) {

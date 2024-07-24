@@ -13,11 +13,12 @@ pub mod graphs;
 pub mod node;
 mod util;
 
+// XXX: maybe add set_attributes???
 pub trait CURNodeGraph {
-    fn new(name: &str) -> Self;
+    fn new(label: &str) -> Self;
     fn get_id(&self) -> String;
-    fn get_name(&self) -> String;
-    fn set_name(&mut self, name: &str);
+    fn get_label(&self) -> String;
+    fn set_label(&mut self, label: &str);
     fn get_attributes(&self) -> Attributes;
 }
 

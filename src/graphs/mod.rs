@@ -17,7 +17,7 @@ pub struct Graphs {
     /// The collections of Graph
     vault: HashMap<String, Vec<Graph>>,
     /// Name for the current collection
-    name: String,
+    label: String,
     /// Some attributes to handle metada for Graphs
     stats: GraphsStats,
 }
@@ -25,11 +25,11 @@ pub struct Graphs {
 impl Graphs {
     /// Inserts a new Graph into the Graphs vault
     // TODO: add the possibility to add a Graph on init
-    pub fn init(name: &str) -> Self {
+    pub fn init(label: &str) -> Self {
         let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
-        vault.insert(String::from(name), vec![]);
+        vault.insert(String::from(label), vec![]);
         let graphs = Graphs {
-            name: String::from(name),
+            label: String::from(label),
             vault,
             stats: GraphsStats::init(),
         };
@@ -40,16 +40,16 @@ impl Graphs {
     /// Creates a new entry on Graphs valut
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
-        self.name = String::from(name);
+        self.label = String::from(name);
         self.stats = self.stats().unwrap();
         debug!("Insertered new entry to Graphs valut: {:#?}", self);
     }
-    pub fn get_name(&self) -> String {
-        self.name.clone()
+    pub fn get_label(&self) -> String {
+        self.label.clone()
     }
 
-    pub fn set_name(&mut self, name: &str) {
-        self.name = name.to_string()
+    pub fn set_label(&mut self, label: &str) {
+        self.label = label.to_string()
     }
 
     pub fn get_stats(&self) -> GraphsStats {
@@ -74,7 +74,7 @@ impl Graphs {
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// ```
     pub fn add_graph(&mut self, graph: &Graph, graphs_name: Option<&str>) {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(v) = self.vault.get_mut(&current_graph) {
             v.push(graph.clone());
             debug!(
@@ -106,7 +106,7 @@ impl Graphs {
     ///     &Node::new("bob"));
     /// the_graphs.add_graph(&graph, None);
     ///
-    /// assert_eq!(the_graphs.get_name(), "init graph");
+    /// assert_eq!(the_graphs.get_label(), "init graph");
     /// let default_graph = the_graphs.get_graphs(None).unwrap();
     /// assert_eq!(default_graph[0].get_id(), graph.get_id());
     ///
@@ -117,12 +117,12 @@ impl Graphs {
     ///     &Node::new("frodo")
     /// );
     /// the_graphs.add_graph(&graph1, Some("new one"));
-    /// assert_eq!(the_graphs.get_name(), "new one");
+    /// assert_eq!(the_graphs.get_label(), "new one");
     /// let other_graph = the_graphs.get_graphs(Some("new one")).unwrap();
     /// assert_eq!(other_graph[0].get_id(), graph1.get_id());
     /// ```
     pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             Ok(graphs.clone())
         } else {
@@ -138,15 +138,15 @@ impl Graphs {
     /// use crate::gruphst::*;
     ///
     /// let mut my_graph = Graphs::init("my_graph");
-    /// assert_eq!(my_graph.get_name(), "my_graph");
+    /// assert_eq!(my_graph.get_label(), "my_graph");
     ///
     /// my_graph.update_name("graphy");
-    /// assert_eq!(my_graph.get_name(), "graphy");
+    /// assert_eq!(my_graph.get_label(), "graphy");
     /// ```
     // TODO: This must deal with multiple vaults
     pub fn update_name(&mut self, name: &str) {
         debug!("Update Graph with name: {}", name);
-        self.name = name.to_string();
+        self.label = name.to_string();
     }
 
     /// Deletes the Graph that matches with the provided id
@@ -178,7 +178,7 @@ impl Graphs {
         id: String,
         graphs_name: Option<&str>,
     ) -> Result<(), &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let index = graphs.iter().position(|graph| graph.get_id() == id);
             if index.is_some() {
@@ -219,7 +219,7 @@ impl Graphs {
     ///
     /// assert_eq!(my_graphs.len(), 2);
     ///
-    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.get_name())).unwrap();
+    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.get_label())).unwrap();
     /// assert_eq!(graphs[1].get_relation(), "super friends");
     ///
     /// alice_fred_graph.update_relation("besties");
@@ -235,7 +235,7 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let index = graphs
                 .iter()
@@ -264,9 +264,9 @@ impl Graphs {
 // A bundle for util functions
 impl Graphs {
     /// Retrieves the current graphs or returns the option one
-    fn select_graphs_name(&self, graphs_name: Option<&str>) -> String {
-        let mut current_graph = self.name.clone();
-        if let Some(gn) = graphs_name {
+    fn select_graphs_label(&self, graphs_label: Option<&str>) -> String {
+        let mut current_graph = self.label.clone();
+        if let Some(gn) = graphs_label {
             current_graph = gn.to_string();
         }
         current_graph.to_string()
