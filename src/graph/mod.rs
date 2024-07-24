@@ -50,7 +50,30 @@ impl CURNodeGraph for Graph {
 }
 
 impl Graph {
-    /// Creates a Graph, the id is generated
+    /// Adds "From" and "To" node 
+    /// to a previous created Graph
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::node::Node;
+    /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
+    ///
+    /// let alice = Node::new("Alice");
+    /// let bob = Node::new("Bob");
+    /// let mut alice_bob_graph = Graph::new("");
+    /// alice_bob_graph.add_relation(&alice, "friend of", &bob);
+    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
+    /// ```
+    pub fn add_relation(&mut self, from: &Node, relation: &str, to: &Node) {
+        self.relation = String::from(relation);
+        self.from = from.clone();
+        self.to = to.clone();
+        debug!("Added relation to Graph: {:#?}", self);
+    }
+    /// Creates a Graph,
+    /// providing "From" and "To" nodes and the "relation"
+    /// the id is generated
     ///
     /// # Examples
     /// ```rust
@@ -62,14 +85,8 @@ impl Graph {
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph =
     ///     Graph::create(&alice, "friend of", &bob);
+    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
     /// ```
-    pub fn add_relation(&mut self, from: &Node, relation: &str, to: &Node) {
-        self.relation = String::from(relation);
-        self.from = from.clone();
-        self.to = to.clone();
-        debug!("Added relation to Graph: {:#?}", self);
-    }
-
     pub fn create(from: &Node, relation: &str, to: &Node) -> Self {
         let mut g = Graph::new(relation);
         g.from = from.clone();
