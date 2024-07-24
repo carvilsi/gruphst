@@ -54,6 +54,10 @@ impl CURNodeGraph for Node {
     fn get_attributes(&self) -> Attributes {
         self.attr.clone()
     }
+    
+    fn set_attributes(&mut self, attributes: Attributes) {
+        self.attr = attributes;
+    }
 }
 
 impl RUDAttribute for Node {

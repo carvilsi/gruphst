@@ -1,3 +1,4 @@
+use attributes::Attributes;
 use gruphst::node::Node;
 use gruphst::*;
 
@@ -28,7 +29,7 @@ fn node_attributes() {
 }
 
 #[test]
-fn node_set_attributes() {
+fn node_set_attribute() {
     let (mut node, _id) = be_prepare_node();
     node.set_attr("address", "Elm Street");
     assert_eq!(node.get_attr("name").unwrap(), "Alice");
@@ -78,4 +79,23 @@ fn node_get_attributes() {
     let attributes = node.get_attributes();
     assert_eq!(attributes.get_attr("name").unwrap(), "Alice");
     assert_eq!(attributes.get_attr("age").unwrap(), "42");
+}
+
+#[test]
+fn node_set_attributes() {
+    let (mut node, _id) = be_prepare_node();
+    let attributes = node.get_attributes();
+    assert_eq!(attributes.get_attr("name").unwrap(), "Alice");
+    assert_eq!(attributes.get_attr("age").unwrap(), "42");
+    assert_eq!(node.get_attr("name").unwrap(), "Alice");
+    assert_eq!(node.get_attr("age").unwrap(), "42");
+    let mut new_attributes = Attributes::new();
+    new_attributes.set_attr("address", "Elm Street");
+    new_attributes.set_attr("city", "Springfield");
+    node.set_attributes(new_attributes);
+    let update_attributes = node.get_attributes();
+    assert!(update_attributes.get_attr("name").is_err());
+    assert!(update_attributes.get_attr("age").is_err());
+    assert_eq!(update_attributes.get_attr("address").unwrap(), "Elm Street");
+    assert_eq!(update_attributes.get_attr("city").unwrap(), "Springfield");
 }

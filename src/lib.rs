@@ -13,13 +13,13 @@ pub mod graphs;
 pub mod node;
 mod util;
 
-// XXX: maybe add set_attributes???
 pub trait CURNodeGraph {
     fn new(label: &str) -> Self;
     fn get_id(&self) -> String;
     fn get_label(&self) -> String;
     fn set_label(&mut self, label: &str);
     fn get_attributes(&self) -> Attributes;
+    fn set_attributes(&mut self, attributes: Attributes);
 }
 
 pub trait RUDAttribute {
