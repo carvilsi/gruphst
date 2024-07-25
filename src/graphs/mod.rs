@@ -36,7 +36,7 @@ impl Graphs {
         graphs
     }
 
-    /// Creates a new element into the Graphs vault inserting a new Graph
+    /// Initializes a new Graphs element adding a Graph to new vault
     pub fn init_with(label: &str, graph: &Graph) -> Self {
         let mut graphs = Graphs::init(label);
         graphs.add_graph(graph, None);
@@ -47,6 +47,15 @@ impl Graphs {
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
+        self.stats = self.stats().unwrap();
+        debug!("Insertered new entry to Graphs valut: {:#?}", self);
+    }
+
+    /// Creates a new entry on Graphs valut with a Graph
+    pub fn insert_with(&mut self, name: &str, graph: &Graph) {
+        self.vault.insert(String::from(name), vec![]);
+        self.label = String::from(name);
+        self.add_graph(graph, Some(name));
         self.stats = self.stats().unwrap();
         debug!("Insertered new entry to Graphs valut: {:#?}", self);
     }

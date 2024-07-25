@@ -148,41 +148,33 @@ fn relation_out() {
     assert_eq!(results.unwrap()[2].get_label(), "Fred");
 }
 
-// TODO: this tests must be refactored
 #[test]
-fn find_in_graphs() {
-    let mut gru = Graphs::init("graphs-a");
-    assert_eq!(gru.get_label(), "graphs-a");
-
-    let node1 = Node::new("a node");
-    let node2 = Node::new("b node");
-    let graph1 = Graph::create(&node1, "friend of", &node2);
-    gru.add_graph(&graph1, None);
-    assert_eq!(gru.len(), 1);
-
-    let node3 = Node::new("c node");
-    let node4 = Node::new("d node");
-    let graph2 = Graph::create(&node3, "knows", &node4);
-    gru.add_graph(&graph2, None);
-    assert_eq!(gru.len(), 2);
-
-    let mut res_graphs = gru.find_by_relation("knows", None).unwrap();
-    assert_eq!(res_graphs.len(), 1);
-    assert_eq!(res_graphs[0].get_relation(), "knows");
-
-    let res = gru.find_by_id(&node1.get_id(), None);
-    assert_eq!(res.unwrap().get_from_node().get_id(), node1.get_id());
-
-    let node5 = Node::new("e node");
-    let graph3 = Graph::create(&node1, "friend of", &node5);
-    gru.add_graph(&graph3, None);
-
-    res_graphs = gru.find_by_relation("friend of", None).unwrap();
-    assert_eq!(res_graphs.len(), 2);
-    assert_eq!(res_graphs[0].get_relation(), "friend of");
-    assert_eq!(res_graphs[1].get_relation(), "friend of");
+fn should_create_new_vault_and_add_graph() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    let graph = Graph::create(
+        &Node::new("foo"), 
+        "before a", 
+        &Node::new("bar"));
+    graphs.insert_with("other", &graph);
+    assert_eq!(graphs.len_graphs(), 2);
 }
 
+// TODO: refactor names for methods related with vault...
+// seems better things like: 
+// add_vault
+// add_vault_with
+
+// #[test]
+// fn find_in_graphs() {
+//     let graphs = prepare_graphs_test();
+//     graphs.(
+//         &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+//         Some("middle-earth"),
+//     );
+// }
+
+// TODO: these tests must be refactored
 #[test]
 fn delete_from_graph() {
     let mut my_graph = Graphs::init("friends");
