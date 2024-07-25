@@ -47,14 +47,14 @@ impl CURNodeGraph for Graph {
     fn get_attributes(&self) -> Attributes {
         self.attr.clone()
     }
-    
+
     fn set_attributes(&mut self, attributes: Attributes) {
         self.attr = attributes;
     }
 }
 
 impl Graph {
-    /// Adds "From" and "To" node 
+    /// Adds "From" and "To" node
     /// to a previous created Graph
     ///
     /// # Examples

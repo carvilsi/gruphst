@@ -1,7 +1,9 @@
-use attributes::Attributes;
-use gruphst::graph::Graph;
-use gruphst::node::Node;
-use gruphst::*;
+use gruphst::{
+    attributes::Attributes,
+    graph::Graph,
+    node::Node,
+    *,
+};
 
 fn prepare_graph_test() -> (Graph, String) {
     let alice = Node::new("alice");
@@ -15,23 +17,23 @@ fn prepare_graph_test() -> (Graph, String) {
 #[test]
 fn graph_get_relation() {
     let (graph, _id) = prepare_graph_test();
-    assert_eq!(graph.get_relation(), "friend of"); 
+    assert_eq!(graph.get_relation(), "friend of");
     // an alias
-    assert_eq!(graph.get_label(), "friend of"); 
+    assert_eq!(graph.get_label(), "friend of");
 }
 
 #[test]
 fn graph_set_relation() {
     let (mut graph, _id) = prepare_graph_test();
-    assert_eq!(graph.get_relation(), "friend of"); 
+    assert_eq!(graph.get_relation(), "friend of");
     graph.set_relation("best friend");
-    assert_eq!(graph.get_relation(), "best friend"); 
+    assert_eq!(graph.get_relation(), "best friend");
 }
 
 #[test]
 fn graph_get_id() {
     let (graph, id) = prepare_graph_test();
-    assert_eq!(graph.get_id(), id); 
+    assert_eq!(graph.get_id(), id);
 }
 
 #[test]
@@ -122,7 +124,7 @@ fn graph_update_from_node() {
     graph.update_from(&node);
     assert_eq!(graph.get_from_node().get_label(), "fred");
 }
- 
+
 #[test]
 fn graph_update_to_node() {
     let (mut graph, _id) = prepare_graph_test();
@@ -131,4 +133,3 @@ fn graph_update_to_node() {
     graph.update_to(&node);
     assert_eq!(graph.get_to_node().get_label(), "fred");
 }
- 

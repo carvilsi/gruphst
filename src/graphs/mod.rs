@@ -73,6 +73,7 @@ impl Graphs {
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// ```
+    // TODO: rethink!
     pub fn add_graph(&mut self, graph: &Graph, graphs_name: Option<&str>) {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(v) = self.vault.get_mut(&current_graph) {
@@ -140,13 +141,12 @@ impl Graphs {
     /// let mut my_graph = Graphs::init("my_graph");
     /// assert_eq!(my_graph.get_label(), "my_graph");
     ///
-    /// my_graph.update_name("graphy");
+    /// my_graph.update_label("graphy");
     /// assert_eq!(my_graph.get_label(), "graphy");
     /// ```
-    // TODO: This must deal with multiple vaults
-    pub fn update_name(&mut self, name: &str) {
-        debug!("Update Graph with name: {}", name);
-        self.label = name.to_string();
+    pub fn update_label(&mut self, label: &str) {
+        debug!("Update Graph with name: {}", label);
+        self.label = label.to_string();
     }
 
     /// Deletes the Graph that matches with the provided id

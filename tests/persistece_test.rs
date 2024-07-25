@@ -1,5 +1,5 @@
-use gruphst::graphs::Graphs;
 use gruphst::graph::Graph;
+use gruphst::graphs::Graphs;
 use gruphst::node::Node;
 use gruphst::*;
 
@@ -41,4 +41,3 @@ fn load_persisted_fail() {
     assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
     assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
 }
-
