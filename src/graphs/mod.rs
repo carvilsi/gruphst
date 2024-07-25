@@ -24,7 +24,6 @@ pub struct Graphs {
 
 impl Graphs {
     /// Inserts a new Graph into the Graphs vault
-    // TODO: add the possibility to add a Graph on init
     pub fn init(label: &str) -> Self {
         let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
@@ -37,6 +36,12 @@ impl Graphs {
         graphs
     }
 
+    pub fn init_with(label: &str, graph: &Graph) -> Self {
+        let mut graphs = Graphs::init(label);
+        graphs.add_graph(graph, None);
+        graphs
+    }
+
     /// Creates a new entry on Graphs valut
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
@@ -44,6 +49,7 @@ impl Graphs {
         self.stats = self.stats().unwrap();
         debug!("Insertered new entry to Graphs valut: {:#?}", self);
     }
+
     pub fn get_label(&self) -> String {
         self.label.clone()
     }
@@ -58,22 +64,33 @@ impl Graphs {
 }
 
 impl Graphs {
-    /// Adds a Graph element to the current colection
+    /// Adds a Graph element to the Graphs' vault
+    /// for the provided graphs vault name
+    /// if does not exists it creates a new entry
+    /// at vault.
+    /// If None name is provided, the current one
+    /// is use for the addition.
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{
+    ///     node::Node,
+    ///     graph::Graph,
+    ///     graphs::Graphs,
+    ///     *,
+    /// };
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
     /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
+    /// let mut my_graphs = Graphs::init("my_graph");
+    /// my_graphs.add_graph(&alice_bob_graph, None);
+    /// assert_eq!(my_graphs.len_graphs(), 1);
+    /// my_graphs.add_graph(
+    ///     &Graph::create(&bob, "best friend", &alice),
+    ///     Some("other graph"));
+    /// assert_eq!(my_graphs.len_graphs(), 2);
     /// ```
-    // TODO: rethink!
     pub fn add_graph(&mut self, graph: &Graph, graphs_name: Option<&str>) {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(v) = self.vault.get_mut(&current_graph) {
@@ -84,10 +101,13 @@ impl Graphs {
                 current_graph,
                 self.len()
             );
-            graphs_memory_watcher(self);
         } else {
-            error!("no graph element {} at vault", current_graph);
+            self.insert(&current_graph);
+            let v = self.vault.get_mut(&current_graph).unwrap();
+            v.push(graph.clone());
+            debug!("no graph element at vault, created one and added graph");
         }
+        graphs_memory_watcher(self);
     }
 
     /// Retrieves the collection of graphs

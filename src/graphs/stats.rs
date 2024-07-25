@@ -207,7 +207,7 @@ impl Graphs {
         self.vault.len()
     }
 
-    /// Checks if the Graphs is empty
+    /// Checks if the Graphs vault is empty
     ///
     /// # Examples
     /// ```rust

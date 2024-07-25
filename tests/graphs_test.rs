@@ -16,7 +16,7 @@ fn prepare_graphs_test() -> Graphs {
     graphs.add_graph(&Graph::create(&bob, "friend of", &alice), None);
     graphs.add_graph(&Graph::create(&fred, "relative of", &alice), None);
     graphs.add_graph(&Graph::create(&fred, "friend of", &alice), None);
-
+    
     graphs
 }
 
@@ -30,6 +30,53 @@ fn get_label() {
 fn lengths_of_graphs() {
     let graphs = prepare_graphs_test();
     assert_eq!(graphs.len(), 4);
+}
+
+#[test]
+fn should_init_adding_a_graph() {
+    let graphs = Graphs::init_with(
+        "grpahs0",
+        &Graph::create(
+            &Node::new("alice"),
+            "lives in",
+            &Node::new("Springfield")
+        )
+    );
+    assert_eq!(graphs.len(), 1);
+}
+
+#[test]
+fn should_insert_a_graph_into_the_vault() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    assert_eq!(graphs.len(), 4);
+    graphs.insert("middle-earth");
+    assert_eq!(graphs.len_graphs(), 2);
+    assert_eq!(graphs.len(), 4);
+    graphs.add_graph(
+        &Graph::create(
+            &Node::new("gandalf"),
+            "enemy of",
+            &Node::new("Saruman")),
+       Some("middle-earth") 
+    );
+    assert_eq!(graphs.len(), 5);
+}
+
+#[test]
+fn should_insert_a_graph_into_the_vault_without_init() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    assert_eq!(graphs.len(), 4);
+    graphs.add_graph(
+        &Graph::create(
+            &Node::new("gandalf"),
+            "enemy of",
+            &Node::new("Saruman")),
+       Some("middle-earth") 
+    );
+    assert_eq!(graphs.len_graphs(), 2);
+    assert_eq!(graphs.len(), 5);
 }
 
 #[test]
