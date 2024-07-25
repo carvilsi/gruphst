@@ -1,9 +1,4 @@
-use gruphst::{
-    graphs::Graphs,
-    graph::Graph,
-    node::Node,
-    *,
-};
+use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
 
 fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");
@@ -27,13 +22,13 @@ fn prepare_graphs_test() -> Graphs {
 
 #[test]
 fn get_label() {
-    let graphs =  prepare_graphs_test();
+    let graphs = prepare_graphs_test();
     assert_eq!(graphs.get_label(), "my graphs");
 }
 
 #[test]
 fn lengths_of_graphs() {
-    let graphs = prepare_graphs_test(); 
+    let graphs = prepare_graphs_test();
     assert_eq!(graphs.len(), 4);
 }
 
@@ -47,7 +42,7 @@ fn is_empty_graphs() {
 
 #[test]
 fn find_in_graphs_failing() {
-    let mut graphs =  prepare_graphs_test();
+    let mut graphs = prepare_graphs_test();
     assert!(graphs.find_by_relation("lol", None).is_err());
 }
 

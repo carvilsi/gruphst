@@ -1,8 +1,4 @@
-use gruphst::{
-    attributes::Attributes,
-    QueryAttribute,
-    RUDAttribute
-};
+use gruphst::{attributes::Attributes, QueryAttribute, RUDAttribute};
 
 fn prepare_attribute_test() -> (Attributes, String) {
     let mut attributes = Attributes::new();

@@ -1,9 +1,4 @@
-use gruphst::{
-    attributes::Attributes,
-    graph::Graph,
-    node::Node,
-    *,
-};
+use gruphst::{attributes::Attributes, graph::Graph, node::Node, *};
 
 fn prepare_graph_test() -> (Graph, String) {
     let alice = Node::new("alice");

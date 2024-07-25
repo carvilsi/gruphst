@@ -1,11 +1,4 @@
-use gruphst::{
-    node::Node,
-    graph::Graph,
-    graphs::Graphs,
-    CURNodeGraph,
-    RUDAttribute,
-};
-
+use gruphst::{graph::Graph, graphs::Graphs, node::Node, CURNodeGraph, RUDAttribute};
 
 #[test]
 fn graphs_stats() {
