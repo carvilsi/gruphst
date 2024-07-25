@@ -126,7 +126,6 @@ impl Graphs {
             uniq_rel.dedup();
             Ok(uniq_rel)
         } else {
-            // TODO: return an error if any graph????
             error!("no graphs in vault");
             Err("vault does not exists")
         }
