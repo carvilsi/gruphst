@@ -110,8 +110,9 @@ impl Graphs {
         get_stats(self)
     }
 
-    // TODO: add uniq relations for all the graphs doc-test
-    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Vec<String> {
+    /// Returns an array with the unique relations in the current graph
+    /// or the one provided 
+    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Result<Vec<String>, &'static str> {
         let mut uniq_rel = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
@@ -120,15 +121,15 @@ impl Graphs {
             }
             uniq_rel.sort();
             uniq_rel.dedup();
-            uniq_rel
+            Ok(uniq_rel)
         } else {
             // TODO: return an error if any graph????
             error!("no graphs in vault");
-            uniq_rel
+            Err("vault does not exists") 
         }
     }
 
-    /// Returns an array with the unique relations in the default Graphs
+    /// Returns an array with the unique relations in the whole Graphs
     ///
     /// # Examples
     /// ```rust

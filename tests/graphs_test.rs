@@ -94,10 +94,45 @@ fn find_in_graphs_failing() {
 }
 
 #[test]
-fn the_unique_relations() {
-    let graphs = prepare_graphs_test();
+fn should_return_the_unique_relations_for_whole_graphs() {
+    let mut graphs = prepare_graphs_test();
     let unique_relations = graphs.uniq_relations();
     assert_eq!(unique_relations, vec!["friend of", "relative of"]);
+    graphs.insert("middle-earth");
+    assert_eq!(graphs.len_graphs(), 2);
+    assert_eq!(graphs.len(), 4);
+    graphs.add_graph(
+        &Graph::create(
+            &Node::new("gandalf"),
+            "enemy of",
+            &Node::new("Saruman")),
+       Some("middle-earth") 
+    );
+    let unique_relations_ag = graphs.uniq_relations();
+    assert_eq!(unique_relations_ag, vec!["enemy of", "friend of", "relative of"]);
+}
+
+#[test]
+fn should_return_the_unique_relations_for_certain_graph_on_vault() {
+    let mut graphs = prepare_graphs_test();
+    graphs.insert("middle-earth");
+    graphs.add_graph(
+        &Graph::create(
+            &Node::new("gandalf"),
+            "enemy of",
+            &Node::new("Saruman")),
+       Some("middle-earth") 
+    );
+    let unique_relations = graphs.uniq_graph_relations(Some("my graphs"));
+    let unique_relations_middle_earth= graphs.uniq_graph_relations(None);
+    assert_eq!(unique_relations.unwrap(), vec!["friend of", "relative of"]);
+    assert_eq!(unique_relations_middle_earth.unwrap(), vec!["enemy of"]);
+}
+
+#[test]
+fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
+    let graphs = prepare_graphs_test();
+    assert!(graphs.uniq_graph_relations(Some("foobar")).is_err());
 }
 
 #[test]
@@ -126,6 +161,7 @@ fn relation_out() {
     assert_eq!(results.unwrap()[2].get_label(), "Fred");
 }
 
+// TODO: this tests must be refactored
 #[test]
 fn find_in_graphs() {
     let mut gru = Graphs::init("graphs-a");
