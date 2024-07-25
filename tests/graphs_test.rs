@@ -16,7 +16,7 @@ fn prepare_graphs_test() -> Graphs {
     graphs.add_graph(&Graph::create(&bob, "friend of", &alice), None);
     graphs.add_graph(&Graph::create(&fred, "relative of", &alice), None);
     graphs.add_graph(&Graph::create(&fred, "friend of", &alice), None);
-    
+
     graphs
 }
 
@@ -36,11 +36,7 @@ fn lengths_of_graphs() {
 fn should_init_adding_a_graph() {
     let graphs = Graphs::init_with(
         "grpahs0",
-        &Graph::create(
-            &Node::new("alice"),
-            "lives in",
-            &Node::new("Springfield")
-        )
+        &Graph::create(&Node::new("alice"), "lives in", &Node::new("Springfield")),
     );
     assert_eq!(graphs.len(), 1);
 }
@@ -54,11 +50,8 @@ fn should_insert_a_graph_into_the_vault() {
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 4);
     graphs.add_graph(
-        &Graph::create(
-            &Node::new("gandalf"),
-            "enemy of",
-            &Node::new("Saruman")),
-       Some("middle-earth") 
+        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
     );
     assert_eq!(graphs.len(), 5);
 }
@@ -69,11 +62,8 @@ fn should_insert_a_graph_into_the_vault_without_init() {
     assert_eq!(graphs.len_graphs(), 1);
     assert_eq!(graphs.len(), 4);
     graphs.add_graph(
-        &Graph::create(
-            &Node::new("gandalf"),
-            "enemy of",
-            &Node::new("Saruman")),
-       Some("middle-earth") 
+        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
     );
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 5);
@@ -102,14 +92,14 @@ fn should_return_the_unique_relations_for_whole_graphs() {
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 4);
     graphs.add_graph(
-        &Graph::create(
-            &Node::new("gandalf"),
-            "enemy of",
-            &Node::new("Saruman")),
-       Some("middle-earth") 
+        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
     );
     let unique_relations_ag = graphs.uniq_relations();
-    assert_eq!(unique_relations_ag, vec!["enemy of", "friend of", "relative of"]);
+    assert_eq!(
+        unique_relations_ag,
+        vec!["enemy of", "friend of", "relative of"]
+    );
 }
 
 #[test]
@@ -117,14 +107,11 @@ fn should_return_the_unique_relations_for_certain_graph_on_vault() {
     let mut graphs = prepare_graphs_test();
     graphs.insert("middle-earth");
     graphs.add_graph(
-        &Graph::create(
-            &Node::new("gandalf"),
-            "enemy of",
-            &Node::new("Saruman")),
-       Some("middle-earth") 
+        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
     );
     let unique_relations = graphs.uniq_graph_relations(Some("my graphs"));
-    let unique_relations_middle_earth= graphs.uniq_graph_relations(None);
+    let unique_relations_middle_earth = graphs.uniq_graph_relations(None);
     assert_eq!(unique_relations.unwrap(), vec!["friend of", "relative of"]);
     assert_eq!(unique_relations_middle_earth.unwrap(), vec!["enemy of"]);
 }

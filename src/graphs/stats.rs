@@ -111,8 +111,11 @@ impl Graphs {
     }
 
     /// Returns an array with the unique relations in the current graph
-    /// or the one provided 
-    pub fn uniq_graph_relations(&self, graphs_name: Option<&str>) -> Result<Vec<String>, &'static str> {
+    /// or the one provided
+    pub fn uniq_graph_relations(
+        &self,
+        graphs_name: Option<&str>,
+    ) -> Result<Vec<String>, &'static str> {
         let mut uniq_rel = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
@@ -125,7 +128,7 @@ impl Graphs {
         } else {
             // TODO: return an error if any graph????
             error!("no graphs in vault");
-            Err("vault does not exists") 
+            Err("vault does not exists")
         }
     }
 

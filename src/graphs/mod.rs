@@ -23,7 +23,7 @@ pub struct Graphs {
 }
 
 impl Graphs {
-    /// Initializes a new Graphs element 
+    /// Initializes a new Graphs element
     pub fn init(label: &str) -> Self {
         let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
@@ -35,7 +35,6 @@ impl Graphs {
         debug!("Created new Graphs: {:#?}", graphs);
         graphs
     }
-
 
     /// Creates a new element into the Graphs vault inserting a new Graph
     pub fn init_with(label: &str, graph: &Graph) -> Self {
