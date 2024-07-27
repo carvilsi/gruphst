@@ -1,3 +1,5 @@
+use std::char::from_u32_unchecked;
+
 use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
 
 fn prepare_graphs_test() -> Graphs {
@@ -160,19 +162,38 @@ fn should_create_new_vault_and_add_graph() {
     assert_eq!(graphs.len_graphs(), 2);
 }
 
-// TODO: refactor names for methods related with vault...
-// seems better things like: 
-// add_vault
-// add_vault_with
+#[test]
+fn find_in_graph() {
+    let mut graphs = prepare_graphs_test();
+    let from_node = Node::new("gandalf");
+    let from_node_id = from_node.get_id();
+    graphs.add_graph(
+        &Graph::create(&from_node, "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
+    );
+    let mut found_graph = graphs.find_by_id(&from_node_id, None).unwrap();
+    assert_eq!(found_graph.get_label(), "enemy of");
+    assert_eq!(found_graph.get_from_node().get_label(), "gandalf");
+    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id(); 
+    found_graph = graphs.find_by_id(&default_graph_id, Some("my graphs")).unwrap();
+    assert_eq!(found_graph.get_label(), "friend of");
+}
 
-// #[test]
-// fn find_in_graphs() {
-//     let graphs = prepare_graphs_test();
-//     graphs.(
-//         &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
-//         Some("middle-earth"),
-//     );
-// }
+#[test]
+fn find_in_graphs() {
+    let mut graphs = prepare_graphs_test();
+    let from_node = Node::new("gandalf");
+    let from_node_id = from_node.get_id();
+    graphs.add_graph(
+        &Graph::create(&from_node, "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
+    );
+    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id(); 
+    let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
+    assert_eq!(found_graph.get_label(), "friend of");
+    found_graph = graphs.find_by_id_in_graphs(&from_node_id).unwrap();
+    assert_eq!(found_graph.get_from_node().get_label(), "gandalf");
+}
 
 // TODO: these tests must be refactored
 #[test]

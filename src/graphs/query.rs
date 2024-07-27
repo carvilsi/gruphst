@@ -324,8 +324,8 @@ impl Graphs {
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs.iter_mut().find(|graph| {
                 graph.get_id() == id
-                    || graph.get_from_node().get_id() == id
-                    || graph.get_to_node().get_id() == id
+                || graph.get_from_node().get_id() == id
+                || graph.get_to_node().get_id() == id
             });
             if graph.is_some() {
                 debug!("Founded Graph by id: {:#?}", graph);
@@ -338,6 +338,27 @@ impl Graphs {
             Err("no graphs found at vault")
         }
     }
+
+    /// Find in any graph on vault by id
+    pub fn find_by_id_in_graphs(
+        &mut self,
+        id: &str,
+    ) -> Result<&mut Graph, &'static str> {
+        for (_graph_name, graphs) in self.vault.iter_mut() {
+            println!("Tha name: {}", _graph_name);
+            let graph = graphs.iter_mut().find(|graph| {
+                graph.get_id() == id
+                || graph.get_from_node().get_id() == id
+                || graph.get_to_node().get_id() == id
+            });
+            if graph.is_some() {
+                debug!("Founded Graph by id: {:#?}", graph);
+                return Ok(graph.unwrap());
+            } 
+        }
+        Err("Graph not found")
+    }
+
 
     /// Retrieves all the nodes with incoming relation
     ///
