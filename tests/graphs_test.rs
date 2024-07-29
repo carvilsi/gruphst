@@ -133,6 +133,36 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 }
 
 #[test]
+fn should_find_graphs_with_attribute() {
+    let mut graphs = prepare_graphs_test();
+    let found_graphs = graphs.has_graph_node_attr("age", None).unwrap();
+    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+}
+
+#[test]
+fn should_find_graphs_with_attribute_like() {
+    let mut graphs = prepare_graphs_test();
+    let found_graphs = graphs.like_graph_node_attr("Ag", None).unwrap();
+    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+}
+
+#[test]
+fn should_find_graphs_with_attribute_equal() {
+    let graphs = prepare_graphs_test();
+    let found_graphs = graphs.attr_equals_to("age", 42, None).unwrap();
+    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+}
+
+#[test]
+fn should_not_find_graphs_with_attribute_equal() {
+    let graphs = prepare_graphs_test();
+    assert!(graphs.attr_equals_to("age", 43, None).is_err());
+}
+
+#[test]
 fn should_return_the_unique_relations_for_certain_graph_on_vault() {
     let mut graphs = prepare_graphs_test();
     prepare_insert_graph_test(&mut graphs);

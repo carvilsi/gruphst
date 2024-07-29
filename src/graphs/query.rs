@@ -227,7 +227,7 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of graphs that matches an attribute node by key
+    /// Returns a collection of graphs that matches an attribute
     /// and value
     ///
     /// # Examples
