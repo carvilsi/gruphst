@@ -1,4 +1,5 @@
 use crate::graph::Graph;
+use crate::QueryAttribute;
 
 impl Graph {
     /// Checks if "from" or "to" node has an attribute
@@ -7,6 +8,7 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// alice.set_attr("Address", "Elm street");
@@ -15,7 +17,7 @@ impl Graph {
     /// let mut bob = Node::new("Bob");
     /// bob.set_attr("city", "Arkham");
     ///
-    /// let graph = Graph::new(&alice, "knows", &bob);
+    /// let graph = Graph::create(&alice, "knows", &bob);
     ///
     /// assert!(!graph.has_node_attr("phone"));
     /// assert!(graph.has_node_attr("age"));
@@ -31,6 +33,7 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// alice.set_attr("Address", "Elm street");
@@ -39,7 +42,7 @@ impl Graph {
     /// let mut bob = Node::new("Bob");
     /// bob.set_attr("city", "Arkham");
     ///
-    /// let graph = Graph::new(&alice, "knows", &bob);
+    /// let graph = Graph::create(&alice, "knows", &bob);
     ///
     /// assert!(!graph.like_node_attr("ph"));
     /// assert!(graph.like_node_attr("ag"));
@@ -55,6 +58,7 @@ impl Graph {
     /// ```rust
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// alice.set_attr("Address", "Elm street");
@@ -63,7 +67,7 @@ impl Graph {
     /// let mut bob = Node::new("Bob");
     /// bob.set_attr("city", "Arkham");
     ///
-    /// let graph = Graph::new(&alice, "knows", &bob);
+    /// let graph = Graph::create(&alice, "knows", &bob);
     ///
     /// assert!(!graph.equals_node_attr("phone", "555-555"));
     /// assert!(graph.equals_node_attr("age", 42));
@@ -74,5 +78,30 @@ impl Graph {
         T: std::fmt::Display + std::clone::Clone,
     {
         self.from.equals_attr(attr_k, attr_v.clone()) || self.to.equals_attr(attr_k, attr_v.clone())
+    }
+}
+
+impl QueryAttribute for Graph {
+    fn has_attr(&self, attr_k: &str) -> bool {
+        self.attr.has_attr(attr_k)
+    }
+
+    fn like_attr(&self, attr_k: &str) -> bool {
+        self.attr.like_attr(attr_k)
+    }
+
+    fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
+    where
+        T: std::fmt::Display + std::clone::Clone,
+    {
+        self.attr.equals_attr(attr_k, attr_v)
+    }
+
+    fn len_attr(&self) -> usize {
+        self.attr.len_attr()
+    }
+
+    fn is_empty_attr(&self) -> bool {
+        self.attr.is_empty_attr()
     }
 }

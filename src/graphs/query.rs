@@ -3,6 +3,7 @@ use log::{debug, error};
 use crate::graph::Graph;
 use crate::graphs::Graphs;
 use crate::node::Node;
+use crate::CURNodeGraph;
 
 impl Graphs {
     /// Returns a collection of Graps elements that matches the relation
@@ -12,34 +13,35 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     ///
     /// let fred = Node::new("Fred");
-    /// my_graph.add_graph(&Graph::new(&fred, "relative", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "relative", &bob), None);
     ///
     /// let result_graph = my_graph.find_by_relation("friend of", None).unwrap();
     /// assert_eq!(result_graph.len(), 1);
-    /// assert_eq!(result_graph[0].relation, "friend of");
+    /// assert_eq!(result_graph[0].get_relation(), "friend of");
     ///
     /// let res_graph = my_graph.find_by_relation("relative", None).unwrap();
     /// assert_eq!(res_graph.len(), 1);
-    /// assert_eq!(res_graph[0].relation, "relative");
+    /// assert_eq!(res_graph[0].get_relation(), "relative");
     /// ```
     pub fn find_by_relation(
         &mut self,
         relation_name: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| grph.relation == relation_name)
+                .filter(|grph| grph.get_relation() == relation_name)
                 .collect::<Vec<&Graph>>();
             if !graphs.is_empty() {
                 debug!(
@@ -65,32 +67,33 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     ///
     /// let fred = Node::new("Fred");
-    /// my_graph.add_graph(&Graph::new(&fred, "relative", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "relative", &bob), None);
     ///
     /// let relations = vec!["friend of", "relative", "knows"];
     /// let result_graph = my_graph.find_by_relations(relations, None).unwrap();
     /// assert_eq!(result_graph.len(), 2);
-    /// assert_eq!(result_graph[0].relation, "friend of");
-    /// assert_eq!(result_graph[1].relation, "relative");
+    /// assert_eq!(result_graph[0].get_relation(), "friend of");
+    /// assert_eq!(result_graph[1].get_relation(), "relative");
     /// ```
     pub fn find_by_relations(
         &mut self,
         relations: Vec<&str>,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| relations.contains(&grph.relation.as_str()))
+                .filter(|grph| relations.contains(&grph.get_relation().as_str()))
                 .collect::<Vec<&Graph>>();
             if !graphs.is_empty() {
                 debug!(
@@ -115,6 +118,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// let mut bob = Node::new("Bob");
@@ -123,16 +127,16 @@ impl Graphs {
     /// alice.set_attr("age", 25);
     /// bob.set_attr("age", 25);
     ///
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::create(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.has_graph_node_attr("room", None).unwrap();
     ///
@@ -143,7 +147,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -172,6 +176,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// let mut bob = Node::new("Bob");
@@ -180,16 +185,16 @@ impl Graphs {
     /// alice.set_attr("age", 25);
     /// bob.set_attr("age", 25);
     ///
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::create(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.like_graph_node_attr("rO", None).unwrap();
     ///
@@ -200,7 +205,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Graph>, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -222,7 +227,7 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of graphs that matches an attribute node by key
+    /// Returns a collection of graphs that matches an attribute
     /// and value
     ///
     /// # Examples
@@ -230,6 +235,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut alice = Node::new("Alice");
     /// let mut bob = Node::new("Bob");
@@ -238,22 +244,22 @@ impl Graphs {
     /// alice.set_attr("age", 25);
     /// bob.set_attr("age", 42);
     ///
-    /// let alice_bob_graph = Graph::new(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Graph::new(&bob, "best friend", &alice);
+    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
+    /// let bob_alice_graph = Graph::create(&bob, "best friend", &alice);
     /// let mut my_graph = Graphs::init("my_graph");
     /// my_graph.add_graph(&alice_bob_graph, None);
     /// my_graph.add_graph(&bob_alice_graph, None);
     ///
     /// let mut fred = Node::new("Fred");
     /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Graph::new(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Graph::new(&fred, "friend of", &alice), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "colege", &bob), None);
+    /// my_graph.add_graph(&Graph::create(&fred, "friend of", &alice), None);
     ///
     /// let graphs_result = my_graph.attr_equals_to("age", 42, None).unwrap();
     ///
     /// assert_eq!(graphs_result.len(), 3);
     /// ```
-    // TODO: add a method to find attr on all graphs
+    // XXX: add a method to find attr on all graphs????
     pub fn attr_equals_to<T>(
         &self,
         attr_k: &str,
@@ -263,7 +269,7 @@ impl Graphs {
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -292,32 +298,35 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     ///
     /// let mut my_graph = Graphs::init("friends");
     /// let alice = Node::new("Alice");
     /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::new(&alice, "is friend of", &bob);
+    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let alice_fred =
-    ///     Graph::new(&alice, "is firend of", &Node::new("Fred"));
+    ///     Graph::create(&alice, "is firend of", &Node::new("Fred"));
     /// my_graph.add_graph(&alice_fred, None);
     ///
-    /// let bob_node_id = bob.id;
+    /// let bob_node_id = bob.get_id();
     /// let res = my_graph.find_by_id(&bob_node_id, None);
-    /// assert_eq!(res.unwrap().to.id, bob_node_id);
+    /// assert_eq!(res.unwrap().get_to_node().get_id(), bob_node_id);
     /// ```
     pub fn find_by_id(
         &mut self,
         id: &str,
         graphs_name: Option<&str>,
     ) -> Result<&mut Graph, &'static str> {
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
-            let graph = graphs
-                .iter_mut()
-                .find(|graph| graph.id == id || graph.from.id == id || graph.to.id == id);
+            let graph = graphs.iter_mut().find(|graph| {
+                graph.get_id() == id
+                    || graph.get_from_node().get_id() == id
+                    || graph.get_to_node().get_id() == id
+            });
             if graph.is_some() {
                 debug!("Founded Graph by id: {:#?}", graph);
                 Ok(graph.unwrap())
@@ -330,6 +339,23 @@ impl Graphs {
         }
     }
 
+    /// Find in any graph on vault by id
+    pub fn find_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Graph, &'static str> {
+        for (_graph_name, graphs) in self.vault.iter_mut() {
+            println!("Tha name: {}", _graph_name);
+            let graph = graphs.iter_mut().find(|graph| {
+                graph.get_id() == id
+                    || graph.get_from_node().get_id() == id
+                    || graph.get_to_node().get_id() == id
+            });
+            if graph.is_some() {
+                debug!("Founded Graph by id: {:#?}", graph);
+                return Ok(graph.unwrap());
+            }
+        }
+        Err("Graph not found")
+    }
+
     /// Retrieves all the nodes with incoming relation
     ///
     /// # Examples
@@ -337,6 +363,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graphs = Graphs::init("my-graphs");
     ///
@@ -344,15 +371,15 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add_graph(&Graph::new(&alice, "is friend of", &bob), None);
-    /// my_graphs.add_graph(&Graph::new(&bob, "is friend of", &fred), None);
-    /// my_graphs.add_graph(&Graph::new(&alice, "knows", &fred), None);
+    /// my_graphs.add_graph(&Graph::create(&alice, "is friend of", &bob), None);
+    /// my_graphs.add_graph(&Graph::create(&bob, "is friend of", &fred), None);
+    /// my_graphs.add_graph(&Graph::create(&alice, "knows", &fred), None);
     ///
     /// let results = my_graphs.has_relation_in("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].name, "Bob");
-    /// assert_eq!(results[1].name, "Fred");
+    /// assert_eq!(results[0].get_label(), "Bob");
+    /// assert_eq!(results[1].get_label(), "Fred");
     /// ```
     pub fn has_relation_in(
         &self,
@@ -360,11 +387,13 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Node>, &'static str> {
         let mut relations_in: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
-                if graph.relation == relation_in && !relations_in.contains(&graph.to) {
-                    relations_in.push(graph.to.clone());
+                if graph.get_relation() == relation_in
+                    && !relations_in.contains(&graph.get_to_node())
+                {
+                    relations_in.push(graph.get_to_node().clone());
                 }
             }
         } else {
@@ -384,6 +413,7 @@ impl Graphs {
     /// use gruphst::node::Node;
     /// use gruphst::graph::Graph;
     /// use gruphst::graphs::Graphs;
+    /// use crate::gruphst::*;
     ///
     /// let mut my_graphs = Graphs::init("my-graphs");
     ///
@@ -391,15 +421,15 @@ impl Graphs {
     /// let bob = Node::new("Bob");
     /// let fred = Node::new("Fred");
     ///
-    /// my_graphs.add_graph(&Graph::new(&alice, "is friend of", &bob), None);
-    /// my_graphs.add_graph(&Graph::new(&bob, "is friend of", &fred), None);
-    /// my_graphs.add_graph(&Graph::new(&alice, "knows", &fred), None);
+    /// my_graphs.add_graph(&Graph::create(&alice, "is friend of", &bob), None);
+    /// my_graphs.add_graph(&Graph::create(&bob, "is friend of", &fred), None);
+    /// my_graphs.add_graph(&Graph::create(&alice, "knows", &fred), None);
     ///
     /// let results = my_graphs.has_relation_out("is friend of", None).unwrap();
     ///
     /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].name, "Alice");
-    /// assert_eq!(results[1].name, "Bob");
+    /// assert_eq!(results[0].get_label(), "Alice");
+    /// assert_eq!(results[1].get_label(), "Bob");
     /// ```
     pub fn has_relation_out(
         &self,
@@ -407,11 +437,13 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Node>, &'static str> {
         let mut relations_out: Vec<Node> = Vec::new();
-        let current_graph = self.select_graphs_name(graphs_name);
+        let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
-                if graph.relation == relation_out && !relations_out.contains(&graph.from) {
-                    relations_out.push(graph.from.clone());
+                if graph.get_relation() == relation_out
+                    && !relations_out.contains(&graph.get_from_node())
+                {
+                    relations_out.push(graph.get_from_node().clone());
                 }
             }
         } else {
