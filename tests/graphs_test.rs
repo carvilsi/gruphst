@@ -1,5 +1,3 @@
-use std::char::from_u32_unchecked;
-
 use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
 
 fn prepare_graphs_test() -> Graphs {
@@ -20,6 +18,16 @@ fn prepare_graphs_test() -> Graphs {
     graphs.add_graph(&Graph::create(&fred, "friend of", &alice), None);
 
     graphs
+}
+
+// fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
+fn prepare_insert_graph_test(graphs: &mut Graphs) {
+    graphs.insert("middle-earth");
+    graphs.add_graph(
+        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        Some("middle-earth"),
+    );
+    // graphs
 }
 
 #[test]
@@ -51,10 +59,7 @@ fn should_insert_a_graph_into_the_vault() {
     graphs.insert("middle-earth");
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 4);
-    graphs.add_graph(
-        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
-    );
+    prepare_insert_graph_test(&mut graphs);
     assert_eq!(graphs.len(), 5);
 }
 
@@ -64,8 +69,11 @@ fn should_insert_a_graph_into_the_vault_without_init() {
     assert_eq!(graphs.len_graphs(), 1);
     assert_eq!(graphs.len(), 4);
     graphs.add_graph(
-        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
+        &Graph::create(
+            &Node::new("Earth"),
+            "has satellite",
+            &Node::new("Moon")),
+        Some("solar-system")
     );
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 5);
@@ -80,7 +88,14 @@ fn is_empty_graphs() {
 }
 
 #[test]
-fn find_in_graphs_failing() {
+fn should_find_by_relation() {
+    let mut graphs = prepare_graphs_test();
+    let found_graph = graphs.find_by_relation("friend of", None).unwrap();
+    assert_eq!(found_graph.len(), 3);
+}
+
+#[test]
+fn should_not_find_by_relation() {
     let mut graphs = prepare_graphs_test();
     assert!(graphs.find_by_relation("lol", None).is_err());
 }
@@ -90,13 +105,9 @@ fn should_return_the_unique_relations_for_whole_graphs() {
     let mut graphs = prepare_graphs_test();
     let unique_relations = graphs.uniq_relations();
     assert_eq!(unique_relations, vec!["friend of", "relative of"]);
-    graphs.insert("middle-earth");
+    prepare_insert_graph_test(&mut graphs);
     assert_eq!(graphs.len_graphs(), 2);
-    assert_eq!(graphs.len(), 4);
-    graphs.add_graph(
-        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
-    );
+    assert_eq!(graphs.len(), 5);
     let unique_relations_ag = graphs.uniq_relations();
     assert_eq!(
         unique_relations_ag,
@@ -107,11 +118,7 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 #[test]
 fn should_return_the_unique_relations_for_certain_graph_on_vault() {
     let mut graphs = prepare_graphs_test();
-    graphs.insert("middle-earth");
-    graphs.add_graph(
-        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
-    );
+    prepare_insert_graph_test(&mut graphs);
     let unique_relations = graphs.uniq_graph_relations(Some("my graphs"));
     let unique_relations_middle_earth = graphs.uniq_graph_relations(None);
     assert_eq!(unique_relations.unwrap(), vec!["friend of", "relative of"]);
@@ -163,36 +170,42 @@ fn should_create_new_vault_and_add_graph() {
 }
 
 #[test]
-fn find_in_graph() {
+fn should_find_in_graph_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("gandalf");
+    let from_node = Node::new("Earth");
     let from_node_id = from_node.get_id();
     graphs.add_graph(
-        &Graph::create(&from_node, "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
+        &Graph::create(
+            &from_node,
+            "has satellite",
+            &Node::new("Moon")),
+        Some("solar-system"),
     );
     let mut found_graph = graphs.find_by_id(&from_node_id, None).unwrap();
-    assert_eq!(found_graph.get_label(), "enemy of");
-    assert_eq!(found_graph.get_from_node().get_label(), "gandalf");
+    assert_eq!(found_graph.get_label(), "has satellite");
+    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
     let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id(); 
     found_graph = graphs.find_by_id(&default_graph_id, Some("my graphs")).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
 }
 
 #[test]
-fn find_in_graphs() {
+fn should_find_in_graphs_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("gandalf");
+    let from_node = Node::new("Earth");
     let from_node_id = from_node.get_id();
     graphs.add_graph(
-        &Graph::create(&from_node, "enemy of", &Node::new("Saruman")),
-        Some("middle-earth"),
+        &Graph::create(
+            &from_node,
+            "has satellite",
+            &Node::new("Moon")),
+        Some("solar-system"),
     );
     let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id(); 
     let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
     found_graph = graphs.find_by_id_in_graphs(&from_node_id).unwrap();
-    assert_eq!(found_graph.get_from_node().get_label(), "gandalf");
+    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
 }
 
 // TODO: these tests must be refactored
