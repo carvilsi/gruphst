@@ -268,26 +268,24 @@ fn delete_from_graph_fail() {
 #[test]
 fn should_update_graph() {
     let mut my_graphs = Graphs::init("my-graphs");
-  
+
     let alice_node = Node::new("Alice");
     let bob_node = Node::new("Bob");
-    let alice_bob_graph =
-        Graph::create(&alice_node, "best friends", &bob_node);
+    let alice_bob_graph = Graph::create(&alice_node, "best friends", &bob_node);
     my_graphs.add_graph(&alice_bob_graph, None);
-  
+
     let fred_node = Node::new("Fred");
-    let mut alice_fred_graph = 
-        Graph::create(&alice_node, "super friends", &fred_node);
+    let mut alice_fred_graph = Graph::create(&alice_node, "super friends", &fred_node);
     my_graphs.add_graph(&alice_fred_graph, None);
-  
+
     assert_eq!(my_graphs.len(), 2);
-  
+
     let graphs = my_graphs.get_graphs(Some(&my_graphs.get_label())).unwrap();
     assert_eq!(graphs[1].get_relation(), "super friends");
-  
+
     alice_fred_graph.update_relation("besties");
     let _ = my_graphs.update_graph(&alice_fred_graph, None);
-  
+
     assert_eq!(my_graphs.len(), 2);
     let updated_graph = my_graphs.find_by_id(&alice_fred_graph.get_id(), None);
     assert_eq!(updated_graph.unwrap().get_relation(), "besties");
