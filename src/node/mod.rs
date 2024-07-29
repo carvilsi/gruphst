@@ -11,7 +11,7 @@ mod query;
 /// Representation of a Node
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Node {
-    /// A Node consists on a uuid as identifier
+    /// A Node id is an uuid as identifier
     id: String,
     /// And a name
     label: String,

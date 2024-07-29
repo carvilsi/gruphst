@@ -1,7 +1,8 @@
 use gruphst::{attributes::Attributes, graph::Graph, node::Node, *};
 
 fn prepare_graph_test() -> (Graph, String) {
-    let alice = Node::new("alice");
+    let mut alice = Node::new("alice");
+    alice.set_attr("age", 42);
     let bob = Node::new("bob");
     let mut graph = Graph::create(&alice, "friend of", &bob);
     graph.set_attr("type", "friendship");
@@ -127,4 +128,48 @@ fn graph_update_to_node() {
     let node = Node::new("fred");
     graph.update_to(&node);
     assert_eq!(graph.get_to_node().get_label(), "fred");
+}
+
+#[test]
+fn should_check_if_attribute_exists_on_graph() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.has_attr("value"));
+    assert!(!graph.has_attr("age"));
+}
+
+#[test]
+fn should_check_if_attribute_exists_on_any_node_on_graph() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.has_node_attr("age"));
+    assert!(!graph.has_node_attr("foo"));
+}
+
+#[test]
+fn should_check_if_attribute_like_on_graph() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.like_attr("va"));
+    assert!(!graph.like_attr("ag"));
+}
+
+#[test]
+fn should_check_if_attribute_like_on_any_node_on_graph() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.like_node_attr("Ag"));
+    assert!(!graph.has_node_attr("foo"));
+}
+
+#[test]
+fn should_check_if_attribute_is_equals_to() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.equals_attr("value", 2));
+    assert!(!graph.equals_attr("value", 5));
+    assert!(!graph.equals_attr("foo", 25));
+}
+
+#[test]
+fn should_check_in_node_if_attribute_is_equals_to() {
+    let (graph, _id) = prepare_graph_test();
+    assert!(graph.equals_node_attr("age", 42));
+    assert!(!graph.equals_node_attr("age", 43));
+    assert!(!graph.equals_node_attr("foo", 25));
 }
