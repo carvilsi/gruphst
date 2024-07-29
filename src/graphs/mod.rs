@@ -278,7 +278,6 @@ impl Graphs {
                 graphs_memory_watcher(self);
                 Ok(())
             } else {
-                // TODO: reformat this!
                 error!(
                     "Graph to update with id: [{}] not found",
                     graph_to_update.get_id()
