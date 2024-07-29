@@ -1,0 +1,8 @@
+[package]
+name = "rock-paper-scissors-lizard-spock"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gruphst = "0.6.0"
+rand = "0.8.5"
