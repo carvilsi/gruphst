@@ -24,7 +24,7 @@ fn prepare_graphs_test() -> Graphs {
 fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
     graphs.add_graph(
-        &Graph::create(&Node::new("gandalf"), "enemy of", &Node::new("Saruman")),
+        &Graph::create(&Node::new("Gandalf"), "enemy of", &Node::new("Saruman")),
         Some("middle-earth"),
     );
     // graphs
@@ -302,4 +302,30 @@ fn should_fail_on_updating_graph() {
 
     let bob_alice = Graph::create(&bob, "friend of", &alice);
     assert!(grphs.update_graph(&bob_alice, None).is_err());
+}
+
+#[test]
+fn should_return_uniq_nodes_from_graph() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+    let mut uniq_nodes = graphs.get_uniq_nodes(None).unwrap();
+    assert_eq!(uniq_nodes.len(), 2);
+    let mut labels: Vec<String> = Vec::new();
+    for node in uniq_nodes {
+        labels.push(node.get_label());
+    }
+
+    assert!(labels.contains(&"Saruman".to_string()));
+    assert!(labels.contains(&"Gandalf".to_string()));
+
+    uniq_nodes = graphs.get_uniq_nodes(Some("my graphs")).unwrap();
+    assert_eq!(uniq_nodes.len(), 3);
+    labels.clear();
+    for node in uniq_nodes {
+        labels.push(node.get_label());
+    }
+
+    assert!(labels.contains(&"Alice".to_string()));
+    assert!(labels.contains(&"Bob".to_string()));
+    assert!(labels.contains(&"Fred".to_string()));
 }
