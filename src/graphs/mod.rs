@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
 use std::collections::HashMap;
 
-use crate::graph::Graph;
-use crate::util::graphs_memory_watcher;
-use crate::CURNodeGraph;
+use crate::{graph::Graph, node::Node, util::graphs_memory_watcher, CURNodeGraph};
 
 mod persistence;
 mod query;
@@ -71,9 +69,7 @@ impl Graphs {
     pub fn get_stats(&self) -> GraphsStats {
         self.stats.clone()
     }
-}
 
-impl Graphs {
     /// Adds a Graph element to the Graphs' vault
     /// for the provided graphs vault name
     /// if does not exists it creates a new entry
@@ -159,6 +155,17 @@ impl Graphs {
         } else {
             Err("no graphs found on vault")
         }
+    }
+
+    pub fn get_uniq_nodes(&self, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
+        let graphs = self.get_graphs(graphs_name).unwrap(); 
+        let mut nodes_map: HashMap<String, Node> = HashMap::new();
+        for graph in graphs {
+            nodes_map.insert(graph.get_from_node().get_id(), graph.get_from_node());
+            nodes_map.insert(graph.get_to_node().get_id(), graph.get_to_node());
+        }
+        let uniq_nodes: Vec<Node> = nodes_map.into_values().collect();
+        Ok(uniq_nodes)
     }
 
     /// Updates the name of the Graphs
