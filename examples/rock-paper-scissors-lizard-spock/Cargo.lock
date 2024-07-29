@@ -55,9 +55,9 @@ dependencies = [
 
 [[package]]
 name = "gruphst"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93d37e876280a70340382c69c9ea5947d53a30d740b8acce2c78aa1203dab469"
+checksum = "59e9f9bb6fdf74d0f1f2a413571b029b8796bfe5b133ac4821ed18b74d5ae897"
 dependencies = [
  "bincode",
  "dotenv",

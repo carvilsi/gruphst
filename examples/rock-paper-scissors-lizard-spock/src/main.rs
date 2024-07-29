@@ -48,8 +48,12 @@ fn main() {
 
     let characters = rules.get_uniq_nodes(None).unwrap();
     // Lets play a bit
-    let player_one_game: Node = characters[rand::thread_rng().gen_range(0..characters.len()).try_into().unwrap()];
-    println!("player one game {}", player_one_game);
-    println!("{:#?}", rules.stats());
+    let mut rand_number: usize = rand::thread_rng().gen_range(0..characters.len()).try_into().unwrap();
+    let player_one_game: &Node = &characters[rand_number];
+    println!("player one game {:#?}", player_one_game);
+    rand_number = rand::thread_rng().gen_range(0..characters.len()).try_into().unwrap();
+    let player_two_game: &Node = &characters[rand_number];
+    println!("player second game {:#?}", player_two_game);
+
 }
 
