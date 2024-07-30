@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::attributes::Attributes;
+use crate::graph::Graph;
 use crate::CURNodeGraph;
 use crate::RUDAttribute;
-use crate::graph::Graph;
 use std::collections::HashMap;
 
 mod query;
@@ -99,15 +99,17 @@ impl RUDAttribute for Node {
 
 impl Node {
     /// Retrieves the nodes that has relation out for the given node on graph
-    pub fn get_relations_out_on_graph(&self, graphs: Vec<Graph>) -> Result<HashMap<String, Vec<Node>>, &'static str> {
+    pub fn get_relations_out_on_graph(
+        &self,
+        graphs: Vec<Graph>,
+    ) -> Result<HashMap<String, Vec<Node>>, &'static str> {
         let mut relations_out: HashMap<String, Vec<Node>> = HashMap::new();
         for graph in graphs {
             if graph.get_from_node().get_id() == self.id {
                 if let Some(nodes_out) = relations_out.get_mut(&graph.get_relation()) {
                     nodes_out.push(graph.get_to_node());
                 } else {
-                    let mut nodes_out = Vec::new();
-                    nodes_out.push(graph.get_to_node());
+                    let nodes_out = vec![graph.get_to_node()];
                     relations_out.insert(graph.get_relation(), nodes_out);
                 }
             }
@@ -118,17 +120,19 @@ impl Node {
             Err("no relations out for node")
         }
     }
-    
+
     /// Retrieves the nodes that has relation in for the given node on graph
-    pub fn get_relations_in_on_graph(&self, graphs: Vec<Graph>) -> Result<HashMap<String, Vec<Node>>, &'static str> {
+    pub fn get_relations_in_on_graph(
+        &self,
+        graphs: Vec<Graph>,
+    ) -> Result<HashMap<String, Vec<Node>>, &'static str> {
         let mut relations_in: HashMap<String, Vec<Node>> = HashMap::new();
         for graph in graphs {
             if graph.get_to_node().get_id() == self.id {
                 if let Some(nodes_in) = relations_in.get_mut(&graph.get_relation()) {
                     nodes_in.push(graph.get_from_node());
                 } else {
-                    let mut nodes_in = Vec::new();
-                    nodes_in.push(graph.get_from_node());
+                    let nodes_in = vec![graph.get_from_node()];
                     relations_in.insert(graph.get_relation(), nodes_in);
                 }
             }
