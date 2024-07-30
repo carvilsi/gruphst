@@ -40,22 +40,54 @@ fn create_game_rules() -> Graphs {
     graphs
 }
 
-// TODO: add get_relation_io for node
+fn resolve_game(player_one_game: Node, player_two_game: Node, rules: Graphs) -> String {
+    let one = format!("player one plays: {}", player_one_game.get_label());
+    let player_one_wins_to = player_one_game
+        .get_relations_out_on_graph(rules.get_graphs(Some("game-rules")).unwrap())
+        .unwrap();
+    let player_two_wins_to = player_two_game
+        .get_relations_out_on_graph(rules.get_graphs(Some("game-rules")).unwrap())
+        .unwrap();
+    let two = format!("player two plays: {}", player_two_game.get_label());
+    let mut game_result = String::from("");
+    if player_one_game.get_label() == player_two_game.get_label() {
+        game_result = String::from("Tie");
+    }
+    for (action, targets) in player_one_wins_to.iter() {
+        for target in targets {
+            if target.get_id() == player_two_game.get_id() {
+                let res = format!("{} {} {}", player_one_game.get_label(), action, player_two_game.get_label());
+                game_result = res;
+            }
+        } 
+    }
+    for (action, targets) in player_two_wins_to.iter() {
+        for target in targets {
+            if target.get_id() == player_one_game.get_id() {
+                let res = format!("{} {} {}", player_two_game.get_label(), action, player_one_game.get_label());
+                game_result = res;
+            }
+        } 
+    }
+    format!("{}\n{}\n{}", one, two, game_result)
+}
+
 fn main() {
     let rules = create_game_rules();
 
-    println!("{:#?}", rules);
     // maybe now you want to persists the game rules 
+    // to use it other day ;)
     let _ = rules.persists(); 
 
+    // get the characters
     let characters = rules.get_uniq_nodes(None).unwrap();
+
     // Lets play a bit
     let mut rand_number: usize = rand::thread_rng().gen_range(0..characters.len()).try_into().unwrap();
     let player_one_game: &Node = &characters[rand_number];
-    println!("player one game {:#?}", player_one_game);
     rand_number = rand::thread_rng().gen_range(0..characters.len()).try_into().unwrap();
     let player_two_game: &Node = &characters[rand_number];
-    println!("player second game {:#?}", player_two_game);
-
+    let result = resolve_game(player_one_game.clone(), player_two_game.clone(), rules);
+    println!("{}", result);
 }
 
