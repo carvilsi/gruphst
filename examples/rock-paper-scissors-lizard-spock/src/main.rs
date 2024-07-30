@@ -40,9 +40,11 @@ fn create_game_rules() -> Graphs {
     graphs
 }
 
+// TODO: add get_relation_io for node
 fn main() {
     let rules = create_game_rules();
 
+    println!("{:#?}", rules);
     // maybe now you want to persists the game rules 
     let _ = rules.persists(); 
 
