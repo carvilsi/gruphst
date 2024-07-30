@@ -1,6 +1,6 @@
 use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
 
-fn prepare_graphs_test() -> Graphs {
+pub fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");
 
     let mut alice = Node::new("Alice");
@@ -15,13 +15,13 @@ fn prepare_graphs_test() -> Graphs {
     graphs.add_graph(&Graph::create(&alice, "friend of", &bob), None);
     graphs.add_graph(&Graph::create(&bob, "friend of", &alice), None);
     graphs.add_graph(&Graph::create(&fred, "relative of", &alice), None);
-    graphs.add_graph(&Graph::create(&fred, "friend of", &alice), None);
+    graphs.add_graph(&Graph::create(&fred, "friend of", &bob), None);
 
     graphs
 }
 
 // fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
-fn prepare_insert_graph_test(graphs: &mut Graphs) {
+pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
     graphs.add_graph(
         &Graph::create(&Node::new("Gandalf"), "enemy of", &Node::new("Saruman")),
@@ -136,7 +136,7 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 fn should_find_graphs_with_attribute() {
     let mut graphs = prepare_graphs_test();
     let found_graphs = graphs.has_graph_node_attr("age", None).unwrap();
-    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
 }
 
@@ -144,7 +144,7 @@ fn should_find_graphs_with_attribute() {
 fn should_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
     let found_graphs = graphs.like_graph_node_attr("Ag", None).unwrap();
-    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
 }
 
@@ -152,7 +152,7 @@ fn should_find_graphs_with_attribute_like() {
 fn should_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
     let found_graphs = graphs.attr_equals_to("age", 42, None).unwrap();
-    assert_eq!(found_graphs.len(), 2);
+    assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
 }
 
@@ -182,7 +182,7 @@ fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
 fn equals_attributes() {
     let graphs = prepare_graphs_test();
     let results = graphs.attr_equals_to("age", 42, None).unwrap();
-    assert_eq!(results.len(), 2);
+    assert_eq!(results.len(), 3);
 }
 
 #[test]
