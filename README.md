@@ -18,6 +18,7 @@ Early state of development with lot of TODOs, just doing nerdy things with Graph
 
 [Documentation](https://docs.rs/gruphst/latest/gruphst/)
 
+## Tests
 
 **To run tests**
 
@@ -27,6 +28,8 @@ To run tests with debug output:
 
 `$ cargo test -- --show-output`
 
+## Usage
+
 **Install**
 
 Run the following Cargo command in your project directory:
@@ -35,7 +38,9 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.6.1"`
+`gruphst = "0.7.0"`
+
+Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
 
 ---
 
