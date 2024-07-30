@@ -158,7 +158,7 @@ impl Graphs {
     }
 
     pub fn get_uniq_nodes(&self, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
-        let graphs = self.get_graphs(graphs_name).unwrap(); 
+        let graphs = self.get_graphs(graphs_name).unwrap();
         let mut nodes_map: HashMap<String, Node> = HashMap::new();
         for graph in graphs {
             nodes_map.insert(graph.get_from_node().get_id(), graph.get_from_node());

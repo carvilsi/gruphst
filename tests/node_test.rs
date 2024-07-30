@@ -1,6 +1,13 @@
+use std::collections::HashMap;
+
 use attributes::Attributes;
+use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
+use gruphst::graph::Graph;
 use gruphst::node::Node;
 use gruphst::*;
+
+#[path = "./graphs_test.rs"]
+mod graphs_test;
 
 fn prepare_node_test() -> (Node, String) {
     let mut node = Node::new("alice");
@@ -118,4 +125,75 @@ fn node_set_attributes() {
     assert!(node.get_attr("age").is_err());
     assert_eq!(node.get_attr("address").unwrap(), "Elm Street");
     assert_eq!(node.get_attr("city").unwrap(), "Springfield");
+}
+
+#[test]
+fn get_node_relation_out() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+
+    let find_results = graphs
+        .has_relation_out("relative of", Some("my graphs"))
+        .unwrap();
+    assert_eq!(find_results.len(), 1);
+    assert_eq!(find_results[0].get_label(), "Fred");
+    let node = find_results[0].clone();
+    graphs.add_graph(
+        &Graph::create(&node, "relative of", &Node::new("Peter")),
+        Some("my graphs"),
+    );
+    let relations_out: HashMap<String, Vec<Node>> = node
+        .get_relations_out_on_graph(graphs.get_graphs(Some("my graphs")).unwrap())
+        .unwrap();
+    assert!(relations_out.contains_key("relative of"));
+    assert!(relations_out.contains_key("friend of"));
+    assert_eq!(relations_out.len(), 2);
+    if let Some(nodes) = relations_out.get("relative of") {
+        assert_eq!(nodes.len(), 2);
+        assert_eq!(nodes[0].get_label(), "Alice".to_string());
+        assert_eq!(nodes[1].get_label(), "Peter".to_string());
+    } else {
+        assert!(false);
+    }
+    if let Some(nodes) = relations_out.get("friend of") {
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(nodes[0].get_label(), "Bob".to_string());
+    } else {
+        assert!(false);
+    }
+}
+
+#[test]
+fn get_node_relation_in() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+
+    let find_results = graphs
+        .has_relation_in("friend of", Some("my graphs"))
+        .unwrap();
+    assert_eq!(find_results.len(), 2);
+    let mut node: Node = Node::new("tmp");
+    for n in find_results {
+        if n.get_label() == "Alice".to_string() {
+            node = n.clone();
+        }
+    }
+    let relations_in: HashMap<String, Vec<Node>> = node
+        .get_relations_in_on_graph(graphs.get_graphs(Some("my graphs")).unwrap())
+        .unwrap();
+    assert!(relations_in.contains_key("relative of"));
+    assert!(relations_in.contains_key("friend of"));
+    assert_eq!(relations_in.len(), 2);
+    if let Some(nodes) = relations_in.get("relative of") {
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(nodes[0].get_label(), "Fred".to_string());
+    } else {
+        assert!(false);
+    }
+    if let Some(nodes) = relations_in.get("friend of") {
+        assert_eq!(nodes.len(), 1);
+        assert_eq!(nodes[0].get_label(), "Bob".to_string());
+    } else {
+        assert!(false);
+    }
 }
