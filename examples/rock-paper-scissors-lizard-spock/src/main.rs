@@ -1,4 +1,5 @@
 use gruphst::{node::Node, graph::Graph, graphs::Graphs, *};
+use std::collections::HashMap;
 use rand::Rng;
 
 fn create_game_rules() -> Graphs {
@@ -40,6 +41,18 @@ fn create_game_rules() -> Graphs {
     graphs
 }
 
+fn who_wins(wins: HashMap<String, Vec<Node>>, a_game: &Node, b_game: &Node) -> Option<String> {
+    for (action, targets) in wins.iter() {
+        for target in targets {
+            if target.get_id() == b_game.get_id() {
+                let res = format!("{} {} {}", a_game.get_label(), action, b_game.get_label());
+                return Some(res);
+            }
+        }
+    }
+    None
+}
+
 fn resolve_game(player_one_game: Node, player_two_game: Node, rules: Graphs) -> String {
     let one = format!("player one plays: {}", player_one_game.get_label());
     let player_one_wins_to = player_one_game
@@ -49,26 +62,22 @@ fn resolve_game(player_one_game: Node, player_two_game: Node, rules: Graphs) -> 
         .get_relations_out_on_graph(rules.get_graphs(Some("game-rules")).unwrap())
         .unwrap();
     let two = format!("player two plays: {}", player_two_game.get_label());
+
     let mut game_result = String::from("");
     if player_one_game.get_label() == player_two_game.get_label() {
         game_result = String::from("Tie");
     }
-    for (action, targets) in player_one_wins_to.iter() {
-        for target in targets {
-            if target.get_id() == player_two_game.get_id() {
-                let res = format!("{} {} {}", player_one_game.get_label(), action, player_two_game.get_label());
-                game_result = res;
-            }
-        } 
+
+    let mut res = who_wins(player_one_wins_to, &player_one_game, &player_two_game);
+    if res.is_some() {
+        game_result = format!("{}\nPlayer one wins!", res.unwrap());
     }
-    for (action, targets) in player_two_wins_to.iter() {
-        for target in targets {
-            if target.get_id() == player_one_game.get_id() {
-                let res = format!("{} {} {}", player_two_game.get_label(), action, player_one_game.get_label());
-                game_result = res;
-            }
-        } 
+
+    res = who_wins(player_two_wins_to, &player_two_game, &player_one_game);
+    if res.is_some() {
+        game_result = format!("{}\nPlayer two wins!", res.unwrap());
     }
+    
     format!("{}\n{}\n{}", one, two, game_result)
 }
 
@@ -90,4 +99,3 @@ fn main() {
     let result = resolve_game(player_one_game.clone(), player_two_game.clone(), rules);
     println!("{}", result);
 }
-
