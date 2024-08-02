@@ -16,8 +16,8 @@ pub struct GraphsStats {
     total_graphs: usize,
     /// total attributes
     total_attr: usize,
-    /// total nodes
-    total_nodes: usize,
+    /// total edges
+    total_edges: usize,
     /// unique relations
     uniq_rel: usize,
 }
@@ -29,7 +29,7 @@ impl GraphsStats {
             len_graphs: 0,
             total_graphs: 0,
             total_attr: 0,
-            total_nodes: 0,
+            total_edges: 0,
             uniq_rel: 0,
         }
     }
@@ -50,8 +50,8 @@ impl GraphsStats {
         self.total_attr
     }
 
-    pub fn get_total_nodes(&self) -> usize {
-        self.total_nodes
+    pub fn get_total_edges(&self) -> usize {
+        self.total_edges
     }
 
     pub fn get_uniq_rel(&self) -> usize {
@@ -68,33 +68,30 @@ impl GraphsStats {
 
 impl Graphs {
     /// Returns stats from Graphs; size in bytes, amount of graph, name, total number of attributes
-    /// and total amount of Nodes
+    /// and total amount of edges
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut my_graphs = Graphs::init("memories");
     /// my_graphs.add_graph(
-    ///     &Graph::create(
-    ///         &Node::new("Alice"),
+    ///     &Vertex::create(
+    ///         &Edge::new("Alice"),
     ///         "recalls friendship with",
-    ///         &Node::new("Bob")
+    ///         &Edge::new("Bob")
     ///     ), None
     /// );
-    /// let mut fred = Node::new("Fred");
+    /// let mut fred = Edge::new("Fred");
     /// fred.set_attr("address", "Elm street");
     /// fred.set_attr("phone", "555-555-555");
     /// fred.set_attr("age", "25");
     ///
     /// my_graphs.add_graph(
-    ///     &Graph::create(
+    ///     &Vertex::create(
     ///         &fred,
     ///         "relative of",
-    ///         &Node::new("Coco")
+    ///         &Edge::new("Coco")
     ///     ), None
     /// );
     ///
@@ -102,7 +99,7 @@ impl Graphs {
     /// assert_eq!(stats.get_mem(), 856);
     /// assert_eq!(stats.get_len_graphs(), 2);
     /// assert_eq!(stats.get_total_attr(), 3);
-    /// assert_eq!(stats.get_total_nodes(), 4);
+    /// assert_eq!(stats.get_total_edges(), 4);
     /// assert_eq!(stats.get_uniq_rel(), 2);
     /// assert_eq!(stats.get_total_graphs(), 1);
     /// ```
@@ -135,21 +132,18 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut my_graph = Graphs::init("my graph");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let fred = Node::new("Fred");
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let fred = Edge::new("Fred");
     ///
-    /// my_graph.add_graph(&Graph::create(&alice, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::create(&alice, "relative of", &fred), None);
-    /// my_graph.add_graph(&Graph::create(&fred, "friend of", &bob), None);
-    /// my_graph.add_graph(&Graph::create(&bob, "friend of", &alice), None);
-    /// my_graph.add_graph(&Graph::create(&fred, "relative of", &alice), None);
+    /// my_graph.add_graph(&Vertex::create(&alice, "friend of", &bob), None);
+    /// my_graph.add_graph(&Vertex::create(&alice, "relative of", &fred), None);
+    /// my_graph.add_graph(&Vertex::create(&fred, "friend of", &bob), None);
+    /// my_graph.add_graph(&Vertex::create(&bob, "friend of", &alice), None);
+    /// my_graph.add_graph(&Vertex::create(&fred, "relative of", &alice), None);
     ///
     /// let relations = my_graph.uniq_relations();
     /// assert_eq!(relations, vec!["friend of", "relative of"]);
@@ -170,17 +164,14 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut graphs = Graphs::init("lengths");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
     ///
-    /// graphs.add_graph(&Graph::create(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::create(&bob, "friend", &alice), None);
+    /// graphs.add_graph(&Vertex::create(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Vertex::create(&bob, "friend", &alice), None);
     ///
     /// assert_eq!(graphs.len(), 2);
     /// ```
@@ -214,20 +205,17 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut graphs = Graphs::init("lengths");
     ///
     /// assert!(graphs.is_empty());
     ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
     ///
-    /// graphs.add_graph(&Graph::create(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Graph::create(&bob, "friend", &alice), None);
+    /// graphs.add_graph(&Vertex::create(&alice, "friend", &bob), None);
+    /// graphs.add_graph(&Vertex::create(&bob, "friend", &alice), None);
     ///
     /// assert!(!graphs.is_empty());
     /// ```
@@ -243,8 +231,8 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
     let mut attr_counter = 0;
     for (_graph_name, graphs) in grphs.vault.iter() {
         for graph in graphs {
-            attr_counter += graph.get_from_node().len_attr();
-            attr_counter += graph.get_to_node().len_attr();
+            attr_counter += graph.get_from_edge().len_attr();
+            attr_counter += graph.get_to_edge().len_attr();
         }
     }
 
@@ -252,7 +240,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
         mem: bytes.len(),
         len_graphs: grphs.len(),
         total_attr: attr_counter,
-        total_nodes: grphs.len() * 2,
+        total_edges: grphs.len() * 2,
         uniq_rel: grphs.uniq_relations().len(),
         total_graphs: grphs.vault.len(),
     };

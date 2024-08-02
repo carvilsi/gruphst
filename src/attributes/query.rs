@@ -6,34 +6,34 @@ impl QueryAttribute for Attributes {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 42);
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 42);
     ///
-    /// assert!(!node.has_attr("phone"));
-    /// assert!(node.has_attr("age"));
+    /// assert!(!edge.has_attr("phone"));
+    /// assert!(edge.has_attr("age"));
     /// ```
     fn has_attr(&self, attr_k: &str) -> bool {
         self.attr.contains_key(attr_k)
     }
 
-    /// Checks if an attribute key is like on a node
+    /// Checks if an attribute key is like on a edge
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 42);
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 42);
     ///
-    /// assert!(!node.like_attr("ph"));
-    /// assert!(node.like_attr("ag"));
-    /// assert!(node.like_attr("adDr"));
+    /// assert!(!edge.like_attr("ph"));
+    /// assert!(edge.like_attr("ag"));
+    /// assert!(edge.like_attr("adDr"));
     /// ```
     fn like_attr(&self, attr_k: &str) -> bool {
         for key in self.attr.keys() {
@@ -44,21 +44,21 @@ impl QueryAttribute for Attributes {
         false
     }
 
-    /// Checks if an attribute key exists on a node
+    /// Checks if an attribute key exists on a edge
     /// and the value matchs
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 42);
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 42);
     ///
-    /// assert!(!node.equals_attr("phone", "555-555"));
-    /// assert!(node.equals_attr("age", 42));
-    /// assert!(!node.equals_attr("age", 24));
+    /// assert!(!edge.equals_attr("phone", "555-555"));
+    /// assert!(edge.equals_attr("age", 42));
+    /// assert!(!edge.equals_attr("age", 24));
     /// ```
     fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
@@ -73,34 +73,34 @@ impl QueryAttribute for Attributes {
         }
     }
 
-    /// Retrieves the lenght of attributes for a Node
+    /// Retrieves the lenght of attributes for a edge
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 25);
-    /// assert_eq!(node.len_attr(), 2);
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 25);
+    /// assert_eq!(edge.len_attr(), 2);
     /// ```
     fn len_attr(&self) -> usize {
         self.attr.len()
     }
 
-    /// Checks if attributes for a Node is empty
+    /// Checks if attributes for a edge is empty
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// assert!(node.is_empty_attr());
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 25);
-    /// assert!(!node.is_empty_attr());
+    /// let mut edge = Edge::new("Alice");
+    /// assert!(edge.is_empty_attr());
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 25);
+    /// assert!(!edge.is_empty_attr());
     /// ```
     fn is_empty_attr(&self) -> bool {
         self.len_attr() == 0

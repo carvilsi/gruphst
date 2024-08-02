@@ -1,21 +1,21 @@
-use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
+use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge, *};
 
 pub fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");
 
-    let mut alice = Node::new("Alice");
+    let mut alice = Edge::new("Alice");
     alice.set_attr("phone", "555-555-555");
     alice.set_attr("address", "Elm street");
 
-    let mut bob = Node::new("Bob");
+    let mut bob = Edge::new("Bob");
     bob.set_attr("age", 42);
 
-    let fred = Node::new("Fred");
+    let fred = Edge::new("Fred");
 
-    graphs.add_graph(&Graph::create(&alice, "friend of", &bob), None);
-    graphs.add_graph(&Graph::create(&bob, "friend of", &alice), None);
-    graphs.add_graph(&Graph::create(&fred, "relative of", &alice), None);
-    graphs.add_graph(&Graph::create(&fred, "friend of", &bob), None);
+    graphs.add_graph(&Vertex::create(&alice, "friend of", &bob), None);
+    graphs.add_graph(&Vertex::create(&bob, "friend of", &alice), None);
+    graphs.add_graph(&Vertex::create(&fred, "relative of", &alice), None);
+    graphs.add_graph(&Vertex::create(&fred, "friend of", &bob), None);
 
     graphs
 }
@@ -24,7 +24,7 @@ pub fn prepare_graphs_test() -> Graphs {
 pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
     graphs.add_graph(
-        &Graph::create(&Node::new("Gandalf"), "enemy of", &Node::new("Saruman")),
+        &Vertex::create(&Edge::new("Gandalf"), "enemy of", &Edge::new("Saruman")),
         Some("middle-earth"),
     );
     // graphs
@@ -46,7 +46,7 @@ fn lengths_of_graphs() {
 fn should_init_adding_a_graph() {
     let graphs = Graphs::init_with(
         "grpahs0",
-        &Graph::create(&Node::new("alice"), "lives in", &Node::new("Springfield")),
+        &Vertex::create(&Edge::new("alice"), "lives in", &Edge::new("Springfield")),
     );
     assert_eq!(graphs.len(), 1);
 }
@@ -69,7 +69,7 @@ fn should_insert_a_graph_into_the_vault_without_init() {
     assert_eq!(graphs.len_graphs(), 1);
     assert_eq!(graphs.len(), 4);
     graphs.add_graph(
-        &Graph::create(&Node::new("Earth"), "has satellite", &Node::new("Moon")),
+        &Vertex::create(&Edge::new("Earth"), "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
     assert_eq!(graphs.len_graphs(), 2);
@@ -135,17 +135,17 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 #[test]
 fn should_find_graphs_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.has_graph_node_attr("age", None).unwrap();
+    let found_graphs = graphs.has_graph_edge_attr("age", None).unwrap();
     assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    assert_eq!(found_graphs[0].get_to_edge().get_label(), "Bob");
 }
 
 #[test]
 fn should_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.like_graph_node_attr("Ag", None).unwrap();
+    let found_graphs = graphs.like_graph_edge_attr("Ag", None).unwrap();
     assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    assert_eq!(found_graphs[0].get_to_edge().get_label(), "Bob");
 }
 
 #[test]
@@ -153,7 +153,7 @@ fn should_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
     let found_graphs = graphs.attr_equals_to("age", 42, None).unwrap();
     assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    assert_eq!(found_graphs[0].get_to_edge().get_label(), "Bob");
 }
 
 #[test]
@@ -208,7 +208,7 @@ fn relation_out() {
 fn should_create_new_vault_and_add_graph() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
-    let graph = Graph::create(&Node::new("foo"), "before a", &Node::new("bar"));
+    let graph = Vertex::create(&Edge::new("foo"), "before a", &Edge::new("bar"));
     graphs.insert_with("other", &graph);
     assert_eq!(graphs.len_graphs(), 2);
 }
@@ -216,15 +216,15 @@ fn should_create_new_vault_and_add_graph() {
 #[test]
 fn should_find_in_graph_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("Earth");
-    let from_node_id = from_node.get_id();
+    let from_edge = Edge::new("Earth");
+    let from_edge_id = from_edge.get_id();
     graphs.add_graph(
-        &Graph::create(&from_node, "has satellite", &Node::new("Moon")),
+        &Vertex::create(&from_edge, "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
-    let mut found_graph = graphs.find_by_id(&from_node_id, None).unwrap();
+    let mut found_graph = graphs.find_by_id(&from_edge_id, None).unwrap();
     assert_eq!(found_graph.get_label(), "has satellite");
-    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
+    assert_eq!(found_graph.get_from_edge().get_label(), "Earth");
     let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
     found_graph = graphs
         .find_by_id(&default_graph_id, Some("my graphs"))
@@ -235,17 +235,17 @@ fn should_find_in_graph_by_id() {
 #[test]
 fn should_find_in_graphs_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("Earth");
-    let from_node_id = from_node.get_id();
+    let from_edge = Edge::new("Earth");
+    let from_edge_id = from_edge.get_id();
     graphs.add_graph(
-        &Graph::create(&from_node, "has satellite", &Node::new("Moon")),
+        &Vertex::create(&from_edge, "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
     let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
     let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
-    found_graph = graphs.find_by_id_in_graphs(&from_node_id).unwrap();
-    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
+    found_graph = graphs.find_by_id_in_graphs(&from_edge_id).unwrap();
+    assert_eq!(found_graph.get_from_edge().get_label(), "Earth");
 }
 
 #[test]
@@ -269,13 +269,13 @@ fn delete_from_graph_fail() {
 fn should_update_graph() {
     let mut my_graphs = Graphs::init("my-graphs");
 
-    let alice_node = Node::new("Alice");
-    let bob_node = Node::new("Bob");
-    let alice_bob_graph = Graph::create(&alice_node, "best friends", &bob_node);
+    let alice_edge = Edge::new("Alice");
+    let bob_edge = Edge::new("Bob");
+    let alice_bob_graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
     my_graphs.add_graph(&alice_bob_graph, None);
 
-    let fred_node = Node::new("Fred");
-    let mut alice_fred_graph = Graph::create(&alice_node, "super friends", &fred_node);
+    let fred_edge = Edge::new("Fred");
+    let mut alice_fred_graph = Vertex::create(&alice_edge, "super friends", &fred_edge);
     my_graphs.add_graph(&alice_fred_graph, None);
 
     assert_eq!(my_graphs.len(), 2);
@@ -295,34 +295,34 @@ fn should_update_graph() {
 fn should_fail_on_updating_graph() {
     let mut grphs = Graphs::init("foobar");
 
-    let alice = Node::new("Alice");
-    let bob = Node::new("Bob");
-    let alice_bob = Graph::create(&alice, "friend of", &bob);
+    let alice = Edge::new("Alice");
+    let bob = Edge::new("Bob");
+    let alice_bob = Vertex::create(&alice, "friend of", &bob);
     grphs.add_graph(&alice_bob, None);
 
-    let bob_alice = Graph::create(&bob, "friend of", &alice);
+    let bob_alice = Vertex::create(&bob, "friend of", &alice);
     assert!(grphs.update_graph(&bob_alice, None).is_err());
 }
 
 #[test]
-fn should_return_uniq_nodes_from_graph() {
+fn should_return_uniq_edges_from_graph() {
     let mut graphs = prepare_graphs_test();
     prepare_insert_graph_test(&mut graphs);
-    let mut uniq_nodes = graphs.get_uniq_nodes(None).unwrap();
-    assert_eq!(uniq_nodes.len(), 2);
+    let mut uniq_edges = graphs.get_uniq_edges(None).unwrap();
+    assert_eq!(uniq_edges.len(), 2);
     let mut labels: Vec<String> = Vec::new();
-    for node in uniq_nodes {
-        labels.push(node.get_label());
+    for edge in uniq_edges {
+        labels.push(edge.get_label());
     }
 
     assert!(labels.contains(&"Saruman".to_string()));
     assert!(labels.contains(&"Gandalf".to_string()));
 
-    uniq_nodes = graphs.get_uniq_nodes(Some("my graphs")).unwrap();
-    assert_eq!(uniq_nodes.len(), 3);
+    uniq_edges = graphs.get_uniq_edges(Some("my graphs")).unwrap();
+    assert_eq!(uniq_edges.len(), 3);
     labels.clear();
-    for node in uniq_nodes {
-        labels.push(node.get_label());
+    for edge in uniq_edges {
+        labels.push(edge.get_label());
     }
 
     assert!(labels.contains(&"Alice".to_string()));

@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
 use std::collections::HashMap;
 
-use crate::{graph::Graph, node::Node, util::graphs_memory_watcher, CURNodeGraph};
+use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
 
 mod persistence;
 mod query;
@@ -13,7 +13,7 @@ mod stats;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
     /// The collections of Graph
-    vault: HashMap<String, Vec<Graph>>,
+    vault: HashMap<String, Vec<Vertex>>,
     /// Name for the current collection
     label: String,
     /// Some attributes to handle metada for Graphs
@@ -23,7 +23,7 @@ pub struct Graphs {
 impl Graphs {
     /// Initializes a new Graphs element
     pub fn init(label: &str) -> Self {
-        let mut vault: HashMap<String, Vec<Graph>> = HashMap::new();
+        let mut vault: HashMap<String, Vec<Vertex>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
         let graphs = Graphs {
             label: String::from(label),
@@ -35,7 +35,7 @@ impl Graphs {
     }
 
     /// Initializes a new Graphs element adding a Graph to new vault
-    pub fn init_with(label: &str, graph: &Graph) -> Self {
+    pub fn init_with(label: &str, graph: &Vertex) -> Self {
         let mut graphs = Graphs::init(label);
         graphs.add_graph(graph, None);
         graphs
@@ -50,7 +50,7 @@ impl Graphs {
     }
 
     /// Creates a new entry on Graphs valut with a Graph
-    pub fn insert_with(&mut self, name: &str, graph: &Graph) {
+    pub fn insert_with(&mut self, name: &str, graph: &Vertex) {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
         self.add_graph(graph, Some(name));
@@ -79,25 +79,20 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::{
-    ///     node::Node,
-    ///     graph::Graph,
-    ///     graphs::Graphs,
-    ///     *,
-    /// };
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob_graph = Graph::create(&alice, "friend of", &bob);
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
     /// let mut my_graphs = Graphs::init("my_graph");
     /// my_graphs.add_graph(&alice_bob_graph, None);
     /// assert_eq!(my_graphs.len_graphs(), 1);
     /// my_graphs.add_graph(
-    ///     &Graph::create(&bob, "best friend", &alice),
+    ///     &Vertex::create(&bob, "best friend", &alice),
     ///     Some("other graph"));
     /// assert_eq!(my_graphs.len_graphs(), 2);
     /// ```
-    pub fn add_graph(&mut self, graph: &Graph, graphs_name: Option<&str>) {
+    pub fn add_graph(&mut self, graph: &Vertex, graphs_name: Option<&str>) {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(v) = self.vault.get_mut(&current_graph) {
             v.push(graph.clone());
@@ -120,17 +115,14 @@ impl Graphs {
     /// the default one or by name
     /// # Examples
     /// ```rust
-    /// use gruphst::graphs::Graphs;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::node::Node;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut the_graphs = Graphs::init("init graph");
     ///
-    /// let graph = Graph::create(
-    ///     &Node::new("alice"),
+    /// let graph = Vertex::create(
+    ///     &Edge::new("alice"),
     ///     "knows",
-    ///     &Node::new("bob"));
+    ///     &Edge::new("bob"));
     /// the_graphs.add_graph(&graph, None);
     ///
     /// assert_eq!(the_graphs.get_label(), "init graph");
@@ -138,17 +130,17 @@ impl Graphs {
     /// assert_eq!(default_graph[0].get_id(), graph.get_id());
     ///
     /// the_graphs.insert("new one");
-    /// let graph1 = Graph::create(
-    ///     &Node::new("bilbo"),
+    /// let graph1 = Vertex::create(
+    ///     &Edge::new("bilbo"),
     ///     "relative",
-    ///     &Node::new("frodo")
+    ///     &Edge::new("frodo")
     /// );
     /// the_graphs.add_graph(&graph1, Some("new one"));
     /// assert_eq!(the_graphs.get_label(), "new one");
     /// let other_graph = the_graphs.get_graphs(Some("new one")).unwrap();
     /// assert_eq!(other_graph[0].get_id(), graph1.get_id());
     /// ```
-    pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Graph>, &'static str> {
+    pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             Ok(graphs.clone())
@@ -157,15 +149,15 @@ impl Graphs {
         }
     }
 
-    pub fn get_uniq_nodes(&self, graphs_name: Option<&str>) -> Result<Vec<Node>, &'static str> {
+    pub fn get_uniq_edges(&self, graphs_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
         let graphs = self.get_graphs(graphs_name).unwrap();
-        let mut nodes_map: HashMap<String, Node> = HashMap::new();
+        let mut edges_map: HashMap<String, Edge> = HashMap::new();
         for graph in graphs {
-            nodes_map.insert(graph.get_from_node().get_id(), graph.get_from_node());
-            nodes_map.insert(graph.get_to_node().get_id(), graph.get_to_node());
+            edges_map.insert(graph.get_from_edge().get_id(), graph.get_from_edge());
+            edges_map.insert(graph.get_to_edge().get_id(), graph.get_to_edge());
         }
-        let uniq_nodes: Vec<Node> = nodes_map.into_values().collect();
-        Ok(uniq_nodes)
+        let uniq_edges: Vec<Edge> = edges_map.into_values().collect();
+        Ok(uniq_edges)
     }
 
     /// Updates the name of the Graphs
@@ -190,19 +182,16 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let alice_fred =
-    ///     Graph::create(&alice, "is firend of", &Node::new("Fred"));
+    ///     Vertex::create(&alice, "is firend of", &Edge::new("Fred"));
     /// my_graph.add_graph(&alice_fred, None);
     ///
     /// assert_eq!(my_graph.len(), 2);
@@ -235,23 +224,20 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     ///
     /// let mut my_graphs = Graphs::init("my-graphs");
     ///
-    /// let alice_node = Node::new("Alice");
-    /// let bob_node = Node::new("Bob");
+    /// let alice_edge = Edge::new("Alice");
+    /// let bob_edge = Edge::new("Bob");
     /// let alice_bob_graph =
-    ///     Graph::create(&alice_node, "best friends", &bob_node);
+    ///     Vertex::create(&alice_edge, "best friends", &bob_edge);
     /// my_graphs.add_graph(&alice_bob_graph, None);
     ///
-    /// let fred_node = Node::new("Fred");
+    /// let fred_edge = Edge::new("Fred");
     /// let mut alice_fred_graph =
-    ///     Graph::create(&alice_node, "super friends", &fred_node);
+    ///     Vertex::create(&alice_edge, "super friends", &fred_edge);
     /// my_graphs.add_graph(&alice_fred_graph, None);
     ///
     /// assert_eq!(my_graphs.len(), 2);
@@ -268,7 +254,7 @@ impl Graphs {
     /// ```
     pub fn update_graph(
         &mut self,
-        graph_to_update: &Graph,
+        graph_to_update: &Vertex,
         graphs_name: Option<&str>,
     ) -> Result<(), &'static str> {
         debug!("Going to update Graphs with {:#?}", graph_to_update);

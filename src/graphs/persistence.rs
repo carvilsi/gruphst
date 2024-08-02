@@ -14,15 +14,12 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// my_graph.persists();
@@ -48,15 +45,12 @@ impl Graphs {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
     ///
     /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
     /// my_graph.add_graph(&alice_bob, None);
     ///
     /// let _ = my_graph.persists();

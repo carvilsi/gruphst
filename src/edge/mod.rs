@@ -3,42 +3,42 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::attributes::Attributes;
-use crate::graph::Graph;
-use crate::CURNodeGraph;
+use crate::vertex::Vertex;
+use crate::CUREdgeVertex;
 use crate::RUDAttribute;
 use std::collections::HashMap;
 
 mod query;
 
-/// Representation of a Node
+/// Representation of a edge
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Node {
-    /// A Node id is an uuid as identifier
+pub struct Edge {
+    /// A edge id is an uuid as identifier
     id: String,
     /// And a name
     label: String,
-    /// The attributes for a node
+    /// The attributes for a edge
     attr: Attributes,
 }
 
-impl CURNodeGraph for Node {
-    /// Creates a Node with the given label, the id is generated
+impl CUREdgeVertex for Edge {
+    /// Creates a edge with the given label, the id is generated
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let node = Node::new("alice node");
+    /// let edge = Edge::new("alice edge");
     /// ```
     fn new(label: &str) -> Self {
-        let node = Node {
+        let edge = Edge {
             label: String::from(label),
             id: Uuid::new_v4().to_string(),
             attr: Attributes::new(),
         };
-        debug!("The created node: {:#?}", &node);
-        node
+        debug!("The created edge: {:#?}", &edge);
+        edge
     }
 
     fn get_id(&self) -> String {
@@ -62,7 +62,7 @@ impl CURNodeGraph for Node {
     }
 }
 
-impl RUDAttribute for Node {
+impl RUDAttribute for Edge {
     fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display,
@@ -97,50 +97,50 @@ impl RUDAttribute for Node {
     }
 }
 
-impl Node {
-    /// Retrieves the nodes that has relation out for the given node on graph
+impl Edge {
+    /// Retrieves the edges that has relation out for the given edge on graph
     pub fn get_relations_out_on_graph(
         &self,
-        graphs: Vec<Graph>,
-    ) -> Result<HashMap<String, Vec<Node>>, &'static str> {
-        let mut relations_out: HashMap<String, Vec<Node>> = HashMap::new();
+        graphs: Vec<Vertex>,
+    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
+        let mut relations_out: HashMap<String, Vec<Edge>> = HashMap::new();
         for graph in graphs {
-            if graph.get_from_node().get_id() == self.id {
-                if let Some(nodes_out) = relations_out.get_mut(&graph.get_relation()) {
-                    nodes_out.push(graph.get_to_node());
+            if graph.get_from_edge().get_id() == self.id {
+                if let Some(edges_out) = relations_out.get_mut(&graph.get_relation()) {
+                    edges_out.push(graph.get_to_edge());
                 } else {
-                    let nodes_out = vec![graph.get_to_node()];
-                    relations_out.insert(graph.get_relation(), nodes_out);
+                    let edges_out = vec![graph.get_to_edge()];
+                    relations_out.insert(graph.get_relation(), edges_out);
                 }
             }
         }
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
-            Err("no relations out for node")
+            Err("no relations out for edge")
         }
     }
 
-    /// Retrieves the nodes that has relation in for the given node on graph
+    /// Retrieves the edges that has relation in for the given edge on graph
     pub fn get_relations_in_on_graph(
         &self,
-        graphs: Vec<Graph>,
-    ) -> Result<HashMap<String, Vec<Node>>, &'static str> {
-        let mut relations_in: HashMap<String, Vec<Node>> = HashMap::new();
+        graphs: Vec<Vertex>,
+    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
+        let mut relations_in: HashMap<String, Vec<Edge>> = HashMap::new();
         for graph in graphs {
-            if graph.get_to_node().get_id() == self.id {
-                if let Some(nodes_in) = relations_in.get_mut(&graph.get_relation()) {
-                    nodes_in.push(graph.get_from_node());
+            if graph.get_to_edge().get_id() == self.id {
+                if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
+                    edges_in.push(graph.get_from_edge());
                 } else {
-                    let nodes_in = vec![graph.get_from_node()];
-                    relations_in.insert(graph.get_relation(), nodes_in);
+                    let edges_in = vec![graph.get_from_edge()];
+                    relations_in.insert(graph.get_relation(), edges_in);
                 }
             }
         }
         if !relations_in.is_empty() {
             Ok(relations_in)
         } else {
-            Err("no relations in for node")
+            Err("no relations in for edge")
         }
     }
 }

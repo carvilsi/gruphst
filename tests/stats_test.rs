@@ -1,14 +1,14 @@
-use gruphst::{graph::Graph, graphs::Graphs, node::Node, CURNodeGraph, RUDAttribute};
+use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge, CUREdgeVertex, RUDAttribute};
 
 #[test]
 fn graphs_stats() {
     let mut graphs = Graphs::init("friends-and-enemies");
 
-    let mut alice = Node::new("Alice");
-    let mut bob = Node::new("Bob");
-    let fred = Node::new("Fred");
-    let john = Node::new("John");
-    let peter = Node::new("Peter");
+    let mut alice = Edge::new("Alice");
+    let mut bob = Edge::new("Bob");
+    let fred = Edge::new("Fred");
+    let john = Edge::new("John");
+    let peter = Edge::new("Peter");
 
     alice.set_attr("address", "Elm street");
     alice.set_attr("email", "alice@mailinator.com");
@@ -21,16 +21,16 @@ fn graphs_stats() {
     let relation_friend_of = "friend of";
     let relation_relative_of = "relative of";
 
-    let mut graph = Graph::create(&alice, relation_friend_of, &bob);
+    let mut graph = Vertex::create(&alice, relation_friend_of, &bob);
     graphs.add_graph(&graph, None);
 
-    graph = Graph::create(&alice, relation_relative_of, &fred);
+    graph = Vertex::create(&alice, relation_relative_of, &fred);
     graphs.add_graph(&graph, None);
 
-    graph = Graph::create(&alice, relation_friend_of, &john);
+    graph = Vertex::create(&alice, relation_friend_of, &john);
     graphs.add_graph(&graph, None);
 
-    graph = Graph::create(&peter, relation_relative_of, &john);
+    graph = Vertex::create(&peter, relation_relative_of, &john);
     graphs.add_graph(&graph, None);
 
     graphs.insert("only relatives");
@@ -39,7 +39,7 @@ fn graphs_stats() {
     // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.stats().unwrap();
     assert_eq!(stats.get_len_graphs(), 5);
-    assert_eq!(stats.get_total_nodes(), 10);
+    assert_eq!(stats.get_total_edges(), 10);
     assert_eq!(stats.get_total_attr(), 12);
     assert_eq!(stats.get_mem(), 2179);
     assert_eq!(stats.get_uniq_rel(), 2);

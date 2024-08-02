@@ -1,10 +1,10 @@
-use gruphst::{attributes::Attributes, graph::Graph, node::Node, *};
+use gruphst::{attributes::Attributes, vertex::Vertex, edge::Edge, *};
 
-fn prepare_graph_test() -> (Graph, String) {
-    let mut alice = Node::new("alice");
+fn prepare_graph_test() -> (Vertex, String) {
+    let mut alice = Edge::new("alice");
     alice.set_attr("age", 42);
-    let bob = Node::new("bob");
-    let mut graph = Graph::create(&alice, "friend of", &bob);
+    let bob = Edge::new("bob");
+    let mut graph = Vertex::create(&alice, "friend of", &bob);
     graph.set_attr("type", "friendship");
     graph.set_attr("value", 2);
     (graph.clone(), graph.get_id())
@@ -113,21 +113,21 @@ fn graph_set_attributes() {
 }
 
 #[test]
-fn graph_update_from_node() {
+fn graph_update_from_edge() {
     let (mut graph, _id) = prepare_graph_test();
-    assert_eq!(graph.get_from_node().get_label(), "alice");
-    let node = Node::new("fred");
-    graph.update_from(&node);
-    assert_eq!(graph.get_from_node().get_label(), "fred");
+    assert_eq!(graph.get_from_edge().get_label(), "alice");
+    let edge = Edge::new("fred");
+    graph.update_from(&edge);
+    assert_eq!(graph.get_from_edge().get_label(), "fred");
 }
 
 #[test]
-fn graph_update_to_node() {
+fn graph_update_to_edge() {
     let (mut graph, _id) = prepare_graph_test();
-    assert_eq!(graph.get_to_node().get_label(), "bob");
-    let node = Node::new("fred");
-    graph.update_to(&node);
-    assert_eq!(graph.get_to_node().get_label(), "fred");
+    assert_eq!(graph.get_to_edge().get_label(), "bob");
+    let edge = Edge::new("fred");
+    graph.update_to(&edge);
+    assert_eq!(graph.get_to_edge().get_label(), "fred");
 }
 
 #[test]
@@ -138,10 +138,10 @@ fn should_check_if_attribute_exists_on_graph() {
 }
 
 #[test]
-fn should_check_if_attribute_exists_on_any_node_on_graph() {
+fn should_check_if_attribute_exists_on_any_edge_on_graph() {
     let (graph, _id) = prepare_graph_test();
-    assert!(graph.has_node_attr("age"));
-    assert!(!graph.has_node_attr("foo"));
+    assert!(graph.has_edge_attr("age"));
+    assert!(!graph.has_edge_attr("foo"));
 }
 
 #[test]
@@ -152,10 +152,10 @@ fn should_check_if_attribute_like_on_graph() {
 }
 
 #[test]
-fn should_check_if_attribute_like_on_any_node_on_graph() {
+fn should_check_if_attribute_like_on_any_edge_on_graph() {
     let (graph, _id) = prepare_graph_test();
-    assert!(graph.like_node_attr("Ag"));
-    assert!(!graph.has_node_attr("foo"));
+    assert!(graph.like_edge_attr("Ag"));
+    assert!(!graph.has_edge_attr("foo"));
 }
 
 #[test]
@@ -167,9 +167,9 @@ fn should_check_if_attribute_is_equals_to() {
 }
 
 #[test]
-fn should_check_in_node_if_attribute_is_equals_to() {
+fn should_check_in_edge_if_attribute_is_equals_to() {
     let (graph, _id) = prepare_graph_test();
-    assert!(graph.equals_node_attr("age", 42));
-    assert!(!graph.equals_node_attr("age", 43));
-    assert!(!graph.equals_node_attr("foo", 25));
+    assert!(graph.equals_edge_attr("age", 42));
+    assert!(!graph.equals_edge_attr("age", 43));
+    assert!(!graph.equals_edge_attr("foo", 25));
 }

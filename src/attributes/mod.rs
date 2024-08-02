@@ -23,15 +23,15 @@ impl Default for Attributes {
 }
 
 impl RUDAttribute for Attributes {
-    /// Set attributes for a Node
+    /// Set attributes for a edge
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
     /// ```
     fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
@@ -39,21 +39,21 @@ impl RUDAttribute for Attributes {
     {
         self.attr.insert(attr_k.to_string(), attr_v.to_string());
         debug!(
-            "added attribute key: {} with value {} for node {}",
+            "added attribute key: {} with value {} for edge {}",
             attr_k, attr_v, self.id
         );
     }
 
-    /// Get attribute for a Node
+    /// Get attribute for a edge
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// let attr = node.get_attr("Address").unwrap();
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// let attr = edge.get_attr("Address").unwrap();
     /// assert_eq!(attr, "Elm street");
     /// ```
     fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
@@ -61,7 +61,7 @@ impl RUDAttribute for Attributes {
         match res {
             Some(res) => {
                 debug!(
-                    "retrieved attribute value '{}' for '{}' for node [{}]",
+                    "retrieved attribute value '{}' for '{}' for edge [{}]",
                     res, attr_k, self.id
                 );
                 Ok(res)
@@ -77,24 +77,24 @@ impl RUDAttribute for Attributes {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 44);
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 44);
     ///
-    /// assert_eq!(node.get_attr("age").unwrap(), "44");
+    /// assert_eq!(edge.get_attr("age").unwrap(), "44");
     ///
-    /// node.update_attr("age", 55);
-    /// assert_eq!(node.get_attr("age").unwrap(), "55");
+    /// edge.update_attr("age", 55);
+    /// assert_eq!(edge.get_attr("age").unwrap(), "55");
     /// ```
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
         debug!(
-            "updated attribute key: {} with value {} for node {}",
+            "updated attribute key: {} with value {} for edge {}",
             attr_k, attr_v, self.id
         );
         if let Some(attr) = self.attr.get_mut(attr_k) {
@@ -108,18 +108,18 @@ impl RUDAttribute for Attributes {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// assert_eq!(node.len_attr(), 1);
-    /// node.upsert_attr("age", 44);
-    /// assert_eq!(node.len_attr(), 2);
-    /// assert_eq!(node.get_attr("age").unwrap(), "44");
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// assert_eq!(edge.len_attr(), 1);
+    /// edge.upsert_attr("age", 44);
+    /// assert_eq!(edge.len_attr(), 2);
+    /// assert_eq!(edge.get_attr("age").unwrap(), "44");
     ///
-    /// node.upsert_attr("age", 55);
-    /// assert_eq!(node.get_attr("age").unwrap(), "55");
+    /// edge.upsert_attr("age", 55);
+    /// assert_eq!(edge.get_attr("age").unwrap(), "55");
     /// ```
     fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
@@ -129,14 +129,14 @@ impl RUDAttribute for Attributes {
             Some(attr) => {
                 *attr = attr_v.to_string();
                 debug!(
-                    "updated (upsert) attribute key: {} with value {} for node {}",
+                    "updated (upsert) attribute key: {} with value {} for edge {}",
                     attr_k, attr_v, self.id
                 );
             }
             None => {
                 self.attr.insert(attr_k.to_string(), attr_v.to_string());
                 debug!(
-                    "added (upsert) attribute key: {} with value {} for node {}",
+                    "added (upsert) attribute key: {} with value {} for edge {}",
                     attr_k, attr_v, self.id
                 );
             }
@@ -147,15 +147,15 @@ impl RUDAttribute for Attributes {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// assert!(node.is_empty_attr());
-    /// node.set_attr("Address", "Elm street");
-    /// assert!(!node.is_empty_attr());
-    /// node.del_attr("Address");
-    /// assert!(node.is_empty_attr());
+    /// let mut edge = Edge::new("Alice");
+    /// assert!(edge.is_empty_attr());
+    /// edge.set_attr("Address", "Elm street");
+    /// assert!(!edge.is_empty_attr());
+    /// edge.del_attr("Address");
+    /// assert!(edge.is_empty_attr());
     /// ```
     fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.attr.remove(v);
@@ -175,13 +175,13 @@ impl RUDAttribute for Attributes {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
+    /// use gruphst::edge::Edge;
     /// use crate::gruphst::*;
     ///
-    /// let mut node = Node::new("Alice");
-    /// node.set_attr("Address", "Elm street");
-    /// node.set_attr("age", 44);
-    /// let keys = node.get_attr_keys();
+    /// let mut edge = Edge::new("Alice");
+    /// edge.set_attr("Address", "Elm street");
+    /// edge.set_attr("age", 44);
+    /// let keys = edge.get_attr_keys();
     /// assert!(keys.contains(&&"Address"));
     /// assert!(keys.contains(&&"age"));
     /// ```
@@ -191,7 +191,7 @@ impl RUDAttribute for Attributes {
             key_vec.push(key.as_str());
         }
         debug!(
-            "requested array of attributes for {} node {:#?}",
+            "requested array of attributes for {} edge {:#?}",
             self.id, key_vec
         );
         key_vec

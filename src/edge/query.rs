@@ -1,7 +1,7 @@
-use super::Node;
+use super::Edge;
 use crate::QueryAttribute;
 
-impl QueryAttribute for Node {
+impl QueryAttribute for Edge {
     fn has_attr(&self, attr_k: &str) -> bool {
         self.attr.has_attr(attr_k)
     }

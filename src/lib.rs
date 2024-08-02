@@ -8,12 +8,12 @@ use attributes::Attributes;
 
 pub mod attributes;
 pub mod config;
-pub mod graph;
+pub mod vertex;
 pub mod graphs;
-pub mod node;
+pub mod edge;
 mod util;
 
-pub trait CURNodeGraph {
+pub trait CUREdgeVertex {
     fn new(label: &str) -> Self;
     fn get_id(&self) -> String;
     fn get_label(&self) -> String;

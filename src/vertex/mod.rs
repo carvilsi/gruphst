@@ -2,32 +2,32 @@ use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{attributes::Attributes, node::Node, CURNodeGraph, RUDAttribute};
+use crate::{attributes::Attributes, edge::Edge, CUREdgeVertex, RUDAttribute};
 
 mod query;
 
-/// Representation of a Graph, relating two nodes
+/// Representation of a Graph, relating two edges
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Graph {
+pub struct Vertex {
     /// A Graph has an uuid
     id: String,
     /// A label for the relation
     relation: String,
-    /// Origin node
-    from: Node,
-    /// Target node
-    to: Node,
+    /// Origin edge
+    from: Edge,
+    /// Target edge
+    to: Edge,
     /// Attributes for the Graph
     attr: Attributes,
 }
 
-impl CURNodeGraph for Graph {
+impl CUREdgeVertex for Vertex {
     fn new(label: &str) -> Self {
-        Graph {
+        Vertex {
             id: Uuid::new_v4().to_string(),
             relation: label.to_string(),
-            from: Node::new(""),
-            to: Node::new(""),
+            from: Edge::new(""),
+            to: Edge::new(""),
             attr: Attributes::new(),
         }
     }
@@ -53,46 +53,46 @@ impl CURNodeGraph for Graph {
     }
 }
 
-impl Graph {
-    /// Adds "From" and "To" node
+impl Vertex {
+    /// Adds "From" and "To" edge
     /// to a previous created Graph
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
+    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     /// use crate::gruphst::*;
     ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let mut alice_bob_graph = Graph::new("");
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let mut alice_bob_graph = Vertex::new("");
     /// alice_bob_graph.add_relation(&alice, "friend of", &bob);
     /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
     /// ```
-    pub fn add_relation(&mut self, from: &Node, relation: &str, to: &Node) {
+    pub fn add_relation(&mut self, from: &Edge, relation: &str, to: &Edge) {
         self.relation = String::from(relation);
         self.from = from.clone();
         self.to = to.clone();
         debug!("Added relation to Graph: {:#?}", self);
     }
     /// Creates a Graph,
-    /// providing "From" and "To" nodes and the "relation"
+    /// providing "From" and "To" edges and the "relation"
     /// the id is generated
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
+    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     /// use crate::gruphst::*;
     ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
     /// let alice_bob_graph =
-    ///     Graph::create(&alice, "friend of", &bob);
+    ///     Vertex::create(&alice, "friend of", &bob);
     /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
     /// ```
-    pub fn create(from: &Node, relation: &str, to: &Node) -> Self {
-        let mut g = Graph::new(relation);
+    pub fn create(from: &Edge, relation: &str, to: &Edge) -> Self {
+        let mut g = Vertex::new(relation);
         g.from = from.clone();
         g.to = to.clone();
         g
@@ -102,14 +102,14 @@ impl Graph {
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
+    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     /// use crate::gruphst::*;
     ///
     ///
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let mut alice_bob_graph = Graph::create(&alice, "friend of", &bob);
+    /// let alice = Edge::new("Alice");
+    /// let bob = Edge::new("Bob");
+    /// let mut alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
     ///
     /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
     ///
@@ -121,58 +121,58 @@ impl Graph {
         self.relation = relation.to_string();
     }
 
-    /// Updates the "from" node in Graph
+    /// Updates the "from" edge in Graph
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
+    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     /// use crate::gruphst::*;
     ///
     ///
-    /// let mut alice_node = Node::new("alice node");
-    /// let bob_node = Node::new("bob node");
-    /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.get_from_node().get_label(), "alice node");
-    /// assert_eq!(graph.get_to_node().get_label(), "bob node");
-    /// alice_node.set_label("alice");
-    /// graph.update_from(&alice_node);
-    /// assert_eq!(graph.get_from_node().get_label(), "alice");
+    /// let mut alice_edge = Edge::new("alice edge");
+    /// let bob_edge = Edge::new("bob edge");
+    /// let mut graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
+    /// assert_eq!(graph.get_from_edge().get_label(), "alice edge");
+    /// assert_eq!(graph.get_to_edge().get_label(), "bob edge");
+    /// alice_edge.set_label("alice");
+    /// graph.update_from(&alice_edge);
+    /// assert_eq!(graph.get_from_edge().get_label(), "alice");
     /// ```
-    pub fn update_from(&mut self, from_node: &Node) {
-        debug!("Updated Graph [{}] from Node: {:#?}", self.id, from_node);
-        self.from = from_node.clone();
+    pub fn update_from(&mut self, from_edge: &Edge) {
+        debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge);
+        self.from = from_edge.clone();
     }
 
-    /// Updates the "to" node in Graph
+    /// Updates the "to" edge in Graph
     ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
+    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     /// use crate::gruphst::*;
     ///
     ///
-    /// let alice_node = Node::new("alice node");
-    /// let bob_node = Node::new("bob node");
-    /// let mut graph = Graph::create(&alice_node, "best friends", &bob_node);
-    /// assert_eq!(graph.get_from_node().get_label(), "alice node");
-    /// assert_eq!(graph.get_to_node().get_label(), "bob node");
-    /// let fred_node = Node::new("fred node");
-    /// graph.update_to(&fred_node);
-    /// assert_eq!(graph.get_to_node().get_label(), "fred node");
-    /// assert_ne!(graph.get_to_node().get_id(), bob_node.get_id());
+    /// let alice_edge = Edge::new("alice edge");
+    /// let bob_edge = Edge::new("bob edge");
+    /// let mut graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
+    /// assert_eq!(graph.get_from_edge().get_label(), "alice edge");
+    /// assert_eq!(graph.get_to_edge().get_label(), "bob edge");
+    /// let fred_edge = Edge::new("fred edge");
+    /// graph.update_to(&fred_edge);
+    /// assert_eq!(graph.get_to_edge().get_label(), "fred edge");
+    /// assert_ne!(graph.get_to_edge().get_id(), bob_edge.get_id());
     /// ```
-    pub fn update_to(&mut self, to_node: &Node) {
-        debug!("Updated Graph [{}] to Node: {:#?}", self.id, to_node);
-        self.to = to_node.clone();
+    pub fn update_to(&mut self, to_edge: &Edge) {
+        debug!("Updated Graph [{}] to edge: {:#?}", self.id, to_edge);
+        self.to = to_edge.clone();
     }
 
-    pub fn get_from_node(&self) -> Node {
+    pub fn get_from_edge(&self) -> Edge {
         self.from.clone()
     }
 
-    pub fn get_to_node(&self) -> Node {
+    pub fn get_to_edge(&self) -> Edge {
         self.to.clone()
     }
 
@@ -185,7 +185,7 @@ impl Graph {
     }
 }
 
-impl RUDAttribute for Graph {
+impl RUDAttribute for Vertex {
     fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display,
