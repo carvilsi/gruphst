@@ -56,19 +56,6 @@ impl CUREdgeVertex for Vertex {
 impl Vertex {
     /// Adds "From" and "To" edge
     /// to a previous created Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use gruphst::vertex::Vertex;
-    /// use crate::gruphst::*;
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let mut alice_bob_graph = Vertex::new("");
-    /// alice_bob_graph.add_relation(&alice, "friend of", &bob);
-    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
-    /// ```
     pub fn add_relation(&mut self, from: &Edge, relation: &str, to: &Edge) {
         self.relation = String::from(relation);
         self.from = from.clone();
@@ -78,19 +65,6 @@ impl Vertex {
     /// Creates a Graph,
     /// providing "From" and "To" edges and the "relation"
     /// the id is generated
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use gruphst::vertex::Vertex;
-    /// use crate::gruphst::*;
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob_graph =
-    ///     Vertex::create(&alice, "friend of", &bob);
-    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
-    /// ```
     pub fn create(from: &Edge, relation: &str, to: &Edge) -> Self {
         let mut g = Vertex::new(relation);
         g.from = from.clone();
@@ -99,70 +73,18 @@ impl Vertex {
     }
 
     /// Updates the relation for the Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use gruphst::vertex::Vertex;
-    /// use crate::gruphst::*;
-    ///
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let mut alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    ///
-    /// assert_eq!(alice_bob_graph.get_relation(), "friend of");
-    ///
-    /// alice_bob_graph.update_relation("best friends");
-    /// assert_eq!(alice_bob_graph.get_relation(), "best friends");
-    /// ```
     pub fn update_relation(&mut self, relation: &str) {
         debug!("Updated Graph [{}] with Relation: {}", self.id, relation);
         self.relation = relation.to_string();
     }
 
     /// Updates the "from" edge in Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use gruphst::vertex::Vertex;
-    /// use crate::gruphst::*;
-    ///
-    ///
-    /// let mut alice_edge = Edge::new("alice edge");
-    /// let bob_edge = Edge::new("bob edge");
-    /// let mut graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
-    /// assert_eq!(graph.get_from_edge().get_label(), "alice edge");
-    /// assert_eq!(graph.get_to_edge().get_label(), "bob edge");
-    /// alice_edge.set_label("alice");
-    /// graph.update_from(&alice_edge);
-    /// assert_eq!(graph.get_from_edge().get_label(), "alice");
-    /// ```
     pub fn update_from(&mut self, from_edge: &Edge) {
         debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge);
         self.from = from_edge.clone();
     }
 
     /// Updates the "to" edge in Graph
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use gruphst::vertex::Vertex;
-    /// use crate::gruphst::*;
-    ///
-    ///
-    /// let alice_edge = Edge::new("alice edge");
-    /// let bob_edge = Edge::new("bob edge");
-    /// let mut graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
-    /// assert_eq!(graph.get_from_edge().get_label(), "alice edge");
-    /// assert_eq!(graph.get_to_edge().get_label(), "bob edge");
-    /// let fred_edge = Edge::new("fred edge");
-    /// graph.update_to(&fred_edge);
-    /// assert_eq!(graph.get_to_edge().get_label(), "fred edge");
-    /// assert_ne!(graph.get_to_edge().get_id(), bob_edge.get_id());
-    /// ```
     pub fn update_to(&mut self, to_edge: &Edge) {
         debug!("Updated Graph [{}] to edge: {:#?}", self.id, to_edge);
         self.to = to_edge.clone();

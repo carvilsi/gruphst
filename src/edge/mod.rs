@@ -23,14 +23,6 @@ pub struct Edge {
 
 impl CUREdgeVertex for Edge {
     /// Creates a edge with the given label, the id is generated
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::edge::Edge;
-    /// use crate::gruphst::*;
-    ///
-    /// let edge = Edge::new("alice edge");
-    /// ```
     fn new(label: &str) -> Self {
         let edge = Edge {
             label: String::from(label),

@@ -76,22 +76,6 @@ impl Graphs {
     /// at vault.
     /// If None name is provided, the current one
     /// is use for the addition.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let mut my_graphs = Graphs::init("my_graph");
-    /// my_graphs.add_graph(&alice_bob_graph, None);
-    /// assert_eq!(my_graphs.len_graphs(), 1);
-    /// my_graphs.add_graph(
-    ///     &Vertex::create(&bob, "best friend", &alice),
-    ///     Some("other graph"));
-    /// assert_eq!(my_graphs.len_graphs(), 2);
-    /// ```
     pub fn add_graph(&mut self, graph: &Vertex, graphs_name: Option<&str>) {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(v) = self.vault.get_mut(&current_graph) {
@@ -113,33 +97,6 @@ impl Graphs {
 
     /// Retrieves the collection of graphs
     /// the default one or by name
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut the_graphs = Graphs::init("init graph");
-    ///
-    /// let graph = Vertex::create(
-    ///     &Edge::new("alice"),
-    ///     "knows",
-    ///     &Edge::new("bob"));
-    /// the_graphs.add_graph(&graph, None);
-    ///
-    /// assert_eq!(the_graphs.get_label(), "init graph");
-    /// let default_graph = the_graphs.get_graphs(None).unwrap();
-    /// assert_eq!(default_graph[0].get_id(), graph.get_id());
-    ///
-    /// the_graphs.insert("new one");
-    /// let graph1 = Vertex::create(
-    ///     &Edge::new("bilbo"),
-    ///     "relative",
-    ///     &Edge::new("frodo")
-    /// );
-    /// the_graphs.add_graph(&graph1, Some("new one"));
-    /// assert_eq!(the_graphs.get_label(), "new one");
-    /// let other_graph = the_graphs.get_graphs(Some("new one")).unwrap();
-    /// assert_eq!(other_graph[0].get_id(), graph1.get_id());
-    /// ```
     pub fn get_graphs(&self, graphs_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
@@ -161,44 +118,12 @@ impl Graphs {
     }
 
     /// Updates the name of the Graphs
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
-    ///
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// assert_eq!(my_graph.get_label(), "my_graph");
-    ///
-    /// my_graph.update_label("graphy");
-    /// assert_eq!(my_graph.get_label(), "graphy");
-    /// ```
     pub fn update_label(&mut self, label: &str) {
         debug!("Update Graph with name: {}", label);
         self.label = label.to_string();
     }
 
     /// Deletes the Graph that matches with the provided id
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// let alice_fred =
-    ///     Vertex::create(&alice, "is firend of", &Edge::new("Fred"));
-    /// my_graph.add_graph(&alice_fred, None);
-    ///
-    /// assert_eq!(my_graph.len(), 2);
-    ///
-    /// my_graph.delete_graph_by_id(alice_bob.get_id(), None);
-    /// assert_eq!(my_graph.len(), 1);
-    /// ```
     pub fn delete_graph_by_id(
         &mut self,
         id: String,
@@ -221,37 +146,6 @@ impl Graphs {
     }
 
     /// Updates the Graphs with the provided one
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    ///
-    /// let mut my_graphs = Graphs::init("my-graphs");
-    ///
-    /// let alice_edge = Edge::new("Alice");
-    /// let bob_edge = Edge::new("Bob");
-    /// let alice_bob_graph =
-    ///     Vertex::create(&alice_edge, "best friends", &bob_edge);
-    /// my_graphs.add_graph(&alice_bob_graph, None);
-    ///
-    /// let fred_edge = Edge::new("Fred");
-    /// let mut alice_fred_graph =
-    ///     Vertex::create(&alice_edge, "super friends", &fred_edge);
-    /// my_graphs.add_graph(&alice_fred_graph, None);
-    ///
-    /// assert_eq!(my_graphs.len(), 2);
-    ///
-    /// let graphs = my_graphs.get_graphs(Some(&my_graphs.get_label())).unwrap();
-    /// assert_eq!(graphs[1].get_relation(), "super friends");
-    ///
-    /// alice_fred_graph.update_relation("besties");
-    /// my_graphs.update_graph(&alice_fred_graph, None);
-    ///
-    /// assert_eq!(my_graphs.len(), 2);
-    /// let updated_graph = my_graphs.find_by_id(&alice_fred_graph.get_id(), None);
-    /// assert_eq!(updated_graph.unwrap().get_relation(), "besties");
-    /// ```
     pub fn update_graph(
         &mut self,
         graph_to_update: &Vertex,

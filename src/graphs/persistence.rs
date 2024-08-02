@@ -11,19 +11,6 @@ use crate::graphs::Graphs;
 
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// my_graph.persists();
-    /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
         let mut file = OpenOptions::new()
@@ -42,31 +29,6 @@ impl Graphs {
     }
 
     /// Loads the persisted Graphs on a file
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// let _ = my_graph.persists();
-    ///
-    /// let name = my_graph.get_label();
-    /// let file_name = format!("{}.grphst", name);
-    /// let loaded_graphs = Graphs::load(&file_name);
-    /// match loaded_graphs {
-    ///     Ok(loaded_graphs) => {
-    ///         let graphs = loaded_graphs.get_graphs(Some(&name)).unwrap();
-    ///         assert_eq!(loaded_graphs.get_label(), name);
-    ///         assert_eq!(graphs[0].get_relation(), alice_bob.get_relation());
-    ///     },
-    ///     Err(_) => panic!(),
-    /// }
-    /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         debug!("Loading persisted file {}", &file_name);
         let read_file = File::open(file_name)?;

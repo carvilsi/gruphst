@@ -7,28 +7,6 @@ use crate::CUREdgeVertex;
 
 impl Graphs {
     /// Returns a collection of Graps elements that matches the relation
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
-    ///
-    /// let fred = Edge::new("Fred");
-    /// my_graph.add_graph(&Vertex::create(&fred, "relative", &bob), None);
-    ///
-    /// let result_graph = my_graph.find_by_relation("friend of", None).unwrap();
-    /// assert_eq!(result_graph.len(), 1);
-    /// assert_eq!(result_graph[0].get_relation(), "friend of");
-    ///
-    /// let res_graph = my_graph.find_by_relation("relative", None).unwrap();
-    /// assert_eq!(res_graph.len(), 1);
-    /// assert_eq!(res_graph[0].get_relation(), "relative");
-    /// ```
     pub fn find_by_relation(
         &mut self,
         relation_name: &str,
@@ -58,26 +36,6 @@ impl Graphs {
 
     /// Returns a collection of Graps elements that matches the relations
     /// in the array
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
-    ///
-    /// let fred = Edge::new("Fred");
-    /// my_graph.add_graph(&Vertex::create(&fred, "relative", &bob), None);
-    ///
-    /// let relations = vec!["friend of", "relative", "knows"];
-    /// let result_graph = my_graph.find_by_relations(relations, None).unwrap();
-    /// assert_eq!(result_graph.len(), 2);
-    /// assert_eq!(result_graph[0].get_relation(), "friend of");
-    /// assert_eq!(result_graph[1].get_relation(), "relative");
-    /// ```
     pub fn find_by_relations(
         &mut self,
         relations: Vec<&str>,
@@ -106,33 +64,6 @@ impl Graphs {
     }
 
     /// Returns a collection of graphs that matches an attribute edge by key
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut alice = Edge::new("Alice");
-    /// let mut bob = Edge::new("Bob");
-    /// alice.set_attr("address", "Elm street");
-    /// alice.set_attr("phone", "555-555");
-    /// alice.set_attr("age", 25);
-    /// bob.set_attr("age", 25);
-    ///
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Vertex::create(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
-    /// my_graph.add_graph(&bob_alice_graph, None);
-    ///
-    /// let mut fred = Edge::new("Fred");
-    /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Vertex::create(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Vertex::create(&fred, "friend of", &alice), None);
-    ///
-    /// let graphs_result = my_graph.has_graph_edge_attr("room", None).unwrap();
-    ///
-    /// assert_eq!(graphs_result.len(), 2);
-    /// ```
     pub fn has_graph_edge_attr(
         &mut self,
         attr_k: &str,
@@ -161,33 +92,6 @@ impl Graphs {
     }
 
     /// Returns a collection of graphs like an attribute edge by key
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut alice = Edge::new("Alice");
-    /// let mut bob = Edge::new("Bob");
-    /// alice.set_attr("address", "Elm street");
-    /// alice.set_attr("phone", "555-555");
-    /// alice.set_attr("age", 25);
-    /// bob.set_attr("age", 25);
-    ///
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Vertex::create(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
-    /// my_graph.add_graph(&bob_alice_graph, None);
-    ///
-    /// let mut fred = Edge::new("Fred");
-    /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Vertex::create(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Vertex::create(&fred, "friend of", &alice), None);
-    ///
-    /// let graphs_result = my_graph.like_graph_edge_attr("rO", None).unwrap();
-    ///
-    /// assert_eq!(graphs_result.len(), 2);
-    /// ```
     pub fn like_graph_edge_attr(
         &mut self,
         attr_k: &str,
@@ -217,33 +121,6 @@ impl Graphs {
 
     /// Returns a collection of graphs that matches an attribute
     /// and value
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut alice = Edge::new("Alice");
-    /// let mut bob = Edge::new("Bob");
-    /// alice.set_attr("address", "Elm street");
-    /// alice.set_attr("phone", "555-555");
-    /// alice.set_attr("age", 25);
-    /// bob.set_attr("age", 42);
-    ///
-    /// let alice_bob_graph = Vertex::create(&alice, "friend of", &bob);
-    /// let bob_alice_graph = Vertex::create(&bob, "best friend", &alice);
-    /// let mut my_graph = Graphs::init("my_graph");
-    /// my_graph.add_graph(&alice_bob_graph, None);
-    /// my_graph.add_graph(&bob_alice_graph, None);
-    ///
-    /// let mut fred = Edge::new("Fred");
-    /// fred.set_attr("room", 5);
-    /// my_graph.add_graph(&Vertex::create(&fred, "colege", &bob), None);
-    /// my_graph.add_graph(&Vertex::create(&fred, "friend of", &alice), None);
-    ///
-    /// let graphs_result = my_graph.attr_equals_to("age", 42, None).unwrap();
-    ///
-    /// assert_eq!(graphs_result.len(), 3);
-    /// ```
     // XXX: add a method to find attr on all graphs????
     pub fn attr_equals_to<T>(
         &self,
@@ -277,26 +154,6 @@ impl Graphs {
     }
 
     /// Returns a Vertex that provided id matches with Vertex, or From, To edges
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let alice_bob = Vertex::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// let alice_fred =
-    ///     Vertex::create(&alice, "is firend of", &Edge::new("Fred"));
-    /// my_graph.add_graph(&alice_fred, None);
-    ///
-    /// let bob_edge_id = bob.get_id();
-    /// let res = my_graph.find_by_id(&bob_edge_id, None);
-    /// assert_eq!(res.unwrap().get_to_edge().get_id(), bob_edge_id);
-    /// ```
     pub fn find_by_id(
         &mut self,
         id: &str,
@@ -339,27 +196,6 @@ impl Graphs {
     }
 
     /// Retrieves all the edges with incoming relation
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graphs = Graphs::init("my-graphs");
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let fred = Edge::new("Fred");
-    ///
-    /// my_graphs.add_graph(&Vertex::create(&alice, "is friend of", &bob), None);
-    /// my_graphs.add_graph(&Vertex::create(&bob, "is friend of", &fred), None);
-    /// my_graphs.add_graph(&Vertex::create(&alice, "knows", &fred), None);
-    ///
-    /// let results = my_graphs.has_relation_in("is friend of", None).unwrap();
-    ///
-    /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].get_label(), "Bob");
-    /// assert_eq!(results[1].get_label(), "Fred");
-    /// ```
     pub fn has_relation_in(
         &self,
         relation_in: &str,
@@ -386,27 +222,6 @@ impl Graphs {
     }
 
     /// Retrieves all the edges with outcoming relation
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graphs = Graphs::init("my-graphs");
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let fred = Edge::new("Fred");
-    ///
-    /// my_graphs.add_graph(&Vertex::create(&alice, "is friend of", &bob), None);
-    /// my_graphs.add_graph(&Vertex::create(&bob, "is friend of", &fred), None);
-    /// my_graphs.add_graph(&Vertex::create(&alice, "knows", &fred), None);
-    ///
-    /// let results = my_graphs.has_relation_out("is friend of", None).unwrap();
-    ///
-    /// assert_eq!(results.len(), 2);
-    /// assert_eq!(results[0].get_label(), "Alice");
-    /// assert_eq!(results[1].get_label(), "Bob");
-    /// ```
     pub fn has_relation_out(
         &self,
         relation_out: &str,

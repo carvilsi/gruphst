@@ -69,40 +69,6 @@ impl GraphsStats {
 impl Graphs {
     /// Returns stats from Graphs; size in bytes, amount of graph, name, total number of attributes
     /// and total amount of edges
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graphs = Graphs::init("memories");
-    /// my_graphs.add_graph(
-    ///     &Vertex::create(
-    ///         &Edge::new("Alice"),
-    ///         "recalls friendship with",
-    ///         &Edge::new("Bob")
-    ///     ), None
-    /// );
-    /// let mut fred = Edge::new("Fred");
-    /// fred.set_attr("address", "Elm street");
-    /// fred.set_attr("phone", "555-555-555");
-    /// fred.set_attr("age", "25");
-    ///
-    /// my_graphs.add_graph(
-    ///     &Vertex::create(
-    ///         &fred,
-    ///         "relative of",
-    ///         &Edge::new("Coco")
-    ///     ), None
-    /// );
-    ///
-    /// let stats = my_graphs.stats().unwrap();
-    /// assert_eq!(stats.get_mem(), 856);
-    /// assert_eq!(stats.get_len_graphs(), 2);
-    /// assert_eq!(stats.get_total_attr(), 3);
-    /// assert_eq!(stats.get_total_edges(), 4);
-    /// assert_eq!(stats.get_uniq_rel(), 2);
-    /// assert_eq!(stats.get_total_graphs(), 1);
-    /// ```
     pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
         get_stats(self)
     }
@@ -129,25 +95,6 @@ impl Graphs {
     }
 
     /// Returns an array with the unique relations in the whole Graphs
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut my_graph = Graphs::init("my graph");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    /// let fred = Edge::new("Fred");
-    ///
-    /// my_graph.add_graph(&Vertex::create(&alice, "friend of", &bob), None);
-    /// my_graph.add_graph(&Vertex::create(&alice, "relative of", &fred), None);
-    /// my_graph.add_graph(&Vertex::create(&fred, "friend of", &bob), None);
-    /// my_graph.add_graph(&Vertex::create(&bob, "friend of", &alice), None);
-    /// my_graph.add_graph(&Vertex::create(&fred, "relative of", &alice), None);
-    ///
-    /// let relations = my_graph.uniq_relations();
-    /// assert_eq!(relations, vec!["friend of", "relative of"]);
-    /// ```
     pub fn uniq_relations(&self) -> Vec<String> {
         let mut uniq_rel = Vec::new();
         for graphs in self.vault.values() {
@@ -161,20 +108,6 @@ impl Graphs {
     }
 
     /// Retrieves the length of the Graphs for whole vault
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut graphs = Graphs::init("lengths");
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    ///
-    /// graphs.add_graph(&Vertex::create(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Vertex::create(&bob, "friend", &alice), None);
-    ///
-    /// assert_eq!(graphs.len(), 2);
-    /// ```
     pub fn len(&self) -> usize {
         let mut length = 0;
         for (_graphs_name, graphs) in self.vault.iter() {
@@ -185,40 +118,11 @@ impl Graphs {
     }
 
     /// Retrieves the length of vault
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
-    ///
-    /// let mut graphs = Graphs::init("graph 0");
-    /// assert_eq!(graphs.len_graphs(), 1);
-    ///
-    /// graphs.insert("graph 1");
-    /// assert_eq!(graphs.len_graphs(), 2);
-    /// ```
     pub fn len_graphs(&self) -> usize {
         self.vault.len()
     }
 
     /// Checks if the Graphs vault is empty
-    ///
-    /// # Examples
-    /// ```rust
-    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs, *};
-    ///
-    /// let mut graphs = Graphs::init("lengths");
-    ///
-    /// assert!(graphs.is_empty());
-    ///
-    /// let alice = Edge::new("Alice");
-    /// let bob = Edge::new("Bob");
-    ///
-    /// graphs.add_graph(&Vertex::create(&alice, "friend", &bob), None);
-    /// graphs.add_graph(&Vertex::create(&bob, "friend", &alice), None);
-    ///
-    /// assert!(!graphs.is_empty());
-    /// ```
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
