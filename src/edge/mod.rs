@@ -136,52 +136,13 @@ impl Edge {
         }
     }
 
-    /// Returns an Array containing all attribute keys
-    fn get_attr_keys(&self) -> Vec<&str> {
-        let mut key_vec = Vec::new();
-        let binding = self.edge.borrow();
-        for key in binding.attr.keys() {
-            key_vec.push(key.as_str());
-        }
-        debug!(
-            "requested array of attributes for {} edge {:#?}",
-            self.get_id(), key_vec
-        );
-        key_vec
-    }
-    // 
-    // fn set_attr<T>(&mut self, key: &str, val: T)
-    // where
-    //     T: std::fmt::Display,
-    // {
-    //     self.edge.borrow_mut().attr.set_attr(key, val);
-    // }
-
-    // // fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
-    // //     self.edge.borrow().attr.get_attr(key).clone()
-    // // }
-
-    // fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
-    // where
-    //     T: std::fmt::Display,
-    // {
-    //     self.edge.borrow_mut().attr.update_attr(attr_k, attr_v)
-    // }
-
-    // fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
-    // where
-    //     T: std::fmt::Display,
-    // {
-    //     self.edge.borrow_mut().attr.upsert_attr(attr_k, attr_v)
-    // }
-
-    // fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
-    //     self.edge.borrow_mut().attr.del_attr(v)
-    // }
-
-    // fn get_attr_keys(&self) -> Vec<&str> {
-    //     // self.edge.borrow_mut().attr.get_attr_keys()
-    //     vec!["foo", "bar"]
+    // FIXME: Fix this!
+    // /// Returns an Array containing all attribute keys
+    // fn get_attr_keys<'a>(&self) -> &'a Vec<&str> {
+    //     let binding = self.edge.borrow();
+    //     let keys = binding.attr.keys(); 
+    //     let kv: Vec<&str> = keys.map(|key| key.as_str()).collect();
+    //     &kv.clone()
     // }
 }
 
@@ -196,50 +157,52 @@ impl Edge_ {
         debug!("The created edge: {:#?}", &edge);
         Rc::new(RefCell::new(edge))
     }
+}
 
-    // Retrieves the edges that has relation out for the given edge on graph
-    // pub fn get_relations_out_on_graph(
-        // &self,
-        // graph: Vec<Vertex>,
-    // ) -> Result<HashMap<String, Vec<Rc<RefCell<Edge_>>>>, &'static str> {
-        // let mut relations_out: HashMap<String, Vec<Rc<RefCell<Edge_>>>> = HashMap::new();
-        // for vertex in graph {
-            // if vertex.get_from_edge().borrow().get_id() == self.id {
-                // if let Some(edges_out) = relations_out.get_mut(&vertex.get_relation()) {
-                    // edges_out.push(vertex.get_to_edge());
-                // } else {
-                    // let edges_out = vec![vertex.get_to_edge()];
-                    // relations_out.insert(vertex.get_relation(), edges_out);
-                // }
-            // }
-        // }
-        // if !relations_out.is_empty() {
-            // Ok(relations_out)
-        // } else {
-            // Err("no relations out for edge")
-        // }
-    // }
-// 
-    // Retrieves the edges that has relation in for the given edge on graph
-    // pub fn get_relations_in_on_graph(
-        // &self,
-        // graphs: Vec<Vertex>,
-    // ) -> Result<HashMap<String, Vec<Rc<RefCell<Edge_>>>>, &'static str> {
-        // let mut relations_in: HashMap<String, Vec<Rc<RefCell<Edge_>>>> = HashMap::new();
-        // for graph in graphs {
-            // if graph.get_to_edge().borrow().get_id() == self.id {
-                // if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
-                    // edges_in.push(graph.get_from_edge());
-                // } else {
-                    // let edges_in = vec![graph.get_from_edge()];
-                    // relations_in.insert(graph.get_relation(), edges_in);
-                // }
-            // }
-        // }
-        // if !relations_in.is_empty() {
-            // Ok(relations_in)
-        // } else {
-            // Err("no relations in for edge")
-        // }
-    // }
+impl Edge {
+    /// Retrieves the edges that has relation out for the given edge on graph
+    pub fn get_relations_out_on_graph(
+        &self,
+        graph: Vec<Vertex>,
+    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
+        let mut relations_out: HashMap<String, Vec<Edge>> = HashMap::new();
+        for vertex in graph {
+            if vertex.get_from_edge().get_id() == self.get_id() {
+                if let Some(edges_out) = relations_out.get_mut(&vertex.get_relation()) {
+                    edges_out.push(vertex.get_to_edge());
+                } else {
+                    let edges_out = vec![vertex.get_to_edge()];
+                    relations_out.insert(vertex.get_relation(), edges_out);
+                }
+            }
+        }
+        if !relations_out.is_empty() {
+            Ok(relations_out)
+        } else {
+            Err("no relations out for edge")
+        }
+    }
+
+    /// Retrieves the edges that has relation in for the given edge on graph
+    pub fn get_relations_in_on_graph(
+        &self,
+        graphs: Vec<Vertex>,
+    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
+        let mut relations_in: HashMap<String, Vec<Edge>> = HashMap::new();
+        for graph in graphs {
+            if graph.get_to_edge().get_id() == self.get_id() {
+                if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
+                    edges_in.push(graph.get_from_edge());
+                } else {
+                    let edges_in = vec![graph.get_from_edge()];
+                    relations_in.insert(graph.get_relation(), edges_in);
+                }
+            }
+        }
+        if !relations_in.is_empty() {
+            Ok(relations_in)
+        } else {
+            Err("no relations in for edge")
+        }
+    }
 }

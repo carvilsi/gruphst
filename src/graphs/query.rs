@@ -1,11 +1,8 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-
 use log::{debug, error};
 
 use crate::vertex::Vertex;
 use crate::graphs::Graphs;
-use crate::edge::Edge_;
+use crate::edge::Edge;
 use crate::CUREdgeVertex;
 
 impl Graphs {
@@ -203,15 +200,15 @@ impl Graphs {
         &self,
         relation_in: &str,
         graphs_name: Option<&str>,
-    ) -> Result<Vec<Rc<RefCell<Edge_>>>, &'static str> {
-        let mut relations_in: Vec<Rc<RefCell<Edge_>>> = Vec::new();
+    ) -> Result<Vec<Edge>, &'static str> {
+        let mut relations_in: Vec<Edge> = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_in
-                    && !relations_in.contains(&graph.get_to_edge().edge)
+                    && !relations_in.contains(&graph.get_to_edge())
                 {
-                    relations_in.push(graph.get_to_edge().clone().edge);
+                    relations_in.push(graph.get_to_edge().clone());
                 }
             }
         } else {
@@ -229,15 +226,15 @@ impl Graphs {
         &self,
         relation_out: &str,
         graphs_name: Option<&str>,
-    ) -> Result<Vec<Rc<RefCell<Edge_>>>, &'static str> {
-        let mut relations_out: Vec<Rc<RefCell<Edge_>>> = Vec::new();
+    ) -> Result<Vec<Edge>, &'static str> {
+        let mut relations_out: Vec<Edge> = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_out
-                    && !relations_out.contains(&graph.get_from_edge().edge)
+                    && !relations_out.contains(&graph.get_from_edge())
                 {
-                    relations_out.push(graph.get_from_edge().clone().edge);
+                    relations_out.push(graph.get_from_edge().clone());
                 }
             }
         } else {

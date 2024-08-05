@@ -1,10 +1,10 @@
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 // use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
-use crate::{vertex::Vertex, edge::Edge_, CUREdgeVertex};
+use crate::{edge::Edge, vertex::Vertex, CUREdgeVertex};
 
 mod persistence;
 mod query;
@@ -107,14 +107,14 @@ impl Graphs {
         }
     }
 
-    pub fn get_uniq_edges(&self, graphs_name: Option<&str>) -> Result<Vec<Rc<RefCell<Edge_>>>, &'static str> {
+    pub fn get_uniq_edges(&self, graphs_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
         let vertices = self.get_graphs(graphs_name).unwrap();
-        let mut edges_map: HashMap<String, Rc<RefCell<Edge_>>> = HashMap::new();
+        let mut edges_map: HashMap<String, Edge> = HashMap::new();
         for vertex in vertices {
-            edges_map.insert(vertex.get_from_edge().get_id(), vertex.get_from_edge().edge);
-            edges_map.insert(vertex.get_to_edge().get_id(), vertex.get_to_edge().edge);
+            edges_map.insert(vertex.get_from_edge().get_id(), vertex.get_from_edge());
+            edges_map.insert(vertex.get_to_edge().get_id(), vertex.get_to_edge());
         }
-        let uniq_edges: Vec<Rc<RefCell<Edge_>>> = edges_map.into_values().collect();
+        let uniq_edges: Vec<Edge> = edges_map.into_values().collect();
         Ok(uniq_edges)
     }
 

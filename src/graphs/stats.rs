@@ -3,8 +3,6 @@ use log::{debug, error};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-use crate::QueryAttribute;
-
 /// Represents stats data from the Graphs
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GraphsStats {
