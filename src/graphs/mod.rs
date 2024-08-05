@@ -1,9 +1,10 @@
 use log::{debug, error};
 use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
-use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
+// use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
+use crate::{vertex::Vertex, edge::Edge, CUREdgeVertex};
 
 mod persistence;
 mod query;
@@ -92,7 +93,7 @@ impl Graphs {
             v.push(graph.clone());
             debug!("no graph element at vault, created one and added graph");
         }
-        graphs_memory_watcher(self);
+        // graphs_memory_watcher(self);
     }
 
     /// Retrieves the collection of graphs
@@ -106,14 +107,14 @@ impl Graphs {
         }
     }
 
-    pub fn get_uniq_edges(&self, graphs_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
+    pub fn get_uniq_edges(&self, graphs_name: Option<&str>) -> Result<Vec<Rc<RefCell<Edge>>>, &'static str> {
         let graphs = self.get_graphs(graphs_name).unwrap();
-        let mut edges_map: HashMap<String, Edge> = HashMap::new();
+        let mut edges_map: HashMap<String, Rc<RefCell<Edge>>> = HashMap::new();
         for graph in graphs {
-            edges_map.insert(graph.get_from_edge().get_id(), graph.get_from_edge());
-            edges_map.insert(graph.get_to_edge().get_id(), graph.get_to_edge());
+            edges_map.insert(graph.get_from_edge().borrow().get_id(), graph.get_from_edge());
+            edges_map.insert(graph.get_to_edge().borrow().get_id(), graph.get_to_edge());
         }
-        let uniq_edges: Vec<Edge> = edges_map.into_values().collect();
+        let uniq_edges: Vec<Rc<RefCell<Edge>>> = edges_map.into_values().collect();
         Ok(uniq_edges)
     }
 
@@ -162,7 +163,7 @@ impl Graphs {
                 graphs.remove(i);
                 debug!("Graph to update found it at index: {i}");
                 graphs.push(graph_to_update.clone());
-                graphs_memory_watcher(self);
+                // graphs_memory_watcher(self);
                 Ok(())
             } else {
                 error!(

@@ -14,7 +14,6 @@ pub mod edge;
 mod util;
 
 pub trait CUREdgeVertex {
-    fn new(label: &str) -> Self;
     fn get_id(&self) -> String;
     fn get_label(&self) -> String;
     fn set_label(&mut self, label: &str);

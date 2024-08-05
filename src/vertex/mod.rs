@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -14,24 +16,14 @@ pub struct Vertex {
     /// A label for the relation
     relation: String,
     /// Origin edge
-    from: Edge,
+    from: Rc<RefCell<Edge>>,
     /// Target edge
-    to: Edge,
+    to: Rc<RefCell<Edge>>,
     /// Attributes for the Graph
     attr: Attributes,
 }
 
 impl CUREdgeVertex for Vertex {
-    fn new(label: &str) -> Self {
-        Vertex {
-            id: Uuid::new_v4().to_string(),
-            relation: label.to_string(),
-            from: Edge::new(""),
-            to: Edge::new(""),
-            attr: Attributes::new(),
-        }
-    }
-
     fn get_id(&self) -> String {
         self.id.clone()
     }
@@ -54,21 +46,33 @@ impl CUREdgeVertex for Vertex {
 }
 
 impl Vertex {
+    /// Creates a new instance
+    fn new(label: &str) -> Self {
+        Vertex {
+            id: Uuid::new_v4().to_string(),
+            relation: label.to_string(),
+            from: Edge::new(""),
+            to: Edge::new(""),
+            attr: Attributes::new(),
+        }
+    }
+
     /// Adds "From" and "To" edge
     /// to a previous created Graph
-    pub fn add_relation(&mut self, from: &Edge, relation: &str, to: &Edge) {
+    pub fn add_relation(&mut self, from: &Rc<RefCell<Edge>>, relation: &str, to: &Rc<RefCell<Edge>>) {
+        self.from = Rc::clone(from);
         self.relation = String::from(relation);
-        self.from = from.clone();
-        self.to = to.clone();
+        self.to = Rc::clone(to);
         debug!("Added relation to Graph: {:#?}", self);
     }
+
     /// Creates a Graph,
     /// providing "From" and "To" edges and the "relation"
     /// the id is generated
-    pub fn create(from: &Edge, relation: &str, to: &Edge) -> Self {
+    pub fn create(from: &Rc<RefCell<Edge>>, relation: &str, to: &Rc<RefCell<Edge>>) -> Self {
         let mut g = Vertex::new(relation);
-        g.from = from.clone();
-        g.to = to.clone();
+        g.from = Rc::clone(from);
+        g.to = Rc::clone(to);
         g
     }
 
@@ -79,22 +83,22 @@ impl Vertex {
     }
 
     /// Updates the "from" edge in Graph
-    pub fn update_from(&mut self, from_edge: &Edge) {
+    pub fn update_from(&mut self, from_edge: &Rc<RefCell<Edge>>) {
         debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge);
-        self.from = from_edge.clone();
+        self.from = Rc::clone(from_edge);
     }
 
     /// Updates the "to" edge in Graph
-    pub fn update_to(&mut self, to_edge: &Edge) {
+    pub fn update_to(&mut self, to_edge: &Rc<RefCell<Edge>>) {
         debug!("Updated Graph [{}] to edge: {:#?}", self.id, to_edge);
-        self.to = to_edge.clone();
+        self.to = Rc::clone(to_edge);
     }
 
-    pub fn get_from_edge(&self) -> Edge {
+    pub fn get_from_edge(&self) -> Rc<RefCell<Edge>> {
         self.from.clone()
     }
 
-    pub fn get_to_edge(&self) -> Edge {
+    pub fn get_to_edge(&self) -> Rc<RefCell<Edge>> {
         self.to.clone()
     }
 

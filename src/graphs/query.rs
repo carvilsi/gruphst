@@ -1,3 +1,6 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use log::{debug, error};
 
 use crate::vertex::Vertex;
@@ -163,8 +166,8 @@ impl Graphs {
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs.iter_mut().find(|graph| {
                 graph.get_id() == id
-                    || graph.get_from_edge().get_id() == id
-                    || graph.get_to_edge().get_id() == id
+                    || graph.get_from_edge().borrow().get_id() == id
+                    || graph.get_to_edge().borrow().get_id() == id
             });
             if graph.is_some() {
                 debug!("Founded Vertex by id: {:#?}", graph);
@@ -184,8 +187,8 @@ impl Graphs {
             println!("Tha name: {}", _graph_name);
             let graph = graphs.iter_mut().find(|graph| {
                 graph.get_id() == id
-                    || graph.get_from_edge().get_id() == id
-                    || graph.get_to_edge().get_id() == id
+                    || graph.get_from_edge().borrow().get_id() == id
+                    || graph.get_to_edge().borrow().get_id() == id
             });
             if graph.is_some() {
                 debug!("Founded Vertex by id: {:#?}", graph);
@@ -200,8 +203,8 @@ impl Graphs {
         &self,
         relation_in: &str,
         graphs_name: Option<&str>,
-    ) -> Result<Vec<Edge>, &'static str> {
-        let mut relations_in: Vec<Edge> = Vec::new();
+    ) -> Result<Vec<Rc<RefCell<Edge>>>, &'static str> {
+        let mut relations_in: Vec<Rc<RefCell<Edge>>> = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
@@ -226,8 +229,8 @@ impl Graphs {
         &self,
         relation_out: &str,
         graphs_name: Option<&str>,
-    ) -> Result<Vec<Edge>, &'static str> {
-        let mut relations_out: Vec<Edge> = Vec::new();
+    ) -> Result<Vec<Rc<RefCell<Edge>>>, &'static str> {
+        let mut relations_out: Vec<Rc<RefCell<Edge>>> = Vec::new();
         let current_graph = self.select_graphs_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {

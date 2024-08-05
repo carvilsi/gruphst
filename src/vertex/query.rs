@@ -4,12 +4,12 @@ use crate::QueryAttribute;
 impl Vertex {
     /// Checks if "from" or "to" edge has an attribute
     pub fn has_edge_attr(&self, attr_k: &str) -> bool {
-        self.from.has_attr(attr_k) || self.to.has_attr(attr_k)
+        self.from.borrow().has_attr(attr_k) || self.to.borrow().has_attr(attr_k)
     }
 
     /// Checks if "from" or "to" edge has a like attribute
     pub fn like_edge_attr(&self, attr_k: &str) -> bool {
-        self.from.like_attr(attr_k) || self.to.like_attr(attr_k)
+        self.from.borrow().like_attr(attr_k) || self.to.borrow().like_attr(attr_k)
     }
 
     /// Checks if "from" or "to" edge has an attribute and equal for value
@@ -17,7 +17,7 @@ impl Vertex {
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        self.from.equals_attr(attr_k, attr_v.clone()) || self.to.equals_attr(attr_k, attr_v.clone())
+        self.from.borrow().equals_attr(attr_k, attr_v.clone()) || self.to.borrow().equals_attr(attr_k, attr_v.clone())
     }
 }
 

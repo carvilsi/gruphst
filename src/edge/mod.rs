@@ -6,9 +6,23 @@ use crate::attributes::Attributes;
 use crate::vertex::Vertex;
 use crate::CUREdgeVertex;
 use crate::RUDAttribute;
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 mod query;
+
+struct Node {
+    edge: Rc<RefCell<Edge>>,
+}
+
+impl Node {
+    pub fn new(label: &str) -> Self {
+        Node {
+            edge: Edge::new(label),
+        }
+    }
+}
 
 /// Representation of a edge
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -22,17 +36,6 @@ pub struct Edge {
 }
 
 impl CUREdgeVertex for Edge {
-    /// Creates a edge with the given label, the id is generated
-    fn new(label: &str) -> Self {
-        let edge = Edge {
-            label: String::from(label),
-            id: Uuid::new_v4().to_string(),
-            attr: Attributes::new(),
-        };
-        debug!("The created edge: {:#?}", &edge);
-        edge
-    }
-
     fn get_id(&self) -> String {
         self.id.clone()
     }
@@ -90,19 +93,30 @@ impl RUDAttribute for Edge {
 }
 
 impl Edge {
+    /// Creates a edge with the given label, the id is generated
+    pub fn new(label: &str) -> Rc<RefCell<Edge>> {
+        let edge = Edge {
+            label: String::from(label),
+            id: Uuid::new_v4().to_string(),
+            attr: Attributes::new(),
+        };
+        debug!("The created edge: {:#?}", &edge);
+        Rc::new(RefCell::new(edge))
+    }
+
     /// Retrieves the edges that has relation out for the given edge on graph
     pub fn get_relations_out_on_graph(
         &self,
-        graphs: Vec<Vertex>,
-    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
-        let mut relations_out: HashMap<String, Vec<Edge>> = HashMap::new();
-        for graph in graphs {
-            if graph.get_from_edge().get_id() == self.id {
-                if let Some(edges_out) = relations_out.get_mut(&graph.get_relation()) {
-                    edges_out.push(graph.get_to_edge());
+        graph: Vec<Vertex>,
+    ) -> Result<HashMap<String, Vec<Rc<RefCell<Edge>>>>, &'static str> {
+        let mut relations_out: HashMap<String, Vec<Rc<RefCell<Edge>>>> = HashMap::new();
+        for vertex in graph {
+            if vertex.get_from_edge().borrow().get_id() == self.id {
+                if let Some(edges_out) = relations_out.get_mut(&vertex.get_relation()) {
+                    edges_out.push(vertex.get_to_edge());
                 } else {
-                    let edges_out = vec![graph.get_to_edge()];
-                    relations_out.insert(graph.get_relation(), edges_out);
+                    let edges_out = vec![vertex.get_to_edge()];
+                    relations_out.insert(vertex.get_relation(), edges_out);
                 }
             }
         }
@@ -117,10 +131,10 @@ impl Edge {
     pub fn get_relations_in_on_graph(
         &self,
         graphs: Vec<Vertex>,
-    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
-        let mut relations_in: HashMap<String, Vec<Edge>> = HashMap::new();
+    ) -> Result<HashMap<String, Vec<Rc<RefCell<Edge>>>>, &'static str> {
+        let mut relations_in: HashMap<String, Vec<Rc<RefCell<Edge>>>> = HashMap::new();
         for graph in graphs {
-            if graph.get_to_edge().get_id() == self.id {
+            if graph.get_to_edge().borrow().get_id() == self.id {
                 if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
                     edges_in.push(graph.get_from_edge());
                 } else {

@@ -1,4 +1,6 @@
+use std::cell::RefCell;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use attributes::Attributes;
 use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
@@ -9,11 +11,11 @@ use gruphst::*;
 #[path = "./graphs_test.rs"]
 mod graphs_test;
 
-fn prepare_edge_test() -> (Edge, String) {
+fn prepare_edge_test() -> (Rc<RefCell<Edge>>, String) {
     let mut edge = Edge::new("alice");
     edge.set_attr("name", "Alice");
     edge.set_attr("age", 42);
-    (edge.clone(), edge.get_id())
+    (edge.clone(), edge.borrow().get_id())
 }
 
 #[test]
