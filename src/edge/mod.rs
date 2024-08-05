@@ -1,4 +1,5 @@
 use log::debug;
+use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -33,68 +34,163 @@ pub struct Edge_ {
     /// And a name
     label: String,
     /// The attributes for a edge
-    attr: Attributes,
+    attr: HashMap<String, String>,
 }
 
-impl CUREdgeVertex for Edge {
-    fn get_id(&self) -> String {
+impl Edge {
+    pub fn get_id(&self) -> String {
         self.edge.borrow().id.clone()
     }
 
-    fn get_label(&self) -> String {
+    pub fn get_label(&self) -> String {
         self.edge.borrow().label.clone()
     }
 
-    fn set_label(&mut self, label: &str) {
+    pub fn set_label(&mut self, label: &str) {
         self.edge.borrow_mut().label = label.to_string();
     }
 
-    fn get_attributes(&self) -> Attributes {
-        self.edge.borrow().attr.clone()
-    }
-
-    fn set_attributes(&mut self, attributes: Attributes) {
-        self.edge.borrow_mut().attr = attributes;
-    }
-}
-
-impl RUDAttribute for Edge {
-    fn set_attr<T>(&mut self, key: &str, val: T)
-    where
-        T: std::fmt::Display,
-    {
-        self.edge.borrow_mut().attr.set_attr(key, val);
-    }
-
-    // fn get_attr(&self, _key: &str) -> Result<String, &'static str> {
-    //     // self.edge.borrow_mut().attr.get_attr(key).clone()
-    //     let stri = "lol".to_string();
-    //     let lol = stri.clone();
-    //     Ok(lol)
+    // fn get_attributes(&self) -> Attributes {
+    //     self.edge.borrow().attr.clone()
     // }
 
-    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    // fn set_attributes(&mut self, attributes: Attributes) {
+    //     self.edge.borrow_mut().attr = attributes;
+    // }
+}
+
+impl Edge {
+    /// Set attributes for a edge
+    pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.edge.borrow_mut().attr.update_attr(attr_k, attr_v)
+        self.edge.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+        debug!(
+            "added attribute key: {} with value {} for edge {}",
+            attr_k, attr_v, self.get_id()
+        );
+    }
+    
+    /// Get attribute for a edge
+    pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
+        let binding = self.edge.borrow();
+        let res = binding.attr.get(attr_k);
+        match res {
+            Some(resp) => {
+                debug!(
+                    "retrieved attribute value '{}' for '{}' for edge [{}]",
+                    resp, attr_k, self.get_id()
+                );
+                Ok(resp.clone())
+            }
+            None => {
+                warn!("attribute '{}' not found", attr_k);
+                Err("attribute not found")
+            }
+        }
     }
 
-    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    /// Updates the value of an attribute
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
-        self.edge.borrow_mut().attr.upsert_attr(attr_k, attr_v)
+        debug!(
+            "updated attribute key: {} with value {} for edge {}",
+            attr_k, attr_v, self.get_id()
+        );
+        if let Some(attr) = self.edge.borrow_mut().attr.get_mut(attr_k) {
+            *attr = attr_v.to_string();
+            return Ok(());
+        }
+        Err("not attribute found to update")
     }
 
-    fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
-        self.edge.borrow_mut().attr.del_attr(v)
+    /// Updates the value of an attribute or creates a new one if attribute key does not exists
+    pub fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    where
+        T: std::fmt::Display,
+    {
+        match self.edge.borrow_mut().attr.get_mut(attr_k) {
+            Some(attr) => {
+                *attr = attr_v.to_string();
+                debug!(
+                    "updated (upsert) attribute key: {} with value {} for edge {}",
+                    attr_k, attr_v, self.get_id()
+                );
+            }
+            None => {
+                self.edge.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+                debug!(
+                    "added (upsert) attribute key: {} with value {} for edge {}",
+                    attr_k, attr_v, self.get_id()
+                );
+            }
+        }
     }
 
-    fn get_attr_keys(&self) -> Vec<&str> {
-        // self.edge.borrow_mut().attr.get_attr_keys()
-        vec!["foo", "bar"]
+    /// Deletes an attribute
+    pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
+        let res = self.edge.borrow_mut().attr.remove(v);
+        match res {
+            Some(_) => {
+                debug!("Removed '{}' attribute for {}", v, self.get_id());
+                Ok(())
+            }
+            None => {
+                warn!("attribute {} not found for remove", v);
+                Err("attribute not found for remove")
+            }
+        }
     }
+
+    // /// Returns an Array containing all attribute keys
+    // fn get_attr_keys(&self) -> Vec<&str> {
+    //     let mut key_vec = Vec::new();
+    //     for key in self.edge.borrow().attr.keys() {
+    //         key_vec.push(key.as_str());
+    //     }
+    //     debug!(
+    //         "requested array of attributes for {} edge {:#?}",
+    //         self.get_id(), key_vec
+    //     );
+    //     key_vec
+    // }
+    
+    // fn set_attr<T>(&mut self, key: &str, val: T)
+    // where
+    //     T: std::fmt::Display,
+    // {
+    //     self.edge.borrow_mut().attr.set_attr(key, val);
+    // }
+
+    // // fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
+    // //     self.edge.borrow().attr.get_attr(key).clone()
+    // // }
+
+    // fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    // where
+    //     T: std::fmt::Display,
+    // {
+    //     self.edge.borrow_mut().attr.update_attr(attr_k, attr_v)
+    // }
+
+    // fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    // where
+    //     T: std::fmt::Display,
+    // {
+    //     self.edge.borrow_mut().attr.upsert_attr(attr_k, attr_v)
+    // }
+
+    // fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
+    //     self.edge.borrow_mut().attr.del_attr(v)
+    // }
+
+    // fn get_attr_keys(&self) -> Vec<&str> {
+    //     // self.edge.borrow_mut().attr.get_attr_keys()
+    //     vec!["foo", "bar"]
+    // }
 }
 
 impl Edge_ {
@@ -103,7 +199,7 @@ impl Edge_ {
         let edge = Edge_ {
             label: String::from(label),
             id: Uuid::new_v4().to_string(),
-            attr: Attributes::new(),
+            attr: HashMap::new(),
         };
         debug!("The created edge: {:#?}", &edge);
         Rc::new(RefCell::new(edge))

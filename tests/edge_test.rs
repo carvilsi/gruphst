@@ -9,58 +9,48 @@ use gruphst::*;
 // #[path = "./graphs_test.rs"]
 // mod graphs_test;
 
-
-#[test]
-fn do_something_in_the_name_of_the_earth() {
-    let mut edge = Edge::new("WTH");
+fn prepare_edge_test() -> (Edge, String) {
+    let mut edge = Edge::new("alice");
     edge.set_attr("name", "Alice");
     edge.set_attr("age", 42);
-    let id = edge.get_id();
-    println!("{:#?}", edge);
+    (edge.clone(), edge.get_id())
 }
 
-// fn prepare_edge_test() -> (Edge, String) {
-//     let mut edge = Edge::new("alice");
-//     edge.set_attr("name", "Alice");
-//     edge.set_attr("age", 42);
-//     (edge, edge.get_id())
-// }
+#[test]
+fn edge_get_label() {
+    let (edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_label(), "alice");
+}
 
-// #[test]
-// fn edge_get_label() {
-//     let (edge, _id) = prepare_edge_test();
-//     assert_eq!(edge.get_label(), "alice");
-// }
+#[test]
+fn edge_set_label() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_label(), "alice");
+    edge.set_label("alice marcus");
+    assert_eq!(edge.get_label(), "alice marcus");
+}
 
-// #[test]
-// fn edge_set_label() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     assert_eq!(edge.get_label(), "alice");
-//     edge.set_label("alice marcus");
-//     assert_eq!(edge.get_label(), "alice marcus");
-// }
+#[test]
+fn edge_get_id() {
+    let (edge, id) = prepare_edge_test();
+    assert_eq!(edge.get_id(), id);
+}
 
-// #[test]
-// fn edge_get_id() {
-//     let (edge, id) = prepare_edge_test();
-//     assert_eq!(edge.get_id(), id);
-// }
+#[test]
+fn edge_get_attributes() {
+    let (edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
+    assert_eq!(edge.get_attr("age").unwrap(), "42");
+}
 
-// #[test]
-// fn edge_attributes() {
-//     let (edge, _id) = prepare_edge_test();
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-//     assert_eq!(edge.get_attr("age").unwrap(), "42");
-// }
-
-// #[test]
-// fn edge_set_attribute() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     edge.set_attr("address", "Elm Street");
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-//     assert_eq!(edge.get_attr("age").unwrap(), "42");
-//     assert_eq!(edge.get_attr("address").unwrap(), "Elm Street");
-// }
+#[test]
+fn edge_set_attribute() {
+    let (mut edge, _id) = prepare_edge_test();
+    edge.set_attr("address", "Elm Street");
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
+    assert_eq!(edge.get_attr("age").unwrap(), "42");
+    assert_eq!(edge.get_attr("address").unwrap(), "Elm Street");
+}
 
 // #[test]
 // fn edge_update_attributes() {
