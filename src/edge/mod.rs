@@ -3,10 +3,7 @@ use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::attributes::Attributes;
 use crate::vertex::Vertex;
-use crate::CUREdgeVertex;
-use crate::RUDAttribute;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -49,14 +46,6 @@ impl Edge {
     pub fn set_label(&mut self, label: &str) {
         self.edge.borrow_mut().label = label.to_string();
     }
-
-    // fn get_attributes(&self) -> Attributes {
-    //     self.edge.borrow().attr.clone()
-    // }
-
-    // fn set_attributes(&mut self, attributes: Attributes) {
-    //     self.edge.borrow_mut().attr = attributes;
-    // }
 }
 
 impl Edge {
@@ -112,7 +101,9 @@ impl Edge {
     where
         T: std::fmt::Display,
     {
-        match self.edge.borrow_mut().attr.get_mut(attr_k) {
+        let mut binding = self.edge.borrow_mut();
+        let attr = binding.attr.get_mut(attr_k);
+        match attr {
             Some(attr) => {
                 *attr = attr_v.to_string();
                 debug!(
@@ -121,7 +112,7 @@ impl Edge {
                 );
             }
             None => {
-                self.edge.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+                binding.attr.insert(attr_k.to_string(), attr_v.to_string());
                 debug!(
                     "added (upsert) attribute key: {} with value {} for edge {}",
                     attr_k, attr_v, self.get_id()
@@ -145,19 +136,20 @@ impl Edge {
         }
     }
 
-    // /// Returns an Array containing all attribute keys
-    // fn get_attr_keys(&self) -> Vec<&str> {
-    //     let mut key_vec = Vec::new();
-    //     for key in self.edge.borrow().attr.keys() {
-    //         key_vec.push(key.as_str());
-    //     }
-    //     debug!(
-    //         "requested array of attributes for {} edge {:#?}",
-    //         self.get_id(), key_vec
-    //     );
-    //     key_vec
-    // }
-    
+    /// Returns an Array containing all attribute keys
+    fn get_attr_keys(&self) -> Vec<&str> {
+        let mut key_vec = Vec::new();
+        let binding = self.edge.borrow();
+        for key in binding.attr.keys() {
+            key_vec.push(key.as_str());
+        }
+        debug!(
+            "requested array of attributes for {} edge {:#?}",
+            self.get_id(), key_vec
+        );
+        key_vec
+    }
+    // 
     // fn set_attr<T>(&mut self, key: &str, val: T)
     // where
     //     T: std::fmt::Display,

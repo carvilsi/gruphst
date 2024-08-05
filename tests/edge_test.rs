@@ -37,7 +37,7 @@ fn edge_get_id() {
 }
 
 #[test]
-fn edge_get_attributes() {
+fn edge_get_attribute() {
     let (edge, _id) = prepare_edge_test();
     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
     assert_eq!(edge.get_attr("age").unwrap(), "42");
@@ -52,49 +52,49 @@ fn edge_set_attribute() {
     assert_eq!(edge.get_attr("address").unwrap(), "Elm Street");
 }
 
-// #[test]
-// fn edge_update_attributes() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     edge.update_attr("name", "Alice Marcus").unwrap();
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice Marcus");
-//     assert_eq!(edge.get_attr("age").unwrap(), "42");
-// }
+#[test]
+fn edge_update_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    edge.update_attr("name", "Alice Marcus").unwrap();
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice Marcus");
+    assert_eq!(edge.get_attr("age").unwrap(), "42");
+}
 
-// #[test]
-// fn edge_fail_update_attributes() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     assert!(edge.update_attr("foo", "Alice Marcus").is_err());
-// }
+#[test]
+fn edge_fail_update_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert!(edge.update_attr("foo", "Alice Marcus").is_err());
+}
 
-// #[test]
-// fn edge_upsert_attributes() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     edge.upsert_attr("surname", "Marcus");
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-//     assert_eq!(edge.get_attr("age").unwrap(), "42");
-//     edge.upsert_attr("age", 43);
-//     assert_eq!(edge.get_attr("surname").unwrap(), "Marcus");
-//     assert_eq!(edge.get_attr("age").unwrap(), "43");
-// }
+#[test]
+fn edge_upsert_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    edge.upsert_attr("surname", "Marcus");
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
+    assert_eq!(edge.get_attr("age").unwrap(), "42");
+    edge.upsert_attr("age", 43);
+    assert_eq!(edge.get_attr("surname").unwrap(), "Marcus");
+    assert_eq!(edge.get_attr("age").unwrap(), "43");
+}
 
-// #[test]
-// fn edge_delete_attributes() {
-//     let (mut edge, _id) = prepare_edge_test();
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-//     assert_eq!(edge.get_attr("age").unwrap(), "42");
-//     let _ = edge.del_attr("age");
-//     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-//     assert!(edge.get_attr("age").is_err());
-// }
+#[test]
+fn edge_delete_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
+    assert_eq!(edge.get_attr("age").unwrap(), "42");
+    let _ = edge.del_attr("age");
+    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
+    assert!(edge.get_attr("age").is_err());
+}
 
-// #[test]
-// fn edge_attribute_keys() {
-//     let (edge, _id) = prepare_edge_test();
-//     let keys = edge.get_attr_keys();
-//     assert!(keys.contains(&&"name"));
-//     assert!(keys.contains(&&"age"));
-//     assert!(!keys.contains(&&"surname"));
-// }
+#[test]
+fn edge_attribute_keys() {
+    let (edge, _id) = prepare_edge_test();
+    let keys = edge.get_attr_keys();
+    assert!(keys.contains(&&"name"));
+    assert!(keys.contains(&&"age"));
+    assert!(!keys.contains(&&"surname"));
+}
 
 // #[test]
 // fn edge_get_attributes() {
