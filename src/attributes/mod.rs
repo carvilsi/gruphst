@@ -55,8 +55,6 @@ impl RUDAttribute for Attributes {
         );
     }
 
-    
-
     /// Updates the value of an attribute
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where

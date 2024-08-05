@@ -85,16 +85,14 @@ fn edge_delete_attributes() {
     assert!(edge.get_attr("age").is_err());
 }
 
-// #[test]
-// TODO: pass the test
-// fn edge_attribute_keys() {
-//     todo!()
-    // let (edge, _id) = prepare_edge_test();
-    // let keys = edge.get_attr_keys();
-    // assert!(keys.contains(&&"name"));
-    // assert!(keys.contains(&&"age"));
-    // assert!(!keys.contains(&&"surname"));
-// }
+#[test]
+fn edge_attribute_keys() {
+    let (edge, _id) = prepare_edge_test();
+    let keys = edge.get_attr_keys();
+    assert!(keys.contains(&"name".to_string()));
+    assert!(keys.contains(&"age".to_string()));
+    assert!(!keys.contains(&"surname".to_string()));
+}
 
 #[test]
 fn get_edge_relation_out() {

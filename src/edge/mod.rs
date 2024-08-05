@@ -136,14 +136,12 @@ impl Edge {
         }
     }
 
-    // FIXME: Fix this!
-    // /// Returns an Array containing all attribute keys
-    // fn get_attr_keys<'a>(&self) -> &'a Vec<&str> {
-    //     let binding = self.edge.borrow();
-    //     let keys = binding.attr.keys(); 
-    //     let kv: Vec<&str> = keys.map(|key| key.as_str()).collect();
-    //     &kv.clone()
-    // }
+    /// Returns an Array containing all attribute keys
+    pub fn get_attr_keys(&self) -> Vec<String> {
+        let binding = self.edge.borrow();
+        let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
+        kv
+    }
 }
 
 impl Edge_ {

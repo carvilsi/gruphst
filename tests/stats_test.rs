@@ -1,14 +1,14 @@
-use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge_, CUREdgeVertex, RUDAttribute};
+use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge};
 
 #[test]
 fn graphs_stats() {
     let mut graphs = Graphs::init("friends-and-enemies");
 
-    let mut alice = Edge_::new("Alice");
-    let mut bob = Edge_::new("Bob");
-    let fred = Edge_::new("Fred");
-    let john = Edge_::new("John");
-    let peter = Edge_::new("Peter");
+    let mut alice = Edge::new("Alice");
+    let mut bob = Edge::new("Bob");
+    let fred = Edge::new("Fred");
+    let john = Edge::new("John");
+    let peter = Edge::new("Peter");
 
     alice.set_attr("address", "Elm street");
     alice.set_attr("email", "alice@mailinator.com");
@@ -41,7 +41,7 @@ fn graphs_stats() {
     assert_eq!(stats.get_len_graphs(), 5);
     assert_eq!(stats.get_total_edges(), 10);
     assert_eq!(stats.get_total_attr(), 12);
-    assert_eq!(stats.get_mem(), 2179);
+    assert_eq!(stats.get_mem(), 1739);
     assert_eq!(stats.get_uniq_rel(), 2);
     assert_eq!(stats.get_total_graphs(), 2);
 }
