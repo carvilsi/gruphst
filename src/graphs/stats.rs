@@ -135,8 +135,8 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
     let mut attr_counter = 0;
     for (_graph_name, graphs) in grphs.vault.iter() {
         for graph in graphs {
-            attr_counter += graph.get_from_edge().borrow().len_attr();
-            attr_counter += graph.get_to_edge().borrow().len_attr();
+            attr_counter += graph.get_from_edge().len_attr();
+            attr_counter += graph.get_to_edge().len_attr();
         }
     }
 

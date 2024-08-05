@@ -36,22 +36,22 @@ impl RUDAttribute for Attributes {
     }
 
     /// Get attribute for a edge
-    fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
-        let res = self.attr.get(attr_k);
-        match res {
-            Some(res) => {
-                debug!(
-                    "retrieved attribute value '{}' for '{}' for edge [{}]",
-                    res, attr_k, self.id
-                );
-                Ok(res)
-            }
-            None => {
-                warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
-            }
-        }
-    }
+    // fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
+    //     let res = self.attr.get(attr_k);
+    //     match res {
+    //         Some(res) => {
+    //             debug!(
+    //                 "retrieved attribute value '{}' for '{}' for edge [{}]",
+    //                 res, attr_k, self.id
+    //             );
+    //             Ok(res)
+    //         }
+    //         None => {
+    //             warn!("attribute '{}' not found", attr_k);
+    //             Err("attribute not found")
+    //         }
+    //     }
+    // }
 
     /// Updates the value of an attribute
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>

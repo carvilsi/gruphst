@@ -4,7 +4,7 @@ use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{attributes::Attributes, edge::Edge, CUREdgeVertex, RUDAttribute};
+use crate::{attributes::Attributes, edge::{Edge, Edge_}, CUREdgeVertex, RUDAttribute};
 
 mod query;
 
@@ -16,9 +16,9 @@ pub struct Vertex {
     /// A label for the relation
     relation: String,
     /// Origin edge
-    from: Rc<RefCell<Edge>>,
+    from: Rc<RefCell<Edge_>>,
     /// Target edge
-    to: Rc<RefCell<Edge>>,
+    to: Rc<RefCell<Edge_>>,
     /// Attributes for the Graph
     attr: Attributes,
 }
@@ -51,28 +51,28 @@ impl Vertex {
         Vertex {
             id: Uuid::new_v4().to_string(),
             relation: label.to_string(),
-            from: Edge::new(""),
-            to: Edge::new(""),
+            from: Edge_::new(""),
+            to: Edge_::new(""),
             attr: Attributes::new(),
         }
     }
 
     /// Adds "From" and "To" edge
     /// to a previous created Graph
-    pub fn add_relation(&mut self, from: &Rc<RefCell<Edge>>, relation: &str, to: &Rc<RefCell<Edge>>) {
-        self.from = Rc::clone(from);
+    pub fn add_relation(&mut self, from: &Edge, relation: &str, to: &Edge) {
+        self.from = Rc::clone(&from.edge);
         self.relation = String::from(relation);
-        self.to = Rc::clone(to);
+        self.to = Rc::clone(&to.edge);
         debug!("Added relation to Graph: {:#?}", self);
     }
 
     /// Creates a Graph,
     /// providing "From" and "To" edges and the "relation"
     /// the id is generated
-    pub fn create(from: &Rc<RefCell<Edge>>, relation: &str, to: &Rc<RefCell<Edge>>) -> Self {
+    pub fn create(from: &Edge, relation: &str, to: &Edge) -> Self {
         let mut g = Vertex::new(relation);
-        g.from = Rc::clone(from);
-        g.to = Rc::clone(to);
+        g.from = Rc::clone(&from.edge);
+        g.to = Rc::clone(&to.edge);
         g
     }
 
@@ -83,23 +83,27 @@ impl Vertex {
     }
 
     /// Updates the "from" edge in Graph
-    pub fn update_from(&mut self, from_edge: &Rc<RefCell<Edge>>) {
-        debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge);
-        self.from = Rc::clone(from_edge);
+    pub fn update_from(&mut self, from_edge: &Edge) {
+        debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge.edge);
+        self.from = Rc::clone(&from_edge.edge);
     }
 
     /// Updates the "to" edge in Graph
-    pub fn update_to(&mut self, to_edge: &Rc<RefCell<Edge>>) {
-        debug!("Updated Graph [{}] to edge: {:#?}", self.id, to_edge);
-        self.to = Rc::clone(to_edge);
+    pub fn update_to(&mut self, to_edge: &Edge) {
+        debug!("Updated Graph [{}] to edge: {:#?}", self.id, to_edge.edge);
+        self.to = Rc::clone(&to_edge.edge);
     }
 
-    pub fn get_from_edge(&self) -> Rc<RefCell<Edge>> {
-        self.from.clone()
+    pub fn get_from_edge(&self) -> Edge {
+        Edge {
+            edge: self.from.clone(),
+        }
     }
 
-    pub fn get_to_edge(&self) -> Rc<RefCell<Edge>> {
-        self.to.clone()
+    pub fn get_to_edge(&self) -> Edge {
+        Edge { 
+            edge: self.to.clone(),
+        }
     }
 
     pub fn get_relation(&self) -> String {
@@ -119,9 +123,9 @@ impl RUDAttribute for Vertex {
         self.attr.set_attr(key, val);
     }
 
-    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
-        self.attr.get_attr(key)
-    }
+    // fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
+    //     self.attr.get_attr(key)
+    // }
 
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where

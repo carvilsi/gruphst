@@ -1,9 +1,9 @@
-use gruphst::{attributes::Attributes, vertex::Vertex, edge::Edge, *};
+use gruphst::{attributes::Attributes, vertex::Vertex, edge::Edge_, *};
 
 fn prepare_graph_test() -> (Vertex, String) {
-    let mut alice = Edge::new("alice");
+    let mut alice = Edge_::new("alice");
     alice.set_attr("age", 42);
-    let bob = Edge::new("bob");
+    let bob = Edge_::new("bob");
     let mut graph = Vertex::create(&alice, "friend of", &bob);
     graph.set_attr("type", "friendship");
     graph.set_attr("value", 2);
@@ -116,7 +116,7 @@ fn graph_set_attributes() {
 fn graph_update_from_edge() {
     let (mut graph, _id) = prepare_graph_test();
     assert_eq!(graph.get_from_edge().get_label(), "alice");
-    let edge = Edge::new("fred");
+    let edge = Edge_::new("fred");
     graph.update_from(&edge);
     assert_eq!(graph.get_from_edge().get_label(), "fred");
 }
@@ -125,7 +125,7 @@ fn graph_update_from_edge() {
 fn graph_update_to_edge() {
     let (mut graph, _id) = prepare_graph_test();
     assert_eq!(graph.get_to_edge().get_label(), "bob");
-    let edge = Edge::new("fred");
+    let edge = Edge_::new("fred");
     graph.update_to(&edge);
     assert_eq!(graph.get_to_edge().get_label(), "fred");
 }

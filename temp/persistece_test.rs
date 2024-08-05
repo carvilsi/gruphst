@@ -1,19 +1,19 @@
 use gruphst::vertex::Vertex;
 use gruphst::graphs::Graphs;
-use gruphst::edge::Edge;
+use gruphst::edge::Edge_;
 use gruphst::*;
 
 #[test]
 fn persistence() {
     let mut gru = Graphs::init("graphs-a");
-    let mut edge1 = Edge::new("a edge");
+    let mut edge1 = Edge_::new("a edge");
     edge1.set_attr("foo", "bar");
-    let edge2 = Edge::new("b edge");
+    let edge2 = Edge_::new("b edge");
     let graph1 = Vertex::create(&edge1, "relation a-b", &edge2);
     gru.add_graph(&graph1, None);
 
-    let edge3 = Edge::new("c edge");
-    let edge4 = Edge::new("d edge");
+    let edge3 = Edge_::new("c edge");
+    let edge4 = Edge_::new("d edge");
     let graph2 = Vertex::create(&edge3, "relation c-d", &edge4);
     gru.add_graph(&graph2, None);
 
