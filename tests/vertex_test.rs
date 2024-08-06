@@ -11,11 +11,29 @@ fn prepare_vertex_test() -> (Vertex, String) {
 }
 
 #[test]
-fn vertex_get_relation() {
+fn vertex_add_relation_to_exisiting_vertex() {
+    let mut vertex = Vertex::new("");
+    let mut alice = Edge::new("alice");
+    alice.set_attr("age", 42);
+    let bob = Edge::new("bob");
+    vertex.add_relation(&alice, "best friends", &bob);
+    assert_eq!(vertex.get_label(), "best friends");
+}
+
+#[test]
+fn vertex_get_relation_label() {
     let (vertex, _id) = prepare_vertex_test();
     assert_eq!(vertex.get_relation(), "friend of");
     // an alias
     assert_eq!(vertex.get_label(), "friend of");
+}
+
+#[test]
+fn vertex_set_relation_label() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    assert_eq!(vertex.get_label(), "friend of");
+    vertex.set_label("best friend of");
+    assert_eq!(vertex.get_label(), "best friend of");
 }
 
 #[test]

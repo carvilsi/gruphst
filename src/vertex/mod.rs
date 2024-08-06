@@ -49,7 +49,7 @@ impl Vertex {
     }
 
     /// Creates a new instance
-    fn new(label: &str) -> Self {
+    pub fn new(label: &str) -> Self {
         Vertex {
             id: Uuid::new_v4().to_string(),
             relation: label.to_string(),
