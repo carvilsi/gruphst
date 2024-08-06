@@ -4,7 +4,7 @@ use stats::GraphsStats;
 use std::collections::HashMap;
 
 // use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
-use crate::{edge::Edge, vertex::Vertex, CUREdgeVertex};
+use crate::{vertex::Vertex, edge::Edge, CUREdgeVertex};
 
 mod persistence;
 mod query;
