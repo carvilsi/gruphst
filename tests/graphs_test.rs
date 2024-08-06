@@ -12,10 +12,10 @@ pub fn prepare_graphs_test() -> Graphs {
 
     let fred = Edge::new("Fred");
 
-    graphs.add_graph(&Vertex::create(&alice, "friend of", &bob), None);
-    graphs.add_graph(&Vertex::create(&bob, "friend of", &alice), None);
-    graphs.add_graph(&Vertex::create(&fred, "relative of", &alice), None);
-    graphs.add_graph(&Vertex::create(&fred, "friend of", &bob), None);
+    graphs.add_vertex(&Vertex::create(&alice, "friend of", &bob), None);
+    graphs.add_vertex(&Vertex::create(&bob, "friend of", &alice), None);
+    graphs.add_vertex(&Vertex::create(&fred, "relative of", &alice), None);
+    graphs.add_vertex(&Vertex::create(&fred, "friend of", &bob), None);
 
     graphs
 }
@@ -23,7 +23,7 @@ pub fn prepare_graphs_test() -> Graphs {
 // fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
 pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
-    graphs.add_graph(
+    graphs.add_vertex(
         &Vertex::create(&Edge::new("Gandalf"), "enemy of", &Edge::new("Saruman")),
         Some("middle-earth"),
     );
@@ -68,7 +68,7 @@ fn should_insert_a_graph_into_the_vault_without_init() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
     assert_eq!(graphs.len(), 4);
-    graphs.add_graph(
+    graphs.add_vertex(
         &Vertex::create(&Edge::new("Earth"), "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
@@ -218,14 +218,14 @@ fn should_find_in_graph_by_id() {
     let mut graphs = prepare_graphs_test();
     let from_edge = Edge::new("Earth");
     let from_edge_id = from_edge.get_id();
-    graphs.add_graph(
+    graphs.add_vertex(
         &Vertex::create(&from_edge, "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
     let mut found_graph = graphs.find_by_id(&from_edge_id, None).unwrap();
     assert_eq!(found_graph.get_label(), "has satellite");
     assert_eq!(found_graph.get_from_edge().get_label(), "Earth");
-    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
+    let default_graph_id = graphs.get_vertices(Some("my graphs")).unwrap()[0].get_id();
     found_graph = graphs
         .find_by_id(&default_graph_id, Some("my graphs"))
         .unwrap();
@@ -237,11 +237,11 @@ fn should_find_in_graphs_by_id() {
     let mut graphs = prepare_graphs_test();
     let from_edge = Edge::new("Earth");
     let from_edge_id = from_edge.get_id();
-    graphs.add_graph(
+    graphs.add_vertex(
         &Vertex::create(&from_edge, "has satellite", &Edge::new("Moon")),
         Some("solar-system"),
     );
-    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
+    let default_graph_id = graphs.get_vertices(Some("my graphs")).unwrap()[0].get_id();
     let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
     found_graph = graphs.find_by_id_in_graphs(&from_edge_id).unwrap();
@@ -253,7 +253,7 @@ fn delete_from_graph() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len(), 4);
 
-    let _ = graphs.delete_graph_by_id(graphs.get_graphs(None).unwrap()[0].get_id(), None);
+    let _ = graphs.delete_vertex_by_id(graphs.get_vertices(None).unwrap()[0].get_id(), None);
     assert_eq!(graphs.len(), 3);
 }
 
@@ -261,7 +261,7 @@ fn delete_from_graph() {
 fn delete_from_graph_fail() {
     let mut graphs = prepare_graphs_test();
     assert!(graphs
-        .delete_graph_by_id("foobar".to_string(), None)
+        .delete_vertex_by_id("foobar".to_string(), None)
         .is_err());
 }
 
@@ -272,15 +272,15 @@ fn should_update_graph() {
     let alice_edge = Edge::new("Alice");
     let bob_edge = Edge::new("Bob");
     let alice_bob_graph = Vertex::create(&alice_edge, "best friends", &bob_edge);
-    my_graphs.add_graph(&alice_bob_graph, None);
+    my_graphs.add_vertex(&alice_bob_graph, None);
 
     let fred_edge = Edge::new("Fred");
     let mut alice_fred_graph = Vertex::create(&alice_edge, "super friends", &fred_edge);
-    my_graphs.add_graph(&alice_fred_graph, None);
+    my_graphs.add_vertex(&alice_fred_graph, None);
 
     assert_eq!(my_graphs.len(), 2);
 
-    let graphs = my_graphs.get_graphs(Some(&my_graphs.get_label())).unwrap();
+    let graphs = my_graphs.get_vertices(Some(&my_graphs.get_label())).unwrap();
     assert_eq!(graphs[1].get_relation(), "super friends");
 
     alice_fred_graph.update_relation("besties");
@@ -298,7 +298,7 @@ fn should_fail_on_updating_graph() {
     let alice = Edge::new("Alice");
     let bob = Edge::new("Bob");
     let alice_bob = Vertex::create(&alice, "friend of", &bob);
-    grphs.add_graph(&alice_bob, None);
+    grphs.add_vertex(&alice_bob, None);
 
     let bob_alice = Vertex::create(&bob, "friend of", &alice);
     assert!(grphs.update_graph(&bob_alice, None).is_err());

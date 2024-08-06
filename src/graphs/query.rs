@@ -5,13 +5,13 @@ use crate::graphs::Graphs;
 use crate::vertex::Vertex;
 
 impl Graphs {
-    /// Returns a collection of Graps elements that matches the relation
+    /// Returns a collection of Vertices that matches the relation
     pub fn find_by_relation(
         &mut self,
         relation_name: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -19,7 +19,7 @@ impl Graphs {
                 .collect::<Vec<&Vertex>>();
             if !graphs.is_empty() {
                 debug!(
-                    "Founded {} graphs with '{}' relation name",
+                    "Founded {} vertices with '{}' relation name",
                     graphs.len(),
                     relation_name
                 );
@@ -33,14 +33,14 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of Graps elements that matches the relations
+    /// Returns a collection of Vertices elements that matches the relations
     /// in the array
     pub fn find_by_relations(
         &mut self,
         relations: Vec<&str>,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -68,7 +68,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -96,7 +96,7 @@ impl Graphs {
         attr_k: &str,
         graphs_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -118,7 +118,7 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of graphs that matches an attribute
+    /// Returns a collection of vertices that matches an attribute
     /// and value
     // XXX: add a method to find attr on all graphs????
     pub fn attr_equals_to<T>(
@@ -130,7 +130,7 @@ impl Graphs {
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
@@ -158,7 +158,7 @@ impl Graphs {
         id: &str,
         graphs_name: Option<&str>,
     ) -> Result<&mut Vertex, &'static str> {
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get_mut(&current_graph) {
             let graph = graphs.iter_mut().find(|graph| {
                 graph.get_id() == id
@@ -201,7 +201,7 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Edge>, &'static str> {
         let mut relations_in: Vec<Edge> = Vec::new();
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_in
@@ -227,7 +227,7 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<Edge>, &'static str> {
         let mut relations_out: Vec<Edge> = Vec::new();
-        let current_graph = self.select_graphs_label(graphs_name);
+        let current_graph = self.select_vault_label(graphs_name);
         if let Some(graphs) = self.vault.get(&current_graph) {
             for graph in graphs {
                 if graph.get_relation() == relation_out

@@ -22,19 +22,19 @@ fn graphs_stats() {
     let relation_relative_of = "relative of";
 
     let mut graph = Vertex::create(&alice, relation_friend_of, &bob);
-    graphs.add_graph(&graph, None);
+    graphs.add_vertex(&graph, None);
 
     graph = Vertex::create(&alice, relation_relative_of, &fred);
-    graphs.add_graph(&graph, None);
+    graphs.add_vertex(&graph, None);
 
     graph = Vertex::create(&alice, relation_friend_of, &john);
-    graphs.add_graph(&graph, None);
+    graphs.add_vertex(&graph, None);
 
     graph = Vertex::create(&peter, relation_relative_of, &john);
-    graphs.add_graph(&graph, None);
+    graphs.add_vertex(&graph, None);
 
     graphs.insert("only relatives");
-    graphs.add_graph(&graph, None);
+    graphs.add_vertex(&graph, None);
 
     // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.stats().unwrap();

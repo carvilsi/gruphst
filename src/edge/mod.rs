@@ -170,13 +170,13 @@ impl Edge {
         kv
     }
 
-    /// Retrieves the edges that has relation out for the given edge on graph
-    pub fn get_relations_out_on_graph(
+    /// Retrieves the edges that has relation out for the given edge on vertices 
+    pub fn get_relations_out_on_vertices(
         &self,
-        graph: Vec<Vertex>,
+        vertices: Vec<Vertex>,
     ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
         let mut relations_out: HashMap<String, Vec<Edge>> = HashMap::new();
-        for vertex in graph {
+        for vertex in vertices {
             if vertex.get_from_edge().get_id() == self.get_id() {
                 if let Some(edges_out) = relations_out.get_mut(&vertex.get_relation()) {
                     edges_out.push(vertex.get_to_edge());
@@ -193,13 +193,13 @@ impl Edge {
         }
     }
 
-    /// Retrieves the edges that has relation in for the given edge on graph
-    pub fn get_relations_in_on_graph(
+    /// Retrieves the edges that has relation in for the given edge on vertices 
+    pub fn get_relations_in_on_vertices(
         &self,
-        graphs: Vec<Vertex>,
+        vertices: Vec<Vertex>,
     ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
         let mut relations_in: HashMap<String, Vec<Edge>> = HashMap::new();
-        for graph in graphs {
+        for graph in vertices {
             if graph.get_to_edge().get_id() == self.get_id() {
                 if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
                     edges_in.push(graph.get_from_edge());

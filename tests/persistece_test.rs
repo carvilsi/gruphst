@@ -9,12 +9,12 @@ fn persistence() {
     edge1.set_attr("foo", "bar");
     let edge2 = Edge::new("b edge");
     let graph1 = Vertex::create(&edge1, "relation a-b", &edge2);
-    gru.add_graph(&graph1, None);
+    gru.add_vertex(&graph1, None);
 
     let edge3 = Edge::new("c edge");
     let edge4 = Edge::new("d edge");
     let graph2 = Vertex::create(&edge3, "relation c-d", &edge4);
-    gru.add_graph(&graph2, None);
+    gru.add_vertex(&graph2, None);
 
     let _ = gru.persists();
 
@@ -23,7 +23,7 @@ fn persistence() {
     let grphs = Graphs::load(&file_name);
     match grphs {
         Ok(grphs) => {
-            let graphs = grphs.get_graphs(Some(name.as_str())).unwrap();
+            let graphs = grphs.get_vertices(Some(name.as_str())).unwrap();
             assert_eq!(grphs.get_label(), name);
             assert_eq!(graphs[0].get_relation(), graph1.get_relation());
             assert_eq!(graphs[0].get_from_edge().get_label(), "a edge");

@@ -24,19 +24,19 @@ fn create_game_rules() -> Graphs {
 
     // Now we create the first relation between two edges
     // and we'll add to the vault's default graph
-    let graph = Vertex::create(&rock, "crushes", &lizard);
-    graphs.add_graph(&graph, None);
+    let vertex = Vertex::create(&rock, "crushes", &lizard);
+    graphs.add_vertex(&vertex, None);
 
     // More relations will be added
-    graphs.add_graph(&Vertex::create(&rock, "crushes", &scissors), None);
-    graphs.add_graph(&Vertex::create(&lizard, "poisons", &spock), None);
-    graphs.add_graph(&Vertex::create(&lizard, "eats", &paper), None);
-    graphs.add_graph(&Vertex::create(&spock, "smashes", &scissors), None);
-    graphs.add_graph(&Vertex::create(&spock, "vaporizes", &rock), None);
-    graphs.add_graph(&Vertex::create(&scissors, "cuts", &paper), None);
-    graphs.add_graph(&Vertex::create(&scissors, "decapites", &lizard), None);
-    graphs.add_graph(&Vertex::create(&paper, "covers", &rock), None);
-    graphs.add_graph(&Vertex::create(&paper, "disproves", &spock), None);
+    graphs.add_vertex(&Vertex::create(&rock, "crushes", &scissors), None);
+    graphs.add_vertex(&Vertex::create(&lizard, "poisons", &spock), None);
+    graphs.add_vertex(&Vertex::create(&lizard, "eats", &paper), None);
+    graphs.add_vertex(&Vertex::create(&spock, "smashes", &scissors), None);
+    graphs.add_vertex(&Vertex::create(&spock, "vaporizes", &rock), None);
+    graphs.add_vertex(&Vertex::create(&scissors, "cuts", &paper), None);
+    graphs.add_vertex(&Vertex::create(&scissors, "decapites", &lizard), None);
+    graphs.add_vertex(&Vertex::create(&paper, "covers", &rock), None);
+    graphs.add_vertex(&Vertex::create(&paper, "disproves", &spock), None);
 
     graphs
 }
@@ -56,10 +56,10 @@ fn who_wins(wins: HashMap<String, Vec<Edge>>, a_game: &Edge, b_game: &Edge) -> O
 fn resolve_game(player_one_game: Edge, player_two_game: Edge, rules: Graphs) -> String {
     let one = format!("Player one plays: {}", player_one_game.get_label());
     let player_one_wins_to = player_one_game
-        .get_relations_out_on_graph(rules.get_graphs(Some("game-rules")).unwrap())
+        .get_relations_out_on_vertices(rules.get_vertices(Some("game-rules")).unwrap())
         .unwrap();
     let player_two_wins_to = player_two_game
-        .get_relations_out_on_graph(rules.get_graphs(Some("game-rules")).unwrap())
+        .get_relations_out_on_vertices(rules.get_vertices(Some("game-rules")).unwrap())
         .unwrap();
     let two = format!("Player two plays: {}", player_two_game.get_label());
 
@@ -92,16 +92,21 @@ fn main() {
     let characters = rules.get_uniq_edges(None).unwrap();
 
     // Lets play a bit
+    // player one game
     let mut rand_number: usize = rand::thread_rng()
         .gen_range(0..characters.len())
         .try_into()
         .unwrap();
     let player_one_game: &Edge = &characters[rand_number];
+
+    // player two game
     rand_number = rand::thread_rng()
         .gen_range(0..characters.len())
         .try_into()
         .unwrap();
     let player_two_game: &Edge = &characters[rand_number];
+
+    // Lets see who won
     let result = resolve_game(player_one_game.clone(), player_two_game.clone(), rules);
     println!("{}", result);
 }

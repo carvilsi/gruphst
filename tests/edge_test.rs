@@ -105,12 +105,12 @@ fn get_edge_relation_out() {
     assert_eq!(find_results.len(), 1);
     assert_eq!(find_results[0].get_label(), "Fred");
     let edge = find_results[0].clone();
-    graphs.add_graph(
+    graphs.add_vertex(
         &Vertex::create(&edge, "relative of", &Edge::new("Peter")),
         Some("my graphs"),
     );
     let relations_out: HashMap<String, Vec<Edge>> = edge
-        .get_relations_out_on_graph(graphs.get_graphs(Some("my graphs")).unwrap())
+        .get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
         .unwrap();
     assert!(relations_out.contains_key("relative of"));
     assert!(relations_out.contains_key("friend of"));
@@ -146,7 +146,7 @@ fn get_edge_relation_in() {
         }
     }
     let relations_in: HashMap<String, Vec<Edge>> = edge
-        .get_relations_in_on_graph(graphs.get_graphs(Some("my graphs")).unwrap())
+        .get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
         .unwrap();
     assert!(relations_in.contains_key("relative of"));
     assert!(relations_in.contains_key("friend of"));

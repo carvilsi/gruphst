@@ -72,10 +72,10 @@ impl Vertex {
     /// providing "From" and "To" edges and the "relation"
     /// the id is generated
     pub fn create(from: &Edge, relation: &str, to: &Edge) -> Self {
-        let mut g = Vertex::new(relation);
-        g.from = Rc::clone(&from.edge);
-        g.to = Rc::clone(&to.edge);
-        g
+        let mut v = Vertex::new(relation);
+        v.from = Rc::clone(&from.edge);
+        v.to = Rc::clone(&to.edge);
+        v
     }
 
     /// Updates the relation for the Graph
