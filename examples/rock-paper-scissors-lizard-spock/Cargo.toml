@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-gruphst = "0.8.1"
+gruphst = "0.9.0"
 rand = "0.8.5"
