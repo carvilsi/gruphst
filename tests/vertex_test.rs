@@ -191,3 +191,28 @@ fn should_check_in_edge_if_attribute_is_equals_to() {
     assert!(!vertex.has_edge_with_attr_value_equal("age", 43));
     assert!(!vertex.has_edge_with_attr_value_equal("foo", 25));
 }
+
+#[test]
+fn should_get_the_amount_of_attribute_for_vertex() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert_eq!(vertex.attr_len(), 2);
+}
+
+#[test]
+fn should_check_if_the_attributes_for_vertex_is_empty() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(!vertex.attr_is_empty());
+}
+
+#[test]
+fn should_delete_an_attribute_for_vertex() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    let _ = vertex.delete_attr("type");
+    assert_eq!(vertex.attr_len(), 1);
+}
+
+#[test]
+fn should_fail_to_delete_an_attribute_for_vertex_if_does_not_exists() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    assert!(vertex.delete_attr("foobar").is_err());
+}
