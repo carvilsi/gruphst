@@ -23,26 +23,26 @@ impl Vertex {
 }
 
 impl QueryAttribute for Vertex {
-    fn has(&self, attr_k: &str) -> bool {
-        self.attr.has(attr_k)
+    fn has_attr_key(&self, attr_k: &str) -> bool {
+        self.attr.has_attr_key(attr_k)
     }
 
-    fn like(&self, attr_k: &str) -> bool {
-        self.attr.like(attr_k)
+    fn has_attr_key_like(&self, attr_k: &str) -> bool {
+        self.attr.has_attr_key_like(attr_k)
     }
 
-    fn equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
+    fn has_attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        self.attr.equals_to(attr_k, attr_v)
+        self.attr.has_attr_equals_to(attr_k, attr_v)
     }
 
-    fn len(&self) -> usize {
-        self.attr.len()
+    fn attr_len(&self) -> usize {
+        self.attr.attr_len()
     }
 
-    fn is_empty(&self) -> bool {
-        self.attr.is_empty()
+    fn attr_is_empty(&self) -> bool {
+        self.attr.attr_is_empty()
     }
 }

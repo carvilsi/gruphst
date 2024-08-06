@@ -2,17 +2,17 @@ use gruphst::{attributes::Attributes, QueryAttribute, RUDAttribute};
 
 fn prepare_attribute_test() -> (Attributes, String) {
     let mut attributes = Attributes::new();
-    attributes.set("name", "foo");
-    attributes.set("var", "bar");
-    attributes.set("val", 2);
+    attributes.set_attr("name", "foo");
+    attributes.set_attr("var", "bar");
+    attributes.set_attr("val", 2);
     (attributes.clone(), attributes.get_id())
 }
 
 #[test]
 fn get_attribute() {
     let (attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.get("name").unwrap(), "foo");
-    assert_eq!(attr.get("var").unwrap(), "bar");
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("var").unwrap(), "bar");
 }
 
 #[test]
@@ -24,52 +24,52 @@ fn get_id() {
 #[test]
 fn set_attribute() {
     let (mut attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.get("name").unwrap(), "foo");
-    assert_eq!(attr.get("var").unwrap(), "bar");
-    attr.set("animal", "pigeon");
-    assert_eq!(attr.get("animal").unwrap(), "pigeon");
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("var").unwrap(), "bar");
+    attr.set_attr("animal", "pigeon");
+    assert_eq!(attr.get_attr("animal").unwrap(), "pigeon");
 }
 
 #[test]
 fn update_attribute() {
     let (mut attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.get("name").unwrap(), "foo");
-    assert_eq!(attr.get("var").unwrap(), "bar");
-    attr.update("name", "lol").unwrap();
-    assert_eq!(attr.get("name").unwrap(), "lol");
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("var").unwrap(), "bar");
+    attr.update_attr("name", "lol").unwrap();
+    assert_eq!(attr.get_attr("name").unwrap(), "lol");
 }
 
 #[test]
 fn update_attribute_fail() {
     let (mut attr, _id) = prepare_attribute_test();
-    assert!(attr.update("foo", "lol").is_err());
+    assert!(attr.update_attr("foo", "lol").is_err());
 }
 
 #[test]
 fn upsert_attribute() {
     let (mut attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.get("name").unwrap(), "foo");
-    assert_eq!(attr.get("var").unwrap(), "bar");
-    attr.upsert("name", "lol");
-    assert_eq!(attr.get("name").unwrap(), "lol");
-    attr.upsert("foo", "lol");
-    assert_eq!(attr.get("foo").unwrap(), "lol");
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("var").unwrap(), "bar");
+    attr.upsert_attr("name", "lol");
+    assert_eq!(attr.get_attr("name").unwrap(), "lol");
+    attr.upsert_attr("foo", "lol");
+    assert_eq!(attr.get_attr("foo").unwrap(), "lol");
 }
 
 #[test]
 fn del_attribute() {
     let (mut attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.get("name").unwrap(), "foo");
-    assert_eq!(attr.get("var").unwrap(), "bar");
-    attr.delete("var").unwrap();
-    assert!(attr.get("var").is_err());
-    assert_eq!(attr.get("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
+    assert_eq!(attr.get_attr("var").unwrap(), "bar");
+    attr.delete_attr("var").unwrap();
+    assert!(attr.get_attr("var").is_err());
+    assert_eq!(attr.get_attr("name").unwrap(), "foo");
 }
 
 #[test]
 fn attribute_keys() {
     let (attr, _id) = prepare_attribute_test();
-    let keys = attr.get_keys();
+    let keys = attr.get_attr_keys();
     assert_eq!(keys.len(), 3);
     assert!(keys.contains(&&"name"));
     assert!(keys.contains(&&"val"));
@@ -80,37 +80,37 @@ fn attribute_keys() {
 #[test]
 fn has_attribute() {
     let (attr, _id) = prepare_attribute_test();
-    assert!(attr.has("name"));
-    assert!(!attr.has("foobar"));
+    assert!(attr.has_attr_key("name"));
+    assert!(!attr.has_attr_key("foobar"));
 }
 
 #[test]
 fn like_attribute() {
     let (attr, _id) = prepare_attribute_test();
-    assert!(attr.like("na"));
-    assert!(attr.like("va"));
-    assert!(!attr.like("fo"));
+    assert!(attr.has_attr_key_like("na"));
+    assert!(attr.has_attr_key_like("va"));
+    assert!(!attr.has_attr_key_like("fo"));
 }
 
 #[test]
 fn equals_attr() {
     let (attr, _id) = prepare_attribute_test();
-    assert!(attr.equals_to("name", "foo"));
-    assert!(attr.equals_to("val", 2));
-    assert!(!attr.equals_to("name", "fo"));
-    assert!(!attr.equals_to("val", 3));
+    assert!(attr.has_attr_equals_to("name", "foo"));
+    assert!(attr.has_attr_equals_to("val", 2));
+    assert!(!attr.has_attr_equals_to("name", "fo"));
+    assert!(!attr.has_attr_equals_to("val", 3));
 }
 
 #[test]
 fn length_attributes() {
     let (attr, _id) = prepare_attribute_test();
-    assert_eq!(attr.len(), 3);
+    assert_eq!(attr.attr_len(), 3);
 }
 
 #[test]
 fn is_empty_attributes() {
     let (attr, _id) = prepare_attribute_test();
-    assert!(!attr.is_empty());
+    assert!(!attr.attr_is_empty());
     let empty_attr = Attributes::new();
-    assert!(empty_attr.is_empty());
+    assert!(empty_attr.attr_is_empty());
 }

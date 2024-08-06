@@ -121,36 +121,36 @@ impl Vertex {
 }
 
 impl RUDAttribute for Vertex {
-    fn set<T>(&mut self, key: &str, val: T)
+    fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.set(key, val);
+        self.attr.set_attr(key, val);
     }
 
-    fn get(&self, key: &str) -> Result<&String, &'static str> {
-        self.attr.get(key)
+    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
+        self.attr.get_attr(key)
     }
 
-    fn update<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
-        self.attr.update(attr_k, attr_v)
+        self.attr.update_attr(attr_k, attr_v)
     }
 
-    fn upsert<T>(&mut self, attr_k: &str, attr_v: T)
+    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.upsert(attr_k, attr_v)
+        self.attr.upsert_attr(attr_k, attr_v)
     }
 
-    fn delete(&mut self, v: &str) -> Result<(), &'static str> {
-        self.attr.delete(v)
+    fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
+        self.attr.delete_attr(v)
     }
 
-    fn get_keys(&self) -> Vec<&str> {
-        self.attr.get_keys()
+    fn get_attr_keys(&self) -> Vec<&str> {
+        self.attr.get_attr_keys()
     }
 }

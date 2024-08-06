@@ -11,28 +11,28 @@ pub mod graphs;
 pub mod vertex;
 
 pub trait RUDAttribute {
-    fn set<T>(&mut self, key: &str, val: T)
+    fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display;
-    fn get(&self, key: &str) -> Result<&String, &'static str>;
-    fn update<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    fn get_attr(&self, key: &str) -> Result<&String, &'static str>;
+    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display;
-    fn upsert<T>(&mut self, attr_k: &str, attr_v: T)
+    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display;
-    fn delete(&mut self, v: &str) -> Result<(), &'static str>;
-    fn get_keys(&self) -> Vec<&str>;
+    fn delete_attr(&mut self, v: &str) -> Result<(), &'static str>;
+    fn get_attr_keys(&self) -> Vec<&str>;
 }
 
 pub trait QueryAttribute {
-    fn has(&self, attr_k: &str) -> bool;
-    fn like(&self, attr_k: &str) -> bool;
-    fn equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
+    fn has_attr_key(&self, attr_k: &str) -> bool;
+    fn has_attr_key_like(&self, attr_k: &str) -> bool;
+    fn has_attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone;
-    fn len(&self) -> usize;
-    fn is_empty(&self) -> bool;
+    fn attr_len(&self) -> usize;
+    fn attr_is_empty(&self) -> bool;
 }
 
 /// Enables logging providing a level
