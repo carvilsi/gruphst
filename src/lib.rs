@@ -25,7 +25,7 @@ pub trait RUDAttribute {
     fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display;
-    // fn get_attr(&self, key: &str) -> Result<&String, &'static str>;
+    fn get_attr(&self, key: &str) -> Result<&String, &'static str>;
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display;

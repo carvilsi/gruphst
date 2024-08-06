@@ -22,9 +22,21 @@ impl Default for Attributes {
     }
 }
 
-impl Attributes {
+impl RUDAttribute for Attributes {
+    /// Set attributes for a edge
+    fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    where
+        T: std::fmt::Display,
+    {
+        self.attr.insert(attr_k.to_string(), attr_v.to_string());
+        debug!(
+            "added attribute key: {} with value {} for edge {}",
+            attr_k, attr_v, self.id
+        );
+    }
+
     /// Get attribute for a edge
-    pub fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
+    fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
         let res = self.attr.get(attr_k);
         match res {
             Some(res) => {
@@ -40,21 +52,6 @@ impl Attributes {
             }
         }
     }
-}
-
-impl RUDAttribute for Attributes {
-    /// Set attributes for a edge
-    fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
-    where
-        T: std::fmt::Display,
-    {
-        self.attr.insert(attr_k.to_string(), attr_v.to_string());
-        debug!(
-            "added attribute key: {} with value {} for edge {}",
-            attr_k, attr_v, self.id
-        );
-    }
-
     /// Updates the value of an attribute
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where

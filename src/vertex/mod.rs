@@ -123,9 +123,9 @@ impl RUDAttribute for Vertex {
         self.attr.set_attr(key, val);
     }
 
-    // fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
-    //     self.attr.get_attr(key)
-    // }
+    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
+        self.attr.get_attr(key)
+    }
 
     fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
