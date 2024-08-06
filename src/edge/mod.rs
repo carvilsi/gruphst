@@ -24,7 +24,7 @@ pub struct Edge_ {
 
 impl Edge_ {
     /// Creates a edge with the given label, the id is generated
-    pub fn new(label: &str) -> Rc<RefCell<Edge_>> {
+    fn new(label: &str) -> Rc<RefCell<Edge_>> {
         let edge = Edge_ {
             label: String::from(label),
             id: Uuid::new_v4().to_string(),
@@ -46,6 +46,10 @@ impl Edge {
         Edge {
             edge: Edge_::new(label),
         }
+    }
+    
+    pub fn create(label: &str) -> Rc<RefCell<Edge_>> {
+        Edge_::new(label)
     }
 
     pub fn get_id(&self) -> String {
