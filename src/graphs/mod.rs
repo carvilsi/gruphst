@@ -94,6 +94,8 @@ impl Graphs {
         }
     }
 
+    // TODO: create method to add a collection of vertex, AKA vertices
+
     /// Retrieves the collection of vertices 
     /// the default one or by name
     pub fn get_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {

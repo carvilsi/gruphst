@@ -35,6 +35,7 @@ impl Edge_ {
     }
 }
 
+// wrapper for Edge_
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Edge {
     pub edge: Rc<RefCell<Edge_>>,
