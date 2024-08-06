@@ -1,6 +1,6 @@
-use gruphst::vertex::Vertex;
-use gruphst::graphs::Graphs;
 use gruphst::edge::Edge;
+use gruphst::graphs::Graphs;
+use gruphst::vertex::Vertex;
 
 #[test]
 fn persistence() {
@@ -27,7 +27,7 @@ fn persistence() {
             assert_eq!(grphs.get_label(), name);
             assert_eq!(graphs[0].get_relation(), graph1.get_relation());
             assert_eq!(graphs[0].get_from_edge().get_label(), "a edge");
-            assert_eq!(graphs[0].get_from_edge().len_attr(), 1);
+            assert_eq!(graphs[0].get_from_edge().attr_len(), 1);
             assert_eq!(graphs[0].get_from_edge().get_attr("foo").unwrap(), "bar");
             assert_eq!(graphs[1], graph2);
         }

@@ -1,22 +1,22 @@
-use gruphst::{edge::edge, graph::Graph, graphs::Graphs, *};
+use gruphst::{edge::Edge, graph::Graph, graphs::Graphs, *};
 use std::collections::HashMap;
 use rand::Rng;
 
 fn create_game_rules() -> Graphs {
     // Create the sets of edges and add some attributes
-    let mut rock = edge::new("Rock");
+    let mut rock = Edge::new("Rock");
     rock.set_attr("description", "A strong stone");
 
-    let mut paper = edge::new("Paper");
+    let mut paper = Edge::new("Paper");
     paper.set_attr("description", "A blank paper");
 
-    let mut scissors = edge::new("Scissors");
+    let mut scissors = Edge::new("Scissors");
     scissors.set_attr("description", "Quite sharp");
 
-    let mut lizard = edge::new("Lizard");
+    let mut lizard = Edge::new("Lizard");
     lizard.set_attr("description", "A reptile");
 
-    let mut spock = edge::new("Spock");
+    let mut spock = Edge::new("Spock");
     spock.set_attr("description", "A Mr. from Vulcan");
 
     // Lets create a Graphs vault to store the rules

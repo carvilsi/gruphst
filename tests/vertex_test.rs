@@ -1,12 +1,12 @@
-use gruphst::{attributes::Attributes, vertex::Vertex, edge::Edge, *};
+use gruphst::{attributes::Attributes, edge::Edge, vertex::Vertex, *};
 
 fn prepare_vertex_test() -> (Vertex, String) {
     let mut alice = Edge::new("alice");
     alice.set_attr("age", 42);
     let bob = Edge::new("bob");
     let mut vertex = Vertex::create(&alice, "friend of", &bob);
-    vertex.set_attr("type", "friendship");
-    vertex.set_attr("value", 2);
+    vertex.set("type", "friendship");
+    vertex.set("value", 2);
     (vertex.clone(), vertex.get_id())
 }
 
@@ -35,47 +35,47 @@ fn vertex_get_id() {
 #[test]
 fn vertex_attributes() {
     let (vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.get_attr("type").unwrap(), "friendship");
-    assert_eq!(vertex.get_attr("value").unwrap(), "2");
+    assert_eq!(vertex.get("type").unwrap(), "friendship");
+    assert_eq!(vertex.get("value").unwrap(), "2");
 }
 
 #[test]
 fn vertex_set_attribute() {
     let (mut vertex, _id) = prepare_vertex_test();
-    vertex.set_attr("weight", 5);
-    assert_eq!(vertex.get_attr("type").unwrap(), "friendship");
-    assert_eq!(vertex.get_attr("value").unwrap(), "2");
-    assert_eq!(vertex.get_attr("weight").unwrap(), "5");
+    vertex.set("weight", 5);
+    assert_eq!(vertex.get("type").unwrap(), "friendship");
+    assert_eq!(vertex.get("value").unwrap(), "2");
+    assert_eq!(vertex.get("weight").unwrap(), "5");
 }
 
 #[test]
 fn vertex_update_attribute() {
     let (mut vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.get_attr("value").unwrap(), "2");
-    vertex.update_attr("value", 3).unwrap();
-    assert_eq!(vertex.get_attr("value").unwrap(), "3");
+    assert_eq!(vertex.get("value").unwrap(), "2");
+    vertex.update("value", 3).unwrap();
+    assert_eq!(vertex.get("value").unwrap(), "3");
 }
 
 #[test]
 fn vertex_fail_update_attribute() {
     let (mut vertex, _id) = prepare_vertex_test();
-    assert!(vertex.update_attr("foo", 3).is_err());
+    assert!(vertex.update("foo", 3).is_err());
 }
 
 #[test]
 fn vertex_upsert_attribute() {
     let (mut vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.get_attr("value").unwrap(), "2");
-    vertex.upsert_attr("value", 3);
-    assert_eq!(vertex.get_attr("value").unwrap(), "3");
-    vertex.upsert_attr("range", "low");
-    assert_eq!(vertex.get_attr("range").unwrap(), "low");
+    assert_eq!(vertex.get("value").unwrap(), "2");
+    vertex.upsert("value", 3);
+    assert_eq!(vertex.get("value").unwrap(), "3");
+    vertex.upsert("range", "low");
+    assert_eq!(vertex.get("range").unwrap(), "low");
 }
 
 #[test]
 fn vertex_attribute_keys() {
     let (vertex, _id) = prepare_vertex_test();
-    let keys = vertex.get_attr_keys();
+    let keys = vertex.get_keys();
     assert!(keys.contains(&&"type"));
     assert!(keys.contains(&&"value"));
     assert!(!keys.contains(&&"foo"));
@@ -85,31 +85,31 @@ fn vertex_attribute_keys() {
 fn vertex_get_attributes() {
     let (vertex, _id) = prepare_vertex_test();
     let attributes = vertex.get_attributes();
-    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
-    assert_eq!(attributes.get_attr("value").unwrap(), "2");
+    assert_eq!(attributes.get("type").unwrap(), "friendship");
+    assert_eq!(attributes.get("value").unwrap(), "2");
 }
 
 #[test]
 fn vertex_set_attributes() {
     let (mut vertex, _id) = prepare_vertex_test();
     let attributes = vertex.get_attributes();
-    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
-    assert_eq!(attributes.get_attr("value").unwrap(), "2");
-    assert_eq!(vertex.get_attr("type").unwrap(), "friendship");
-    assert_eq!(vertex.get_attr("value").unwrap(), "2");
+    assert_eq!(attributes.get("type").unwrap(), "friendship");
+    assert_eq!(attributes.get("value").unwrap(), "2");
+    assert_eq!(vertex.get("type").unwrap(), "friendship");
+    assert_eq!(vertex.get("value").unwrap(), "2");
     let mut new_attributes = Attributes::new();
-    new_attributes.set_attr("color", "black");
-    new_attributes.set_attr("weight", 5);
+    new_attributes.set("color", "black");
+    new_attributes.set("weight", 5);
     vertex.set_attributes(new_attributes);
     let update_attributes = vertex.get_attributes();
-    assert!(update_attributes.get_attr("type").is_err());
-    assert!(update_attributes.get_attr("value").is_err());
-    assert_eq!(update_attributes.get_attr("color").unwrap(), "black");
-    assert_eq!(update_attributes.get_attr("weight").unwrap(), "5");
-    assert!(vertex.get_attr("type").is_err());
-    assert!(vertex.get_attr("value").is_err());
-    assert_eq!(vertex.get_attr("color").unwrap(), "black");
-    assert_eq!(vertex.get_attr("weight").unwrap(), "5");
+    assert!(update_attributes.get("type").is_err());
+    assert!(update_attributes.get("value").is_err());
+    assert_eq!(update_attributes.get("color").unwrap(), "black");
+    assert_eq!(update_attributes.get("weight").unwrap(), "5");
+    assert!(vertex.get("type").is_err());
+    assert!(vertex.get("value").is_err());
+    assert_eq!(vertex.get("color").unwrap(), "black");
+    assert_eq!(vertex.get("weight").unwrap(), "5");
 }
 
 #[test]
@@ -133,43 +133,43 @@ fn vertex_update_to_edge() {
 #[test]
 fn should_check_if_attribute_exists_on_vertex() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.has_attr("value"));
-    assert!(!vertex.has_attr("age"));
+    assert!(vertex.has("value"));
+    assert!(!vertex.has("age"));
 }
 
 #[test]
 fn should_check_if_attribute_exists_on_any_edge_on_vertex() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.has_edge_attr("age"));
-    assert!(!vertex.has_edge_attr("foo"));
+    assert!(vertex.has_edge_with_attr_key("age"));
+    assert!(!vertex.has_edge_with_attr_key("foo"));
 }
 
 #[test]
 fn should_check_if_attribute_like_on_vertex() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.like_attr("va"));
-    assert!(!vertex.like_attr("ag"));
+    assert!(vertex.like("va"));
+    assert!(!vertex.like("ag"));
 }
 
 #[test]
 fn should_check_if_attribute_like_on_any_edge_on_vertex() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.like_edge_attr("Ag"));
-    assert!(!vertex.has_edge_attr("foo"));
+    assert!(vertex.has_edge_with_attr_key_like("Ag"));
+    assert!(!vertex.has_edge_with_attr_key("foo"));
 }
 
 #[test]
 fn should_check_if_attribute_is_equals_to() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.equals_attr("value", 2));
-    assert!(!vertex.equals_attr("value", 5));
-    assert!(!vertex.equals_attr("foo", 25));
+    assert!(vertex.equals_to("value", 2));
+    assert!(!vertex.equals_to("value", 5));
+    assert!(!vertex.equals_to("foo", 25));
 }
 
 #[test]
 fn should_check_in_edge_if_attribute_is_equals_to() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(vertex.equals_edge_attr("age", 42));
-    assert!(!vertex.equals_edge_attr("age", 43));
-    assert!(!vertex.equals_edge_attr("foo", 25));
+    assert!(vertex.has_edge_with_attr_value_equal("age", 42));
+    assert!(!vertex.has_edge_with_attr_value_equal("age", 43));
+    assert!(!vertex.has_edge_with_attr_value_equal("foo", 25));
 }

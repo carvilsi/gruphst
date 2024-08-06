@@ -3,12 +3,12 @@ use crate::QueryAttribute;
 
 impl QueryAttribute for Attributes {
     /// Checks if an attribute key exists
-    fn has_attr(&self, attr_k: &str) -> bool {
+    fn has(&self, attr_k: &str) -> bool {
         self.attr.contains_key(attr_k)
     }
 
     /// Checks if an attribute key is like on a edge
-    fn like_attr(&self, attr_k: &str) -> bool {
+    fn like(&self, attr_k: &str) -> bool {
         for key in self.attr.keys() {
             if key.to_lowercase().contains(&attr_k.to_lowercase()) {
                 return true;
@@ -19,7 +19,7 @@ impl QueryAttribute for Attributes {
 
     /// Checks if an attribute key exists on a edge
     /// and the value matchs
-    fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
+    fn equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {
@@ -33,12 +33,12 @@ impl QueryAttribute for Attributes {
     }
 
     /// Retrieves the lenght of attributes for a edge
-    fn len_attr(&self) -> usize {
+    fn len(&self) -> usize {
         self.attr.len()
     }
 
     /// Checks if attributes for a edge is empty
-    fn is_empty_attr(&self) -> bool {
-        self.len_attr() == 0
+    fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }

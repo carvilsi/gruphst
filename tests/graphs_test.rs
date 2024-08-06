@@ -1,4 +1,4 @@
-use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge, *};
+use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 
 pub fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");

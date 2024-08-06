@@ -1,4 +1,4 @@
-use gruphst::{vertex::Vertex, graphs::Graphs, edge::Edge};
+use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 
 #[test]
 fn graphs_stats() {

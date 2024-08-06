@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
-use gruphst::vertex::Vertex;
 use gruphst::edge::Edge;
+use gruphst::vertex::Vertex;
 
 #[path = "./graphs_test.rs"]
 mod graphs_test;

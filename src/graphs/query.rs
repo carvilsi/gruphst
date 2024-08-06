@@ -1,9 +1,8 @@
 use log::{debug, error};
 
-use crate::vertex::Vertex;
-use crate::graphs::Graphs;
 use crate::edge::Edge;
-use crate::CUREdgeVertex;
+use crate::graphs::Graphs;
+use crate::vertex::Vertex;
 
 impl Graphs {
     /// Returns a collection of Graps elements that matches the relation
@@ -73,7 +72,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| grph.has_edge_attr(attr_k))
+                .filter(|grph| grph.has_edge_with_attr_key(attr_k))
                 .collect::<Vec<&Vertex>>();
             if !graphs.is_empty() {
                 debug!(
@@ -101,7 +100,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| grph.like_edge_attr(attr_k))
+                .filter(|grph| grph.has_edge_with_attr_key_like(attr_k))
                 .collect::<Vec<&Vertex>>();
             if !graphs.is_empty() {
                 debug!(
@@ -135,7 +134,7 @@ impl Graphs {
         if let Some(graphs) = self.vault.get(&current_graph) {
             let graphs = graphs
                 .iter()
-                .filter(|grph| grph.equals_edge_attr(attr_k, attr_v.clone()))
+                .filter(|grph| grph.has_edge_with_attr_value_equal(attr_k, attr_v.clone()))
                 .collect::<Vec<&Vertex>>();
             if !graphs.is_empty() {
                 debug!(

@@ -4,7 +4,11 @@ use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{attributes::Attributes, edge::{Edge, Edge_}, CUREdgeVertex, RUDAttribute};
+use crate::{
+    attributes::Attributes,
+    edge::{Edge, Edge_},
+    RUDAttribute,
+};
 
 mod query;
 
@@ -23,29 +27,27 @@ pub struct Vertex {
     attr: Attributes,
 }
 
-impl CUREdgeVertex for Vertex {
-    fn get_id(&self) -> String {
+impl Vertex {
+    pub fn get_id(&self) -> String {
         self.id.clone()
     }
 
-    fn get_label(&self) -> String {
+    pub fn get_label(&self) -> String {
         self.relation.clone()
     }
 
-    fn set_label(&mut self, label: &str) {
+    pub fn set_label(&mut self, label: &str) {
         self.relation = label.to_string()
     }
 
-    fn get_attributes(&self) -> Attributes {
+    pub fn get_attributes(&self) -> Attributes {
         self.attr.clone()
     }
 
-    fn set_attributes(&mut self, attributes: Attributes) {
+    pub fn set_attributes(&mut self, attributes: Attributes) {
         self.attr = attributes;
     }
-}
 
-impl Vertex {
     /// Creates a new instance
     fn new(label: &str) -> Self {
         Vertex {
@@ -84,7 +86,10 @@ impl Vertex {
 
     /// Updates the "from" edge in Graph
     pub fn update_from(&mut self, from_edge: &Edge) {
-        debug!("Updated Graph [{}] from edge: {:#?}", self.id, from_edge.edge);
+        debug!(
+            "Updated Graph [{}] from edge: {:#?}",
+            self.id, from_edge.edge
+        );
         self.from = Rc::clone(&from_edge.edge);
     }
 
@@ -101,7 +106,7 @@ impl Vertex {
     }
 
     pub fn get_to_edge(&self) -> Edge {
-        Edge { 
+        Edge {
             edge: self.to.clone(),
         }
     }
@@ -116,36 +121,36 @@ impl Vertex {
 }
 
 impl RUDAttribute for Vertex {
-    fn set_attr<T>(&mut self, key: &str, val: T)
+    fn set<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.set_attr(key, val);
+        self.attr.set(key, val);
     }
 
-    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
-        self.attr.get_attr(key)
+    fn get(&self, key: &str) -> Result<&String, &'static str> {
+        self.attr.get(key)
     }
 
-    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    fn update<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
-        self.attr.update_attr(attr_k, attr_v)
+        self.attr.update(attr_k, attr_v)
     }
 
-    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    fn upsert<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.upsert_attr(attr_k, attr_v)
+        self.attr.upsert(attr_k, attr_v)
     }
 
-    fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
-        self.attr.del_attr(v)
+    fn delete(&mut self, v: &str) -> Result<(), &'static str> {
+        self.attr.delete(v)
     }
 
-    fn get_attr_keys(&self) -> Vec<&str> {
-        self.attr.get_attr_keys()
+    fn get_keys(&self) -> Vec<&str> {
+        self.attr.get_keys()
     }
 }

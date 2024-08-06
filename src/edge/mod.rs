@@ -10,19 +10,7 @@ use std::rc::Rc;
 
 mod query;
 
-#[derive(Debug, Clone, PartialEq,  Serialize, Deserialize)]
-pub struct Edge {
-    pub edge: Rc<RefCell<Edge_>>,
-}
-
-impl Edge {
-    pub fn new(label: &str) -> Self {
-        Edge {
-            edge: Edge_::new(label),
-        }
-    }
-}
-
+// TODO: this should be private
 /// Representation of a edge
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Edge_ {
@@ -34,7 +22,31 @@ pub struct Edge_ {
     attr: HashMap<String, String>,
 }
 
+impl Edge_ {
+    /// Creates a edge with the given label, the id is generated
+    pub fn new(label: &str) -> Rc<RefCell<Edge_>> {
+        let edge = Edge_ {
+            label: String::from(label),
+            id: Uuid::new_v4().to_string(),
+            attr: HashMap::new(),
+        };
+        debug!("The created edge: {:#?}", &edge);
+        Rc::new(RefCell::new(edge))
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Edge {
+    pub edge: Rc<RefCell<Edge_>>,
+}
+
 impl Edge {
+    pub fn new(label: &str) -> Self {
+        Edge {
+            edge: Edge_::new(label),
+        }
+    }
+
     pub fn get_id(&self) -> String {
         self.edge.borrow().id.clone()
     }
@@ -46,21 +58,24 @@ impl Edge {
     pub fn set_label(&mut self, label: &str) {
         self.edge.borrow_mut().label = label.to_string();
     }
-}
 
-impl Edge {
     /// Set attributes for a edge
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.edge.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+        self.edge
+            .borrow_mut()
+            .attr
+            .insert(attr_k.to_string(), attr_v.to_string());
         debug!(
             "added attribute key: {} with value {} for edge {}",
-            attr_k, attr_v, self.get_id()
+            attr_k,
+            attr_v,
+            self.get_id()
         );
     }
-    
+
     /// Get attribute for a edge
     pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
         let binding = self.edge.borrow();
@@ -69,7 +84,9 @@ impl Edge {
             Some(resp) => {
                 debug!(
                     "retrieved attribute value '{}' for '{}' for edge [{}]",
-                    resp, attr_k, self.get_id()
+                    resp,
+                    attr_k,
+                    self.get_id()
                 );
                 Ok(resp.clone())
             }
@@ -87,7 +104,9 @@ impl Edge {
     {
         debug!(
             "updated attribute key: {} with value {} for edge {}",
-            attr_k, attr_v, self.get_id()
+            attr_k,
+            attr_v,
+            self.get_id()
         );
         if let Some(attr) = self.edge.borrow_mut().attr.get_mut(attr_k) {
             *attr = attr_v.to_string();
@@ -108,14 +127,18 @@ impl Edge {
                 *attr = attr_v.to_string();
                 debug!(
                     "updated (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k, attr_v, self.get_id()
+                    attr_k,
+                    attr_v,
+                    self.get_id()
                 );
             }
             None => {
                 binding.attr.insert(attr_k.to_string(), attr_v.to_string());
                 debug!(
                     "added (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k, attr_v, self.get_id()
+                    attr_k,
+                    attr_v,
+                    self.get_id()
                 );
             }
         }
@@ -139,25 +162,14 @@ impl Edge {
     /// Returns an Array containing all attribute keys
     pub fn get_attr_keys(&self) -> Vec<String> {
         let binding = self.edge.borrow();
-        let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
+        // FIXME: clippy has a warning here:
+        // let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
+        // |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `binding.attr.keys().map(|k| k.clone())`
+
+        let kv: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
         kv
     }
-}
 
-impl Edge_ {
-    /// Creates a edge with the given label, the id is generated
-    pub fn new(label: &str) -> Rc<RefCell<Edge_>> {
-        let edge = Edge_ {
-            label: String::from(label),
-            id: Uuid::new_v4().to_string(),
-            attr: HashMap::new(),
-        };
-        debug!("The created edge: {:#?}", &edge);
-        Rc::new(RefCell::new(edge))
-    }
-}
-
-impl Edge {
     /// Retrieves the edges that has relation out for the given edge on graph
     pub fn get_relations_out_on_graph(
         &self,

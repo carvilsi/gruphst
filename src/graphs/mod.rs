@@ -3,8 +3,7 @@ use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
 use std::collections::HashMap;
 
-// use crate::{vertex::Vertex, edge::Edge, util::graphs_memory_watcher, CUREdgeVertex};
-use crate::{edge::Edge, vertex::Vertex, CUREdgeVertex};
+use crate::{edge::Edge, vertex::Vertex};
 
 mod persistence;
 mod query;
@@ -93,7 +92,6 @@ impl Graphs {
             v.push(graph.clone());
             debug!("no graph element at vault, created one and added graph");
         }
-        // graphs_memory_watcher(self);
     }
 
     /// Retrieves the collection of graphs
@@ -163,7 +161,6 @@ impl Graphs {
                 graphs.remove(i);
                 debug!("Graph to update found it at index: {i}");
                 graphs.push(graph_to_update.clone());
-                // graphs_memory_watcher(self);
                 Ok(())
             } else {
                 error!(
