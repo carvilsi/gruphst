@@ -35,6 +35,20 @@ fn edge_get_id() {
 }
 
 #[test]
+fn edge_attribute_len() {
+    let (edge, _id) = prepare_edge_test();
+    assert_eq!(edge.attr_len(), 2);
+}
+
+#[test]
+fn edge_attribute_emptiness() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(!edge.attr_is_empty());
+    let ed = Edge::new("Ed");
+    assert!(ed.attr_is_empty());
+}
+
+#[test]
 fn edge_get_attribute() {
     let (edge, _id) = prepare_edge_test();
     assert_eq!(edge.get_attr("name").unwrap(), "Alice");
@@ -86,6 +100,12 @@ fn edge_delete_attributes() {
 }
 
 #[test]
+fn edge_delete_attributes_fail_since_attribute_does_not_exists() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert!(edge.del_attr("foobar").is_err());
+}
+
+#[test]
 fn edge_attribute_keys() {
     let (edge, _id) = prepare_edge_test();
     let keys = edge.get_attr_keys();
@@ -128,6 +148,14 @@ fn get_edge_relation_out() {
     } else {
         assert!(false);
     }
+}
+
+#[test]
+fn not_relations_out_in_on_vertices() {
+    let graphs = prepare_graphs_test();
+    let edge = Edge::new("solo");
+    assert!(edge.get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap()).is_err());
+    assert!(edge.get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap()).is_err());
 }
 
 #[test]

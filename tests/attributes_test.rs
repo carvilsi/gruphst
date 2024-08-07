@@ -1,4 +1,4 @@
-use gruphst::{attributes::Attributes, QueryAttribute, RUDAttribute};
+use gruphst::{attributes::Attributes, config::get_log_level, enable_logging, QueryAttribute, RUDAttribute};
 
 fn prepare_attribute_test() -> (Attributes, String) {
     let mut attributes = Attributes::new();
@@ -68,6 +68,7 @@ fn del_attribute() {
 
 #[test]
 fn attribute_keys() {
+    enable_logging(get_log_level());
     let (attr, _id) = prepare_attribute_test();
     let keys = attr.get_attr_keys();
     assert_eq!(keys.len(), 3);

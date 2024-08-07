@@ -9,27 +9,27 @@ impl Graphs {
     pub fn find_by_relation(
         &mut self,
         relation_name: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            let graphs = graphs
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            let vrtcs = vertices
                 .iter()
                 .filter(|grph| grph.get_relation() == relation_name)
                 .collect::<Vec<&Vertex>>();
-            if !graphs.is_empty() {
+            if !vrtcs.is_empty() {
                 debug!(
                     "Founded {} vertices with '{}' relation name",
-                    graphs.len(),
+                    vrtcs.len(),
                     relation_name
                 );
-                Ok(graphs)
+                Ok(vrtcs)
             } else {
                 error!("Any graph found for relation: {}", relation_name);
                 Err("Any graph found for relation")
             }
         } else {
-            Err("no graphs found on vault")
+            Err("no vertices on vault")
         }
     }
 
@@ -38,55 +38,55 @@ impl Graphs {
     pub fn find_by_relations(
         &mut self,
         relations: Vec<&str>,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            let graphs = graphs
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            let vertex = vertices
                 .iter()
                 .filter(|grph| relations.contains(&grph.get_relation().as_str()))
                 .collect::<Vec<&Vertex>>();
-            if !graphs.is_empty() {
+            if !vertex.is_empty() {
                 debug!(
                     "Founded {} graphs with '{:#?}' relations",
-                    graphs.len(),
+                    vertex.len(),
                     relations
                 );
-                Ok(graphs)
+                Ok(vertex)
             } else {
                 error!("Any graph found for relations: {:#?}", relations);
                 Err("Any graph found for relation")
             }
         } else {
-            Err("graphs not found on vault")
+            Err("no vertices not found on vault")
         }
     }
 
-    /// Returns a collection of graphs that matches an attribute edge by key
-    pub fn has_graph_edge_attr(
+    /// Returns a collection of vertices that matches an attribute edge by key
+    pub fn has_edge_attr_on_vertices(
         &mut self,
         attr_k: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            let graphs = graphs
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            let vrtcs = vertices
                 .iter()
                 .filter(|grph| grph.has_edge_with_attr_key(attr_k))
                 .collect::<Vec<&Vertex>>();
-            if !graphs.is_empty() {
+            if !vrtcs.is_empty() {
                 debug!(
                     "Founded {} graphs where an attribute key is '{}'",
-                    graphs.len(),
+                    vrtcs.len(),
                     attr_k
                 );
-                Ok(graphs)
+                Ok(vrtcs)
             } else {
-                error!("Any graph found for attribute: {}", attr_k);
-                Err("Any graph found for attribute")
+                error!("Any vertex found for attribute: {}", attr_k);
+                Err("Any vertex found for attribute")
             }
         } else {
-            Err("no graphs found on vault")
+            Err("no vertices on vault")
         }
     }
 
@@ -94,24 +94,24 @@ impl Graphs {
     pub fn like_graph_edge_attr(
         &mut self,
         attr_k: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str> {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            let graphs = graphs
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            let vrtcs = vertices
                 .iter()
                 .filter(|grph| grph.has_edge_with_attr_key_like(attr_k))
                 .collect::<Vec<&Vertex>>();
-            if !graphs.is_empty() {
+            if !vrtcs.is_empty() {
                 debug!(
-                    "Founded {} graphs where an attribute key is '{}'",
-                    graphs.len(),
+                    "Founded {} Vertices where an attribute key is '{}'",
+                    vrtcs.len(),
                     attr_k
                 );
-                Ok(graphs)
+                Ok(vrtcs)
             } else {
-                error!("Any graph found for attribute: {}", attr_k);
-                Err("Any graph found for attribute")
+                error!("Any vertex found for attribute: {}", attr_k);
+                Err("Any vertex found for attribute")
             }
         } else {
             Err("no graphs on vault")
@@ -125,30 +125,30 @@ impl Graphs {
         &self,
         attr_k: &str,
         attr_v: T,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<&Vertex>, &'static str>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            let graphs = graphs
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            let vrtcs = vertices
                 .iter()
                 .filter(|grph| grph.has_edge_with_attr_value_equal(attr_k, attr_v.clone()))
                 .collect::<Vec<&Vertex>>();
-            if !graphs.is_empty() {
+            if !vrtcs.is_empty() {
                 debug!(
-                    "Founded {} graphs where an attribute key is '{}'",
-                    graphs.len(),
+                    "Founded {} Vertices where an attribute key is '{}'",
+                    vrtcs.len(),
                     attr_k
                 );
-                Ok(graphs)
+                Ok(vrtcs)
             } else {
-                error!("Any graph found for attribute: {}", attr_k);
-                Err("Any graph found for attribute")
+                error!("Any vertex found for attribute: {}", attr_k);
+                Err("Any vertex found for attribute")
             }
         } else {
-            Err("no graphs on vault")
+            Err("no vertices on vault")
         }
     }
 
@@ -156,39 +156,39 @@ impl Graphs {
     pub fn find_by_id(
         &mut self,
         id: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<&mut Vertex, &'static str> {
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get_mut(&current_graph) {
-            let graph = graphs.iter_mut().find(|graph| {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get_mut(&current_vault) {
+            let vertex = vertices.iter_mut().find(|graph| {
                 graph.get_id() == id
                     || graph.get_from_edge().get_id() == id
                     || graph.get_to_edge().get_id() == id
             });
-            if graph.is_some() {
-                debug!("Founded Vertex by id: {:#?}", graph);
-                Ok(graph.unwrap())
+            if vertex.is_some() {
+                debug!("Founded Vertex by id: {:#?}", vertex);
+                Ok(vertex.unwrap())
             } else {
                 error!("Vertex with id [{}] not found", id);
                 Err("Vertex not found")
             }
         } else {
-            Err("no graphs found at vault")
+            Err("no vertices found at vault")
         }
     }
 
     /// Find in any graph on vault by id
     pub fn find_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Vertex, &'static str> {
-        for (_graph_name, graphs) in self.vault.iter_mut() {
-            println!("Tha name: {}", _graph_name);
-            let graph = graphs.iter_mut().find(|graph| {
-                graph.get_id() == id
-                    || graph.get_from_edge().get_id() == id
-                    || graph.get_to_edge().get_id() == id
+        for (_vault_name, vertices) in self.vault.iter_mut() {
+            println!("Tha name: {}", _vault_name);
+            let vertex = vertices.iter_mut().find(|vrtx| {
+                vrtx.get_id() == id
+                    || vrtx.get_from_edge().get_id() == id
+                    || vrtx.get_to_edge().get_id() == id
             });
-            if graph.is_some() {
-                debug!("Founded Vertex by id: {:#?}", graph);
-                return Ok(graph.unwrap());
+            if vertex.is_some() {
+                debug!("Founded Vertex by id: {:#?}", vertex);
+                return Ok(vertex.unwrap());
             }
         }
         Err("Vertex not found")
@@ -198,20 +198,20 @@ impl Graphs {
     pub fn has_relation_in(
         &self,
         relation_in: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<Edge>, &'static str> {
         let mut relations_in: Vec<Edge> = Vec::new();
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            for graph in graphs {
-                if graph.get_relation() == relation_in
-                    && !relations_in.contains(&graph.get_to_edge())
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            for vertex in vertices {
+                if vertex.get_relation() == relation_in
+                    && !relations_in.contains(&vertex.get_to_edge())
                 {
-                    relations_in.push(graph.get_to_edge().clone());
+                    relations_in.push(vertex.get_to_edge().clone());
                 }
             }
         } else {
-            return Err("no current graph in vault");
+            return Err("no current vertex in vault");
         }
         if !relations_in.is_empty() {
             Ok(relations_in)
@@ -224,20 +224,20 @@ impl Graphs {
     pub fn has_relation_out(
         &self,
         relation_out: &str,
-        graphs_name: Option<&str>,
+        vault_name: Option<&str>,
     ) -> Result<Vec<Edge>, &'static str> {
         let mut relations_out: Vec<Edge> = Vec::new();
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            for graph in graphs {
-                if graph.get_relation() == relation_out
-                    && !relations_out.contains(&graph.get_from_edge())
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(vertices) = self.vault.get(&current_vault) {
+            for vertex in vertices {
+                if vertex.get_relation() == relation_out
+                    && !relations_out.contains(&vertex.get_from_edge())
                 {
-                    relations_out.push(graph.get_from_edge().clone());
+                    relations_out.push(vertex.get_from_edge().clone());
                 }
             }
         } else {
-            return Err("no current graph in vault");
+            return Err("no current vertex in vault");
         }
         if !relations_out.is_empty() {
             Ok(relations_out)

@@ -135,7 +135,7 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 #[test]
 fn should_find_graphs_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.has_graph_edge_attr("age", None).unwrap();
+    let found_graphs = graphs.has_edge_attr_on_vertices("age", None).unwrap();
     assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_edge().get_label(), "Bob");
 }
