@@ -4,11 +4,11 @@ use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 fn graphs_stats() {
     let mut graphs = Graphs::init("friends-and-enemies");
 
-    let mut alice = Edge::new("Alice");
-    let mut bob = Edge::new("Bob");
-    let fred = Edge::new("Fred");
-    let john = Edge::new("John");
-    let peter = Edge::new("Peter");
+    let mut alice = Vertex::new("Alice");
+    let mut bob = Vertex::new("Bob");
+    let fred = Vertex::new("Fred");
+    let john = Vertex::new("John");
+    let peter = Vertex::new("Peter");
 
     alice.set_attr("address", "Elm street");
     alice.set_attr("email", "alice@mailinator.com");
@@ -21,20 +21,20 @@ fn graphs_stats() {
     let relation_friend_of = "friend of";
     let relation_relative_of = "relative of";
 
-    let mut graph = Vertex::create(&alice, relation_friend_of, &bob);
-    graphs.add_vertex(&graph, None);
+    let mut graph = Edge::create(&alice, relation_friend_of, &bob);
+    graphs.add_edge(&graph, None);
 
-    graph = Vertex::create(&alice, relation_relative_of, &fred);
-    graphs.add_vertex(&graph, None);
+    graph = Edge::create(&alice, relation_relative_of, &fred);
+    graphs.add_edge(&graph, None);
 
-    graph = Vertex::create(&alice, relation_friend_of, &john);
-    graphs.add_vertex(&graph, None);
+    graph = Edge::create(&alice, relation_friend_of, &john);
+    graphs.add_edge(&graph, None);
 
-    graph = Vertex::create(&peter, relation_relative_of, &john);
-    graphs.add_vertex(&graph, None);
+    graph = Edge::create(&peter, relation_relative_of, &john);
+    graphs.add_edge(&graph, None);
 
     graphs.insert("only relatives");
-    graphs.add_vertex(&graph, None);
+    graphs.add_edge(&graph, None);
 
     // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.stats().unwrap();

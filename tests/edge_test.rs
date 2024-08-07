@@ -1,31 +1,47 @@
-use std::collections::HashMap;
-
-use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
-use gruphst::edge::Edge;
-use gruphst::vertex::Vertex;
-
-#[path = "./graphs_test.rs"]
-mod graphs_test;
+use gruphst::{attributes::Attributes, edge::Edge, vertex::Vertex, *};
 
 fn prepare_edge_test() -> (Edge, String) {
-    let mut edge = Edge::new("alice");
-    edge.set_attr("name", "Alice");
-    edge.set_attr("age", 42);
+    let mut alice = Vertex::new("alice");
+    alice.set_attr("age", 42);
+    let bob = Vertex::new("bob");
+    let mut edge = Edge::create(&alice, "friend of", &bob);
+    edge.set_attr("type", "friendship");
+    edge.set_attr("value", 2);
     (edge.clone(), edge.get_id())
 }
 
 #[test]
-fn edge_get_label() {
-    let (edge, _id) = prepare_edge_test();
-    assert_eq!(edge.get_label(), "alice");
+fn edge_add_relation_to_exisiting_edge() {
+    let mut edge = Edge::new("");
+    let mut alice = Vertex::new("alice");
+    alice.set_attr("age", 42);
+    let bob = Vertex::new("bob");
+    edge.add_relation(&alice, "best friends", &bob);
+    assert_eq!(edge.get_label(), "best friends");
 }
 
 #[test]
-fn edge_set_label() {
+fn edge_get_relation_label() {
+    let (edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_relation(), "friend of");
+    // an alias
+    assert_eq!(edge.get_label(), "friend of");
+}
+
+#[test]
+fn edge_set_relation_label() {
     let (mut edge, _id) = prepare_edge_test();
-    assert_eq!(edge.get_label(), "alice");
-    edge.set_label("alice marcus");
-    assert_eq!(edge.get_label(), "alice marcus");
+    assert_eq!(edge.get_label(), "friend of");
+    edge.set_label("best friend of");
+    assert_eq!(edge.get_label(), "best friend of");
+}
+
+#[test]
+fn edge_set_relation() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_relation(), "friend of");
+    edge.set_relation("best friend");
+    assert_eq!(edge.get_relation(), "best friend");
 }
 
 #[test]
@@ -35,164 +51,168 @@ fn edge_get_id() {
 }
 
 #[test]
-fn edge_attribute_len() {
+fn edge_attributes() {
     let (edge, _id) = prepare_edge_test();
-    assert_eq!(edge.attr_len(), 2);
-}
-
-#[test]
-fn edge_attribute_emptiness() {
-    let (edge, _id) = prepare_edge_test();
-    assert!(!edge.attr_is_empty());
-    let ed = Edge::new("Ed");
-    assert!(ed.attr_is_empty());
-}
-
-#[test]
-fn edge_get_attribute() {
-    let (edge, _id) = prepare_edge_test();
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-    assert_eq!(edge.get_attr("age").unwrap(), "42");
+    assert_eq!(edge.get_attr("type").unwrap(), "friendship");
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
 }
 
 #[test]
 fn edge_set_attribute() {
     let (mut edge, _id) = prepare_edge_test();
-    edge.set_attr("address", "Elm Street");
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-    assert_eq!(edge.get_attr("age").unwrap(), "42");
-    assert_eq!(edge.get_attr("address").unwrap(), "Elm Street");
+    edge.set_attr("weight", 5);
+    assert_eq!(edge.get_attr("type").unwrap(), "friendship");
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
+    assert_eq!(edge.get_attr("weight").unwrap(), "5");
 }
 
 #[test]
-fn edge_update_attributes() {
+fn edge_update_attribute() {
     let (mut edge, _id) = prepare_edge_test();
-    edge.update_attr("name", "Alice Marcus").unwrap();
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice Marcus");
-    assert_eq!(edge.get_attr("age").unwrap(), "42");
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
+    edge.update_attr("value", 3).unwrap();
+    assert_eq!(edge.get_attr("value").unwrap(), "3");
 }
 
 #[test]
-fn edge_fail_update_attributes() {
+fn edge_fail_update_attribute() {
     let (mut edge, _id) = prepare_edge_test();
-    assert!(edge.update_attr("foo", "Alice Marcus").is_err());
+    assert!(edge.update_attr("foo", 3).is_err());
 }
 
 #[test]
-fn edge_upsert_attributes() {
+fn edge_upsert_attribute() {
     let (mut edge, _id) = prepare_edge_test();
-    edge.upsert_attr("surname", "Marcus");
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-    assert_eq!(edge.get_attr("age").unwrap(), "42");
-    edge.upsert_attr("age", 43);
-    assert_eq!(edge.get_attr("surname").unwrap(), "Marcus");
-    assert_eq!(edge.get_attr("age").unwrap(), "43");
-}
-
-#[test]
-fn edge_delete_attributes() {
-    let (mut edge, _id) = prepare_edge_test();
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-    assert_eq!(edge.get_attr("age").unwrap(), "42");
-    let _ = edge.del_attr("age");
-    assert_eq!(edge.get_attr("name").unwrap(), "Alice");
-    assert!(edge.get_attr("age").is_err());
-}
-
-#[test]
-fn edge_delete_attributes_fail_since_attribute_does_not_exists() {
-    let (mut edge, _id) = prepare_edge_test();
-    assert!(edge.del_attr("foobar").is_err());
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
+    edge.upsert_attr("value", 3);
+    assert_eq!(edge.get_attr("value").unwrap(), "3");
+    edge.upsert_attr("range", "low");
+    assert_eq!(edge.get_attr("range").unwrap(), "low");
 }
 
 #[test]
 fn edge_attribute_keys() {
     let (edge, _id) = prepare_edge_test();
     let keys = edge.get_attr_keys();
-    assert!(keys.contains(&"name".to_string()));
-    assert!(keys.contains(&"age".to_string()));
-    assert!(!keys.contains(&"surname".to_string()));
+    assert!(keys.contains(&&"type"));
+    assert!(keys.contains(&&"value"));
+    assert!(!keys.contains(&&"foo"));
 }
 
 #[test]
-fn get_edge_relation_out() {
-    let mut graphs = prepare_graphs_test();
-    prepare_insert_graph_test(&mut graphs);
-
-    let find_results = graphs
-        .has_relation_out("relative of", Some("my graphs"))
-        .unwrap();
-    assert_eq!(find_results.len(), 1);
-    assert_eq!(find_results[0].get_label(), "Fred");
-    let edge = find_results[0].clone();
-    graphs.add_vertex(
-        &Vertex::create(&edge, "relative of", &Edge::new("Peter")),
-        Some("my graphs"),
-    );
-    let relations_out: HashMap<String, Vec<Edge>> = edge
-        .get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
-        .unwrap();
-    assert!(relations_out.contains_key("relative of"));
-    assert!(relations_out.contains_key("friend of"));
-    assert_eq!(relations_out.len(), 2);
-    if let Some(edges) = relations_out.get("relative of") {
-        assert_eq!(edges.len(), 2);
-        assert_eq!(edges[0].get_label(), "Alice".to_string());
-        assert_eq!(edges[1].get_label(), "Peter".to_string());
-    } else {
-        assert!(false);
-    }
-    if let Some(edges) = relations_out.get("friend of") {
-        assert_eq!(edges.len(), 1);
-        assert_eq!(edges[0].get_label(), "Bob".to_string());
-    } else {
-        assert!(false);
-    }
+fn edge_get_attributes() {
+    let (edge, _id) = prepare_edge_test();
+    let attributes = edge.get_attributes();
+    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
+    assert_eq!(attributes.get_attr("value").unwrap(), "2");
 }
 
 #[test]
-fn not_relations_out_in_on_vertices() {
-    let graphs = prepare_graphs_test();
-    let edge = Edge::new("solo");
-    assert!(edge
-        .get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
-        .is_err());
-    assert!(edge
-        .get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
-        .is_err());
+fn edge_set_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    let attributes = edge.get_attributes();
+    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
+    assert_eq!(attributes.get_attr("value").unwrap(), "2");
+    assert_eq!(edge.get_attr("type").unwrap(), "friendship");
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
+    let mut new_attributes = Attributes::new();
+    new_attributes.set_attr("color", "black");
+    new_attributes.set_attr("weight", 5);
+    edge.set_attributes(new_attributes);
+    let update_attributes = edge.get_attributes();
+    assert!(update_attributes.get_attr("type").is_err());
+    assert!(update_attributes.get_attr("value").is_err());
+    assert_eq!(update_attributes.get_attr("color").unwrap(), "black");
+    assert_eq!(update_attributes.get_attr("weight").unwrap(), "5");
+    assert!(edge.get_attr("type").is_err());
+    assert!(edge.get_attr("value").is_err());
+    assert_eq!(edge.get_attr("color").unwrap(), "black");
+    assert_eq!(edge.get_attr("weight").unwrap(), "5");
 }
 
 #[test]
-fn get_edge_relation_in() {
-    let mut graphs = prepare_graphs_test();
-    prepare_insert_graph_test(&mut graphs);
+fn edge_update_from_vertex() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_from_vertex().get_label(), "alice");
+    let vertex = Vertex::new("fred");
+    edge.update_from(&vertex);
+    assert_eq!(edge.get_from_vertex().get_label(), "fred");
+}
 
-    let find_results = graphs
-        .has_relation_in("friend of", Some("my graphs"))
-        .unwrap();
-    assert_eq!(find_results.len(), 2);
-    let mut edge: Edge = Edge::new("tmp");
-    for n in find_results {
-        if n.get_label() == "Alice".to_string() {
-            edge = n.clone();
-        }
-    }
-    let relations_in: HashMap<String, Vec<Edge>> = edge
-        .get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
-        .unwrap();
-    assert!(relations_in.contains_key("relative of"));
-    assert!(relations_in.contains_key("friend of"));
-    assert_eq!(relations_in.len(), 2);
-    if let Some(edges) = relations_in.get("relative of") {
-        assert_eq!(edges.len(), 1);
-        assert_eq!(edges[0].get_label(), "Fred".to_string());
-    } else {
-        assert!(false);
-    }
-    if let Some(edges) = relations_in.get("friend of") {
-        assert_eq!(edges.len(), 1);
-        assert_eq!(edges[0].get_label(), "Bob".to_string());
-    } else {
-        assert!(false);
-    }
+#[test]
+fn edge_update_to_vertex() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_to_vertex().get_label(), "bob");
+    let vertex = Vertex::new("fred");
+    edge.update_to(&vertex);
+    assert_eq!(edge.get_to_vertex().get_label(), "fred");
+}
+
+#[test]
+fn should_check_if_attribute_exists_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_attr_key("value"));
+    assert!(!edge.has_attr_key("age"));
+}
+
+#[test]
+fn should_check_if_attribute_exists_on_any_edge_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_key("age"));
+    assert!(!edge.has_vertex_with_attr_key("foo"));
+}
+
+#[test]
+fn should_check_if_attribute_like_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_attr_key_like("va"));
+    assert!(!edge.has_attr_key_like("ag"));
+}
+
+#[test]
+fn should_check_if_attribute_like_on_any_edge_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_key_like("Ag"));
+    assert!(!edge.has_vertex_with_attr_key("foo"));
+}
+
+#[test]
+fn should_check_if_attribute_is_equals_to() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_attr_equals_to("value", 2));
+    assert!(!edge.has_attr_equals_to("value", 5));
+    assert!(!edge.has_attr_equals_to("foo", 25));
+}
+
+#[test]
+fn should_check_in_edge_if_attribute_is_equals_to() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_value_equals_to("age", 42));
+    assert!(!edge.has_vertex_with_attr_value_equals_to("age", 43));
+    assert!(!edge.has_vertex_with_attr_value_equals_to("foo", 25));
+}
+
+#[test]
+fn should_get_the_amount_of_attribute_for_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert_eq!(edge.attr_len(), 2);
+}
+
+#[test]
+fn should_check_if_the_attributes_for_edge_is_empty() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(!edge.attr_is_empty());
+}
+
+#[test]
+fn should_delete_an_attribute_for_edge() {
+    let (mut edge, _id) = prepare_edge_test();
+    let _ = edge.delete_attr("type");
+    assert_eq!(edge.attr_len(), 1);
+}
+
+#[test]
+fn should_fail_to_delete_an_attribute_for_edge_if_does_not_exists() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert!(edge.delete_attr("foobar").is_err());
 }

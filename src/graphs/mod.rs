@@ -12,8 +12,8 @@ mod stats;
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
-    /// The container of Vertices
-    vault: HashMap<String, Vec<Vertex>>,
+    /// The container of Edges
+    vault: HashMap<String, Vec<Edge>>,
     /// Name for the current vault
     label: String,
     /// Some attributes to handle metada for Graphs
@@ -23,7 +23,7 @@ pub struct Graphs {
 impl Graphs {
     /// Initializes a new Graphs element
     pub fn init(label: &str) -> Self {
-        let mut vault: HashMap<String, Vec<Vertex>> = HashMap::new();
+        let mut vault: HashMap<String, Vec<Edge>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
         Graphs {
             label: String::from(label),
@@ -33,9 +33,9 @@ impl Graphs {
     }
 
     /// Initializes a new Graphs element adding a Graph to new vault
-    pub fn init_with(label: &str, vertex: &Vertex) -> Self {
+    pub fn init_with(label: &str, vertex: &Edge) -> Self {
         let mut graphs = Graphs::init(label);
-        graphs.add_vertex(vertex, None);
+        graphs.add_edge(vertex, None);
         graphs
     }
 
@@ -47,10 +47,10 @@ impl Graphs {
     }
 
     /// Creates a new entry on Graphs valut with a Graph
-    pub fn insert_with(&mut self, name: &str, vertex: &Vertex) {
+    pub fn insert_with(&mut self, name: &str, edge: &Edge) {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
-        self.add_vertex(vertex, Some(name));
+        self.add_edge(edge, Some(name));
         self.stats = self.stats().unwrap();
     }
 
@@ -66,46 +66,46 @@ impl Graphs {
         self.stats.clone()
     }
 
-    /// Adds a Vertex element to the Graphs' vault
+    /// Adds a Edge element to the Graphs' vault
     /// for the provided graphs vault name
     /// if does not exists it creates a new entry
     /// at vault.
     /// If None name is provided, the current one
     /// is use for the addition.
-    pub fn add_vertex(&mut self, vertex: &Vertex, vault_name: Option<&str>) {
+    pub fn add_edge(&mut self, edge: &Edge, vault_name: Option<&str>) {
         let current_vault = self.select_vault_label(vault_name);
-        if let Some(v) = self.vault.get_mut(&current_vault) {
-            v.push(vertex.clone());
+        if let Some(e) = self.vault.get_mut(&current_vault) {
+            e.push(edge.clone());
         } else {
             self.insert(&current_vault);
             let v = self.vault.get_mut(&current_vault).unwrap();
-            v.push(vertex.clone());
+            v.push(edge.clone());
         }
     }
 
-    // TODO: create method to add a collection of vertex, AKA vertices
+    // TODO: create method to add a collection of Edges
 
-    /// Retrieves the collection of vertices
+    /// Retrieves the collection of edges
     /// the default one or by name
-    pub fn get_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
+    pub fn get_edges(&self, vault_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
         let current_vault = self.select_vault_label(vault_name);
-        if let Some(vertices) = self.vault.get(&current_vault) {
-            Ok(vertices.clone())
+        if let Some(edges) = self.vault.get(&current_vault) {
+            Ok(edges.clone())
         } else {
             Err("no graphs found on vault")
         }
     }
 
-    /// Returns a collection with the unique edges on a vault
-    pub fn get_uniq_edges(&self, vault_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
-        let vertices = self.get_vertices(vault_name).unwrap();
-        let mut edges_map: HashMap<String, Edge> = HashMap::new();
-        for vertex in vertices {
-            edges_map.insert(vertex.get_from_edge().get_id(), vertex.get_from_edge());
-            edges_map.insert(vertex.get_to_edge().get_id(), vertex.get_to_edge());
+    /// Returns a collection with the unique vertices on a vault
+    pub fn get_uniq_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
+        let edges = self.get_edges(vault_name).unwrap();
+        let mut vertices_map: HashMap<String, Vertex> = HashMap::new();
+        for edge in edges {
+            vertices_map.insert(edge.get_from_vertex().get_id(), edge.get_from_vertex());
+            vertices_map.insert(edge.get_to_vertex().get_id(), edge.get_to_vertex());
         }
-        let uniq_edges: Vec<Edge> = edges_map.into_values().collect();
-        Ok(uniq_edges)
+        let uniq_vertices: Vec<Vertex> = vertices_map.into_values().collect();
+        Ok(uniq_vertices)
     }
 
     /// Updates the name of the Graphs
@@ -113,57 +113,54 @@ impl Graphs {
         self.label = label.to_string();
     }
 
-    /// Deletes the Vertex that matches with the provided id
-    pub fn delete_vertex_by_id(
+    /// Deletes the Edge that matches with the provided id
+    pub fn delete_edge_by_id(
         &mut self,
         id: String,
         vault_name: Option<&str>,
     ) -> Result<(), &'static str> {
         let current_vault = self.select_vault_label(vault_name);
-        if let Some(vertices) = self.vault.get_mut(&current_vault) {
-            if let Some(index) = vertices.iter().position(|vertex| vertex.get_id() == id) {
-                vertices.remove(index);
+        if let Some(edges) = self.vault.get_mut(&current_vault) {
+            if let Some(index) = edges.iter().position(|edge| edge.get_id() == id) {
+                edges.remove(index);
                 Ok(())
             } else {
-                error!("Vertex [{}] to delete not found", id);
-                Err("Vertex to delete not found")
+                error!("Edge [{}] to delete not found", id);
+                Err("Edge to delete not found")
             }
         } else {
-            Err("no vertices found on vault")
+            Err("no edges found on vault")
         }
     }
 
-    /// Updates the Vertex on vault with the provided one
+    /// Updates the Edge on vault with the provided one
     pub fn update_graph(
         &mut self,
-        vertex_to_update: &Vertex,
+        edge_to_update: &Edge,
         vault_name: Option<&str>,
     ) -> Result<(), &'static str> {
         let current_vault = self.select_vault_label(vault_name);
-        if let Some(vertices) = self.vault.get_mut(&current_vault) {
-            let index = vertices
+        if let Some(edges) = self.vault.get_mut(&current_vault) {
+            let index = edges
                 .iter()
-                .position(|vertex| vertex.get_id() == vertex_to_update.get_id());
+                .position(|vertex| vertex.get_id() == edge_to_update.get_id());
             if index.is_some() {
                 let i = index.unwrap();
-                vertices.remove(i);
-                vertices.push(vertex_to_update.clone());
+                edges.remove(i);
+                edges.push(edge_to_update.clone());
                 Ok(())
             } else {
                 error!(
-                    "Vertex to update with id: [{}] not found",
-                    vertex_to_update.get_id()
+                    "Edge to update with id: [{}] not found",
+                    edge_to_update.get_id()
                 );
-                Err("vertex to update not found")
+                Err("edge to update not found")
             }
         } else {
             Err("no graphs in vault")
         }
     }
-}
 
-// A bundle for util functions
-impl Graphs {
     /// Retrieves the current vault or returns the current one
     fn select_vault_label(&self, vault_label: Option<&str>) -> String {
         let mut current_vault = self.label.clone();

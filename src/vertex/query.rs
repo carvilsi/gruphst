@@ -1,48 +1,43 @@
-use crate::vertex::Vertex;
-use crate::QueryAttribute;
+use super::Vertex;
 
 impl Vertex {
-    /// Checks if "from" or "to" edge has an attribute
-    pub fn has_edge_with_attr_key(&self, attr_k: &str) -> bool {
-        self.get_from_edge().has_attr(attr_k) || self.get_to_edge().has_attr(attr_k)
+    /// Checks if an attribute key exists
+    pub fn has_attr(&self, attr_k: &str) -> bool {
+        self.vrtx.borrow().attr.contains_key(attr_k)
     }
 
-    /// Checks if "from" or "to" edge has a like attribute
-    pub fn has_edge_with_attr_key_like(&self, attr_k: &str) -> bool {
-        self.get_from_edge().has_attr_like(attr_k) || self.get_to_edge().has_attr_like(attr_k)
+    /// Checks if an attribute key is like on a vertex
+    pub fn has_attr_like(&self, attr_k: &str) -> bool {
+        for key in self.vrtx.borrow().attr.keys() {
+            if key.to_lowercase().contains(&attr_k.to_lowercase()) {
+                return true;
+            }
+        }
+        false
     }
 
-    /// Checks if "from" or "to" edge has an attribute and equal for value
-    pub fn has_edge_with_attr_value_equal<T>(&self, attr_k: &str, attr_v: T) -> bool
+    /// Checks if an attribute key exists on a vertex
+    /// and the value matchs
+    pub fn attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        self.get_from_edge().attr_equals_to(attr_k, attr_v.clone())
-            || self.get_to_edge().attr_equals_to(attr_k, attr_v.clone())
-    }
-}
-
-impl QueryAttribute for Vertex {
-    fn has_attr_key(&self, attr_k: &str) -> bool {
-        self.attr.has_attr_key(attr_k)
-    }
-
-    fn has_attr_key_like(&self, attr_k: &str) -> bool {
-        self.attr.has_attr_key_like(attr_k)
+        match self.vrtx.borrow().attr.get(attr_k) {
+            Some(val) => {
+                let v = attr_v.clone();
+                *val == v.to_string()
+            }
+            None => false,
+        }
     }
 
-    fn has_attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
-    where
-        T: std::fmt::Display + std::clone::Clone,
-    {
-        self.attr.has_attr_equals_to(attr_k, attr_v)
+    /// Retrieves the lenght of attributes for a vertex
+    pub fn attr_len(&self) -> usize {
+        self.vrtx.borrow().attr.len()
     }
 
-    fn attr_len(&self) -> usize {
-        self.attr.attr_len()
-    }
-
-    fn attr_is_empty(&self) -> bool {
-        self.attr.attr_is_empty()
+    /// Checks if attributes for a vertex is empty
+    pub fn attr_is_empty(&self) -> bool {
+        self.attr_len() == 0
     }
 }

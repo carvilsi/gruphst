@@ -1,186 +1,148 @@
-use log::warn;
+use std::{cell::RefCell, rc::Rc};
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::vertex::Vertex;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::Rc;
+use crate::{
+    attributes::Attributes,
+    vertex::{Vertex, Vertex_},
+    RUDAttribute,
+};
 
 mod query;
 
-// TODO: this should be private
-/// Representation of a edge
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Edge_ {
-    /// A edge id is an uuid as identifier
-    id: String,
-    /// And a name
-    label: String,
-    /// The attributes for a edge
-    attr: HashMap<String, String>,
-}
-
-impl Edge_ {
-    /// Creates a edge with the given label, the id is generated
-    fn new(label: &str) -> Rc<RefCell<Edge_>> {
-        let edge = Edge_ {
-            label: String::from(label),
-            id: Uuid::new_v4().to_string(),
-            attr: HashMap::new(),
-        };
-        Rc::new(RefCell::new(edge))
-    }
-}
-
-// wrapper for Edge_
+/// Representation of a Edge, that consists on the relation of two vertices
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Edge {
-    pub edge: Rc<RefCell<Edge_>>,
+    /// A Edge has an uuid
+    id: String,
+    /// A label for the relation
+    relation: String,
+    /// Origin vertex
+    from: Rc<RefCell<Vertex_>>,
+    /// Target vertex
+    to: Rc<RefCell<Vertex_>>,
+    /// Attributes for the Edge
+    attr: Attributes,
 }
 
 impl Edge {
-    pub fn new(label: &str) -> Self {
-        Edge {
-            edge: Edge_::new(label),
-        }
-    }
-
-    pub fn create(label: &str) -> Rc<RefCell<Edge_>> {
-        Edge_::new(label)
-    }
-
     pub fn get_id(&self) -> String {
-        self.edge.borrow().id.clone()
+        self.id.clone()
     }
 
     pub fn get_label(&self) -> String {
-        self.edge.borrow().label.clone()
+        self.relation.clone()
     }
 
     pub fn set_label(&mut self, label: &str) {
-        self.edge.borrow_mut().label = label.to_string();
+        self.relation = label.to_string()
     }
 
-    /// Set attributes for a edge
-    pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    pub fn get_attributes(&self) -> Attributes {
+        self.attr.clone()
+    }
+
+    pub fn set_attributes(&mut self, attributes: Attributes) {
+        self.attr = attributes;
+    }
+
+    /// Creates a new instance
+    pub fn new(label: &str) -> Self {
+        Edge {
+            id: Uuid::new_v4().to_string(),
+            relation: label.to_string(),
+            from: Vertex::create(""),
+            to: Vertex::create(""),
+            attr: Attributes::new(),
+        }
+    }
+
+    /// Adds "From" and "To" vertices
+    /// to a previous created Edge
+    pub fn add_relation(&mut self, from: &Vertex, relation: &str, to: &Vertex) {
+        self.from = Rc::clone(&from.vrtx);
+        self.relation = String::from(relation);
+        self.to = Rc::clone(&to.vrtx);
+    }
+
+    /// Creates an Edge,
+    /// providing "From" and "To" edges and the "relation"
+    /// the id is generated
+    pub fn create(from: &Vertex, relation: &str, to: &Vertex) -> Self {
+        let mut v = Edge::new(relation);
+        v.from = Rc::clone(&from.vrtx);
+        v.to = Rc::clone(&to.vrtx);
+        v
+    }
+
+    /// Updates the relation for the Edge
+    pub fn update_relation(&mut self, relation: &str) {
+        self.relation = relation.to_string();
+    }
+
+    /// Updates the "from" or source edge in Edge
+    pub fn update_from(&mut self, from_vertex: &Vertex) {
+        self.from = Rc::clone(&from_vertex.vrtx);
+    }
+
+    /// Updates the "to" or target edge in Edge
+    pub fn update_to(&mut self, to_vertex: &Vertex) {
+        self.to = Rc::clone(&to_vertex.vrtx);
+    }
+
+    pub fn get_from_vertex(&self) -> Vertex {
+        Vertex {
+            vrtx: self.from.clone(),
+        }
+    }
+
+    pub fn get_to_vertex(&self) -> Vertex {
+        Vertex {
+            vrtx: self.to.clone(),
+        }
+    }
+
+    pub fn get_relation(&self) -> String {
+        self.relation.clone()
+    }
+
+    pub fn set_relation(&mut self, relation_label: &str) {
+        self.relation = relation_label.to_string();
+    }
+}
+
+impl RUDAttribute for Edge {
+    fn set_attr<T>(&mut self, key: &str, val: T)
     where
         T: std::fmt::Display,
     {
-        self.edge
-            .borrow_mut()
-            .attr
-            .insert(attr_k.to_string(), attr_v.to_string());
+        self.attr.set_attr(key, val);
     }
 
-    /// Get attribute for a edge
-    pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
-        let binding = self.edge.borrow();
-        let res = binding.attr.get(attr_k);
-        match res {
-            Some(resp) => Ok(resp.clone()),
-            None => {
-                warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
-            }
-        }
+    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
+        self.attr.get_attr(key)
     }
 
-    /// Updates the value of an attribute
-    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
-        if let Some(attr) = self.edge.borrow_mut().attr.get_mut(attr_k) {
-            *attr = attr_v.to_string();
-            return Ok(());
-        }
-        Err("not attribute found to update")
+        self.attr.update_attr(attr_k, attr_v)
     }
 
-    /// Updates the value of an attribute or creates a new one if attribute key does not exists
-    pub fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        let mut binding = self.edge.borrow_mut();
-        let attr = binding.attr.get_mut(attr_k);
-        match attr {
-            Some(attr) => {
-                *attr = attr_v.to_string();
-            }
-            None => {
-                binding.attr.insert(attr_k.to_string(), attr_v.to_string());
-            }
-        }
+        self.attr.upsert_attr(attr_k, attr_v)
     }
 
-    /// Deletes an attribute
-    pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
-        let res = self.edge.borrow_mut().attr.remove(v);
-        match res {
-            Some(_) => Ok(()),
-            None => {
-                warn!("attribute {} not found for remove", v);
-                Err("attribute not found for remove")
-            }
-        }
+    fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
+        self.attr.delete_attr(v)
     }
 
-    /// Returns an Array containing all attribute keys
-    pub fn get_attr_keys(&self) -> Vec<String> {
-        let binding = self.edge.borrow();
-        // FIXME: clippy has a warning here:
-        // let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
-        // |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `binding.attr.keys().map(|k| k.clone())`
-
-        let kv: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
-        kv
-    }
-
-    /// Retrieves the edges that has relation out for the given edge on vertices
-    pub fn get_relations_out_on_vertices(
-        &self,
-        vertices: Vec<Vertex>,
-    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
-        let mut relations_out: HashMap<String, Vec<Edge>> = HashMap::new();
-        for vertex in vertices {
-            if vertex.get_from_edge().get_id() == self.get_id() {
-                if let Some(edges_out) = relations_out.get_mut(&vertex.get_relation()) {
-                    edges_out.push(vertex.get_to_edge());
-                } else {
-                    let edges_out = vec![vertex.get_to_edge()];
-                    relations_out.insert(vertex.get_relation(), edges_out);
-                }
-            }
-        }
-        if !relations_out.is_empty() {
-            Ok(relations_out)
-        } else {
-            Err("no relations out for edge")
-        }
-    }
-
-    /// Retrieves the edges that has relation in for the given edge on vertices
-    pub fn get_relations_in_on_vertices(
-        &self,
-        vertices: Vec<Vertex>,
-    ) -> Result<HashMap<String, Vec<Edge>>, &'static str> {
-        let mut relations_in: HashMap<String, Vec<Edge>> = HashMap::new();
-        for graph in vertices {
-            if graph.get_to_edge().get_id() == self.get_id() {
-                if let Some(edges_in) = relations_in.get_mut(&graph.get_relation()) {
-                    edges_in.push(graph.get_from_edge());
-                } else {
-                    let edges_in = vec![graph.get_from_edge()];
-                    relations_in.insert(graph.get_relation(), edges_in);
-                }
-            }
-        }
-        if !relations_in.is_empty() {
-            Ok(relations_in)
-        } else {
-            Err("no relations in for edge")
-        }
+    fn get_attr_keys(&self) -> Vec<&str> {
+        self.attr.get_attr_keys()
     }
 }

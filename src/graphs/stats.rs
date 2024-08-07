@@ -15,7 +15,7 @@ pub struct GraphsStats {
     /// total attributes
     total_attr: usize,
     /// total edges
-    total_edges: usize,
+    total_vertices: usize,
     /// unique relations
     uniq_rel: usize,
 }
@@ -27,7 +27,7 @@ impl GraphsStats {
             len_graphs: 0,
             total_graphs: 0,
             total_attr: 0,
-            total_edges: 0,
+            total_vertices: 0,
             uniq_rel: 0,
         }
     }
@@ -49,7 +49,7 @@ impl GraphsStats {
     }
 
     pub fn get_total_edges(&self) -> usize {
-        self.total_edges
+        self.total_vertices
     }
 
     pub fn get_uniq_rel(&self) -> usize {
@@ -79,9 +79,9 @@ impl Graphs {
     ) -> Result<Vec<String>, &'static str> {
         let mut uniq_rel = Vec::new();
         let current_graph = self.select_vault_label(graphs_name);
-        if let Some(graphs) = self.vault.get(&current_graph) {
-            for graph in graphs.iter() {
-                uniq_rel.push(graph.get_relation());
+        if let Some(edges) = self.vault.get(&current_graph) {
+            for edge in edges.iter() {
+                uniq_rel.push(edge.get_relation());
             }
             uniq_rel.sort();
             uniq_rel.dedup();
@@ -95,9 +95,9 @@ impl Graphs {
     /// Returns an array with the unique relations in the whole Graphs
     pub fn uniq_relations(&self) -> Vec<String> {
         let mut uniq_rel = Vec::new();
-        for graphs in self.vault.values() {
-            for graph in graphs.iter() {
-                uniq_rel.push(graph.get_relation());
+        for edges in self.vault.values() {
+            for edge in edges.iter() {
+                uniq_rel.push(edge.get_relation());
             }
             uniq_rel.sort();
             uniq_rel.dedup();
@@ -108,8 +108,8 @@ impl Graphs {
     /// Retrieves the length of the Graphs for whole vault
     pub fn len(&self) -> usize {
         let mut length = 0;
-        for (_graphs_name, graphs) in self.vault.iter() {
-            length += graphs.len();
+        for (_graphs_name, edges) in self.vault.iter() {
+            length += edges.len();
         }
         length
     }
@@ -130,10 +130,10 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
     let bytes = bincode::serialize(grphs)?;
     // lets count the amount of attributes in the graph
     let mut attr_counter = 0;
-    for (_graph_name, graphs) in grphs.vault.iter() {
-        for graph in graphs {
-            attr_counter += graph.get_from_edge().attr_len();
-            attr_counter += graph.get_to_edge().attr_len();
+    for (_graph_name, edges) in grphs.vault.iter() {
+        for edge in edges {
+            attr_counter += edge.get_from_vertex().attr_len();
+            attr_counter += edge.get_to_vertex().attr_len();
         }
     }
 
@@ -141,7 +141,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
         mem: bytes.len(),
         len_graphs: grphs.len(),
         total_attr: attr_counter,
-        total_edges: grphs.len() * 2,
+        total_vertices: grphs.len() * 2,
         uniq_rel: grphs.uniq_relations().len(),
         total_graphs: grphs.vault.len(),
     };
