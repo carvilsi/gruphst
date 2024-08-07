@@ -59,7 +59,7 @@ impl Vertex {
     }
 
     /// Adds "From" and "To" edge
-    /// to a previous created Vertex 
+    /// to a previous created Vertex
     pub fn add_relation(&mut self, from: &Edge, relation: &str, to: &Edge) {
         self.from = Rc::clone(&from.edge);
         self.relation = String::from(relation);
@@ -81,12 +81,12 @@ impl Vertex {
         self.relation = relation.to_string();
     }
 
-    /// Updates the "from" or source edge in Vertex 
+    /// Updates the "from" or source edge in Vertex
     pub fn update_from(&mut self, from_edge: &Edge) {
         self.from = Rc::clone(&from_edge.edge);
     }
 
-    /// Updates the "to" or target edge in Vertex 
+    /// Updates the "to" or target edge in Vertex
     pub fn update_to(&mut self, to_edge: &Edge) {
         self.to = Rc::clone(&to_edge.edge);
     }

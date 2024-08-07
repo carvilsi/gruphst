@@ -26,9 +26,7 @@ pub fn get_max_mem_usage() -> usize {
             max = max * 1024 * 1024;
             max
         }
-        Err(_) => {
-            DEFAULT_GRUPHST_MAX_MEM_USAGE
-        }
+        Err(_) => DEFAULT_GRUPHST_MAX_MEM_USAGE,
     }
 }
 
@@ -54,12 +52,8 @@ pub fn get_log_level() -> log::Level {
             "info" => log::Level::Info,
             "warn" | "warning" => log::Level::Warn,
             "err" | "error" => log::Level::Error,
-            _ => {
-                DEFAULT_GRUPHST_LOG_LEVEL
-            }
+            _ => DEFAULT_GRUPHST_LOG_LEVEL,
         },
-        Err(_) => {
-            DEFAULT_GRUPHST_LOG_LEVEL
-        }
+        Err(_) => DEFAULT_GRUPHST_LOG_LEVEL,
     }
 }

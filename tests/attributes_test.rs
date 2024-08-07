@@ -1,4 +1,6 @@
-use gruphst::{attributes::Attributes, config::get_log_level, enable_logging, QueryAttribute, RUDAttribute};
+use gruphst::{
+    attributes::Attributes, config::get_log_level, enable_logging, QueryAttribute, RUDAttribute,
+};
 
 fn prepare_attribute_test() -> (Attributes, String) {
     let mut attributes = Attributes::new();

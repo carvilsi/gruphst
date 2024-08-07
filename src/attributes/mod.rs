@@ -35,9 +35,7 @@ impl RUDAttribute for Attributes {
     fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
         let res = self.attr.get(attr_k);
         match res {
-            Some(res) => {
-                Ok(res)
-            }
+            Some(res) => Ok(res),
             None => {
                 warn!("attribute '{}' not found", attr_k);
                 Err("attribute not found")
@@ -75,9 +73,7 @@ impl RUDAttribute for Attributes {
     fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.attr.remove(v);
         match res {
-            Some(_) => {
-                Ok(())
-            }
+            Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
                 Err("attribute not found for remove")

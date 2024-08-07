@@ -12,9 +12,9 @@ mod stats;
 /// A colection of Graph
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Graphs {
-    /// The container of Vertices 
+    /// The container of Vertices
     vault: HashMap<String, Vec<Vertex>>,
-    /// Name for the current vault 
+    /// Name for the current vault
     label: String,
     /// Some attributes to handle metada for Graphs
     stats: GraphsStats,
@@ -25,12 +25,11 @@ impl Graphs {
     pub fn init(label: &str) -> Self {
         let mut vault: HashMap<String, Vec<Vertex>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
-        let graphs = Graphs {
+        Graphs {
             label: String::from(label),
             vault,
             stats: GraphsStats::init(),
-        };
-        graphs
+        }
     }
 
     /// Initializes a new Graphs element adding a Graph to new vault
@@ -86,7 +85,7 @@ impl Graphs {
 
     // TODO: create method to add a collection of vertex, AKA vertices
 
-    /// Retrieves the collection of vertices 
+    /// Retrieves the collection of vertices
     /// the default one or by name
     pub fn get_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
         let current_vault = self.select_vault_label(vault_name);
@@ -122,9 +121,8 @@ impl Graphs {
     ) -> Result<(), &'static str> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(vertices) = self.vault.get_mut(&current_vault) {
-            let index = vertices.iter().position(|vertex| vertex.get_id() == id);
-            if index.is_some() {
-                vertices.remove(index.unwrap());
+            if let Some(index) = vertices.iter().position(|vertex| vertex.get_id() == id) {
+                vertices.remove(index);
                 Ok(())
             } else {
                 error!("Vertex [{}] to delete not found", id);

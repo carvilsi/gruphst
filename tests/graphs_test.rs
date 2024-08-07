@@ -370,7 +370,9 @@ fn should_update_graph() {
 
     assert_eq!(my_graphs.len(), 2);
 
-    let graphs = my_graphs.get_vertices(Some(&my_graphs.get_label())).unwrap();
+    let graphs = my_graphs
+        .get_vertices(Some(&my_graphs.get_label()))
+        .unwrap();
     assert_eq!(graphs[1].get_relation(), "super friends");
 
     alice_fred_graph.update_relation("besties");

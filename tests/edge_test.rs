@@ -154,8 +154,12 @@ fn get_edge_relation_out() {
 fn not_relations_out_in_on_vertices() {
     let graphs = prepare_graphs_test();
     let edge = Edge::new("solo");
-    assert!(edge.get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap()).is_err());
-    assert!(edge.get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap()).is_err());
+    assert!(edge
+        .get_relations_out_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
+        .is_err());
+    assert!(edge
+        .get_relations_in_on_vertices(graphs.get_vertices(Some("my graphs")).unwrap())
+        .is_err());
 }
 
 #[test]

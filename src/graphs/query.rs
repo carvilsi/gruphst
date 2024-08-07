@@ -137,13 +137,12 @@ impl Graphs {
     ) -> Result<&mut Vertex, &'static str> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(vertices) = self.vault.get_mut(&current_vault) {
-            let vertex = vertices.iter_mut().find(|graph| {
+            if let Some(vertex) = vertices.iter_mut().find(|graph| {
                 graph.get_id() == id
                     || graph.get_from_edge().get_id() == id
                     || graph.get_to_edge().get_id() == id
-            });
-            if vertex.is_some() {
-                Ok(vertex.unwrap())
+            }) {
+                Ok(vertex)
             } else {
                 error!("Vertex with id [{}] not found", id);
                 Err("Vertex not found")
@@ -156,14 +155,12 @@ impl Graphs {
     /// Find in any graph on vault by id
     pub fn find_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Vertex, &'static str> {
         for (_vault_name, vertices) in self.vault.iter_mut() {
-            println!("Tha name: {}", _vault_name);
-            let vertex = vertices.iter_mut().find(|vrtx| {
+            if let Some(vertex) = vertices.iter_mut().find(|vrtx| {
                 vrtx.get_id() == id
                     || vrtx.get_from_edge().get_id() == id
                     || vrtx.get_to_edge().get_id() == id
-            });
-            if vertex.is_some() {
-                return Ok(vertex.unwrap());
+            }) {
+                return Ok(vertex);
             }
         }
         Err("Vertex not found")

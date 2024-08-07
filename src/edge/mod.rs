@@ -45,7 +45,7 @@ impl Edge {
             edge: Edge_::new(label),
         }
     }
-    
+
     pub fn create(label: &str) -> Rc<RefCell<Edge_>> {
         Edge_::new(label)
     }
@@ -78,9 +78,7 @@ impl Edge {
         let binding = self.edge.borrow();
         let res = binding.attr.get(attr_k);
         match res {
-            Some(resp) => {
-                Ok(resp.clone())
-            }
+            Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
                 Err("attribute not found")
@@ -121,9 +119,7 @@ impl Edge {
     pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
         let res = self.edge.borrow_mut().attr.remove(v);
         match res {
-            Some(_) => {
-                Ok(())
-            }
+            Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
                 Err("attribute not found for remove")
@@ -142,7 +138,7 @@ impl Edge {
         kv
     }
 
-    /// Retrieves the edges that has relation out for the given edge on vertices 
+    /// Retrieves the edges that has relation out for the given edge on vertices
     pub fn get_relations_out_on_vertices(
         &self,
         vertices: Vec<Vertex>,
@@ -165,7 +161,7 @@ impl Edge {
         }
     }
 
-    /// Retrieves the edges that has relation in for the given edge on vertices 
+    /// Retrieves the edges that has relation in for the given edge on vertices
     pub fn get_relations_in_on_vertices(
         &self,
         vertices: Vec<Vertex>,
