@@ -1,6 +1,7 @@
 <div class="text" align="center">
     <img src="https://img.shields.io/github/actions/workflow/status/carvilsi/gruphst/test.yml?logo=github&label=tests" alt="test">
     <img src="https://img.shields.io/crates/v/gruphst.svg" alt="crates">
+    <img src="https://codecov.io/github/carvilsi/gruphst/graph/badge.svg?token=W1XVSQB3H0"/> 
     <p></p>
     <p>GruPHst</p>
     <p>An in-memory graph database</p>
