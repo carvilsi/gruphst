@@ -48,6 +48,16 @@ impl Edge {
     }
 
     /// Creates a new instance
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex};
+    /// 
+    /// let mut edge = Edge::new(""); 
+    /// edge.add_relation(
+    ///     &Vertex::new("Frodo"),
+    ///     "friend of",
+    ///     &Vertex::new("Sam"));
+    /// ```
     pub fn new(label: &str) -> Self {
         Edge {
             id: Uuid::new_v4().to_string(),
@@ -60,6 +70,16 @@ impl Edge {
 
     /// Adds "From" and "To" vertices
     /// to a previous created Edge
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex};
+    /// 
+    /// let mut edge = Edge::new(""); 
+    /// edge.add_relation(
+    ///     &Vertex::new("Frodo"),
+    ///     "friend of",
+    ///     &Vertex::new("Sam"));
+    /// ```
     pub fn add_relation(&mut self, from: &Vertex, relation: &str, to: &Vertex) {
         self.from = Rc::clone(&from.vrtx);
         self.relation = String::from(relation);
@@ -67,8 +87,17 @@ impl Edge {
     }
 
     /// Creates an Edge,
-    /// providing "From" and "To" edges and the "relation"
+    /// providing "From" and "To" vertices and the "relation"
     /// the id is generated
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex};
+    /// 
+    /// Edge::create( 
+    ///     &Vertex::new("Theoden"),
+    ///     "kinf of",
+    ///     &Vertex::new("Rohan"));
+    /// ```
     pub fn create(from: &Vertex, relation: &str, to: &Vertex) -> Self {
         let mut v = Edge::new(relation);
         v.from = Rc::clone(&from.vrtx);

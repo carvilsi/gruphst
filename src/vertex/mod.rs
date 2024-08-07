@@ -40,6 +40,13 @@ pub struct Vertex {
 }
 
 impl Vertex {
+    /// Creates a edge with the given label, the id is generated
+    /// # Examples
+    /// ```rust
+    /// use gruphst::edge::Edge;
+    /// 
+    /// Edge::new("Gandalf"); 
+    /// ```
     pub fn new(label: &str) -> Self {
         Vertex {
             vrtx: Vertex_::new(label),
@@ -63,6 +70,14 @@ impl Vertex {
     }
 
     /// Set attributes for a vertex
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    /// 
+    /// let mut gandalf = Vertex::new("Gandalf");
+    /// gandalf.set_attr("known as", "The Gray"); 
+    /// gandalf.set_attr("years old", 24000); 
+    /// ``` 
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
@@ -74,6 +89,17 @@ impl Vertex {
     }
 
     /// Get attribute for a vertex
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    /// 
+    /// let mut gandalf = Vertex::new("Gandalf");
+    /// gandalf.set_attr("known as", "The Gray"); 
+    /// gandalf.set_attr("years old", 24000); 
+    /// 
+    /// let gandalf_years = gandalf.get_attr("years old").unwrap();
+    /// assert_eq!(gandalf_years, "24000");
+    /// ```
     pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
         let binding = self.vrtx.borrow();
         let res = binding.attr.get(attr_k);
@@ -138,7 +164,7 @@ impl Vertex {
         kv
     }
 
-    /// Retrieves the vertices that has relation out for the given vertex on a collection of edges
+    /// Retrieves the vertices that has relation out for the given vertex on a collection of edges 
     pub fn get_relations_out_on_edges(
         &self,
         edges: Vec<Edge>,
@@ -161,7 +187,7 @@ impl Vertex {
         }
     }
 
-    /// Retrieves the vertices that has relation in for the given vertex on edges
+    /// Retrieves the vertices that has relation in for the given vertex on edges 
     pub fn get_relations_in_on_edges(
         &self,
         edges: Vec<Edge>,

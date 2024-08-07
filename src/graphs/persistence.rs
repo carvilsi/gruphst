@@ -11,6 +11,20 @@ use crate::graphs::Graphs;
 
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    ///  
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
+    /// 
+    /// // will write a file called 'Middle-earth.grphst' with 
+    /// // the content of the graphs
+    /// graphs.persists();
+    /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
         let mut file = OpenOptions::new()
@@ -29,6 +43,12 @@ impl Graphs {
     }
 
     /// Loads the persisted Graphs on a file
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// 
+    /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
+    /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         let read_file = File::open(file_name)?;
         let mut reader = BufReader::new(read_file);

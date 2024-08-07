@@ -22,6 +22,12 @@ pub struct Graphs {
 
 impl Graphs {
     /// Initializes a new Graphs element
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    ///  
+    /// Graphs::init("my graph");
+    /// ```
     pub fn init(label: &str) -> Self {
         let mut vault: HashMap<String, Vec<Edge>> = HashMap::new();
         vault.insert(String::from(label), vec![]);
@@ -32,7 +38,17 @@ impl Graphs {
         }
     }
 
-    /// Initializes a new Graphs element adding a Graph to new vault
+    /// Initializes a new Graphs element adding a Edge to new vault
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    ///  
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// Graphs::init_with("my graph", &edge);
+    /// ```
     pub fn init_with(label: &str, vertex: &Edge) -> Self {
         let mut graphs = Graphs::init(label);
         graphs.add_edge(vertex, None);
@@ -40,6 +56,13 @@ impl Graphs {
     }
 
     /// Creates a new entry on Graphs valut
+    /// # Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    ///  
+    /// let mut graphs = Graphs::init("my graphs");
+    /// graphs.insert("my other graphs"); 
+    /// ```
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
