@@ -1,4 +1,4 @@
-use log::{debug, error};
+use log::error;
 
 use crate::edge::Edge;
 use crate::graphs::Graphs;
@@ -6,7 +6,8 @@ use crate::vertex::Vertex;
 
 impl Graphs {
     /// Returns a collection of Vertices that matches the relation
-    pub fn find_by_relation(
+    /// for provided vault or default when None
+    pub fn find_vertices_by_relation(
         &mut self,
         relation_name: &str,
         vault_name: Option<&str>,
@@ -18,24 +19,20 @@ impl Graphs {
                 .filter(|grph| grph.get_relation() == relation_name)
                 .collect::<Vec<&Vertex>>();
             if !vrtcs.is_empty() {
-                debug!(
-                    "Founded {} vertices with '{}' relation name",
-                    vrtcs.len(),
-                    relation_name
-                );
                 Ok(vrtcs)
             } else {
-                error!("Any graph found for relation: {}", relation_name);
-                Err("Any graph found for relation")
+                error!("Any vertex found for relation: {}", relation_name);
+                Err("Any vertex found for relation")
             }
         } else {
-            Err("no vertices on vault")
+            Err("provided vault does not exists")
         }
     }
 
     /// Returns a collection of Vertices elements that matches the relations
     /// in the array
-    pub fn find_by_relations(
+    /// for provided vault or default when None
+    pub fn find_vertices_by_relations(
         &mut self,
         relations: Vec<&str>,
         vault_name: Option<&str>,
@@ -47,18 +44,13 @@ impl Graphs {
                 .filter(|grph| relations.contains(&grph.get_relation().as_str()))
                 .collect::<Vec<&Vertex>>();
             if !vertex.is_empty() {
-                debug!(
-                    "Founded {} graphs with '{:#?}' relations",
-                    vertex.len(),
-                    relations
-                );
                 Ok(vertex)
             } else {
-                error!("Any graph found for relations: {:#?}", relations);
-                Err("Any graph found for relation")
+                error!("Any vertex found for relations: {:#?}", relations);
+                Err("Any vertex found for relation")
             }
         } else {
-            Err("no vertices not found on vault")
+            Err("provided vault does not exists")
         }
     }
 
@@ -75,18 +67,13 @@ impl Graphs {
                 .filter(|grph| grph.has_edge_with_attr_key(attr_k))
                 .collect::<Vec<&Vertex>>();
             if !vrtcs.is_empty() {
-                debug!(
-                    "Founded {} graphs where an attribute key is '{}'",
-                    vrtcs.len(),
-                    attr_k
-                );
                 Ok(vrtcs)
             } else {
                 error!("Any vertex found for attribute: {}", attr_k);
                 Err("Any vertex found for attribute")
             }
         } else {
-            Err("no vertices on vault")
+            Err("provided vault does not exists")
         }
     }
 
@@ -103,18 +90,13 @@ impl Graphs {
                 .filter(|grph| grph.has_edge_with_attr_key_like(attr_k))
                 .collect::<Vec<&Vertex>>();
             if !vrtcs.is_empty() {
-                debug!(
-                    "Founded {} Vertices where an attribute key is '{}'",
-                    vrtcs.len(),
-                    attr_k
-                );
                 Ok(vrtcs)
             } else {
                 error!("Any vertex found for attribute: {}", attr_k);
                 Err("Any vertex found for attribute")
             }
         } else {
-            Err("no graphs on vault")
+            Err("provided vault does not exists")
         }
     }
 
@@ -137,18 +119,13 @@ impl Graphs {
                 .filter(|grph| grph.has_edge_with_attr_value_equal(attr_k, attr_v.clone()))
                 .collect::<Vec<&Vertex>>();
             if !vrtcs.is_empty() {
-                debug!(
-                    "Founded {} Vertices where an attribute key is '{}'",
-                    vrtcs.len(),
-                    attr_k
-                );
                 Ok(vrtcs)
             } else {
                 error!("Any vertex found for attribute: {}", attr_k);
                 Err("Any vertex found for attribute")
             }
         } else {
-            Err("no vertices on vault")
+            Err("provided vault does not exists")
         }
     }
 
@@ -166,14 +143,13 @@ impl Graphs {
                     || graph.get_to_edge().get_id() == id
             });
             if vertex.is_some() {
-                debug!("Founded Vertex by id: {:#?}", vertex);
                 Ok(vertex.unwrap())
             } else {
                 error!("Vertex with id [{}] not found", id);
                 Err("Vertex not found")
             }
         } else {
-            Err("no vertices found at vault")
+            Err("provided vault does not exists")
         }
     }
 
@@ -187,7 +163,6 @@ impl Graphs {
                     || vrtx.get_to_edge().get_id() == id
             });
             if vertex.is_some() {
-                debug!("Founded Vertex by id: {:#?}", vertex);
                 return Ok(vertex.unwrap());
             }
         }
@@ -211,12 +186,12 @@ impl Graphs {
                 }
             }
         } else {
-            return Err("no current vertex in vault");
+            return Err("provided vault does not exists");
         }
         if !relations_in.is_empty() {
             Ok(relations_in)
         } else {
-            Err("any edge with relation in")
+            Err("any edge found with relation in")
         }
     }
 
@@ -237,12 +212,12 @@ impl Graphs {
                 }
             }
         } else {
-            return Err("no current vertex in vault");
+            return Err("provided vault does not exists");
         }
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
-            Err("any edge with relation out")
+            Err("any edge found with relation out")
         }
     }
 }

@@ -1,4 +1,3 @@
-use log::debug;
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -30,7 +29,6 @@ impl Edge_ {
             id: Uuid::new_v4().to_string(),
             attr: HashMap::new(),
         };
-        debug!("The created edge: {:#?}", &edge);
         Rc::new(RefCell::new(edge))
     }
 }
@@ -73,12 +71,6 @@ impl Edge {
             .borrow_mut()
             .attr
             .insert(attr_k.to_string(), attr_v.to_string());
-        debug!(
-            "added attribute key: {} with value {} for edge {}",
-            attr_k,
-            attr_v,
-            self.get_id()
-        );
     }
 
     /// Get attribute for a edge
@@ -87,12 +79,6 @@ impl Edge {
         let res = binding.attr.get(attr_k);
         match res {
             Some(resp) => {
-                debug!(
-                    "retrieved attribute value '{}' for '{}' for edge [{}]",
-                    resp,
-                    attr_k,
-                    self.get_id()
-                );
                 Ok(resp.clone())
             }
             None => {
@@ -107,12 +93,6 @@ impl Edge {
     where
         T: std::fmt::Display,
     {
-        debug!(
-            "updated attribute key: {} with value {} for edge {}",
-            attr_k,
-            attr_v,
-            self.get_id()
-        );
         if let Some(attr) = self.edge.borrow_mut().attr.get_mut(attr_k) {
             *attr = attr_v.to_string();
             return Ok(());
@@ -130,21 +110,9 @@ impl Edge {
         match attr {
             Some(attr) => {
                 *attr = attr_v.to_string();
-                debug!(
-                    "updated (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k,
-                    attr_v,
-                    self.get_id()
-                );
             }
             None => {
                 binding.attr.insert(attr_k.to_string(), attr_v.to_string());
-                debug!(
-                    "added (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k,
-                    attr_v,
-                    self.get_id()
-                );
             }
         }
     }
@@ -154,7 +122,6 @@ impl Edge {
         let res = self.edge.borrow_mut().attr.remove(v);
         match res {
             Some(_) => {
-                debug!("Removed '{}' attribute for {}", v, self.get_id());
                 Ok(())
             }
             None => {

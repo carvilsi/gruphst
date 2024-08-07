@@ -1,4 +1,4 @@
-use log::{debug, warn};
+use log::warn;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -29,10 +29,6 @@ impl RUDAttribute for Attributes {
         T: std::fmt::Display,
     {
         self.attr.insert(attr_k.to_string(), attr_v.to_string());
-        debug!(
-            "added attribute key: {} with value {} for edge {}",
-            attr_k, attr_v, self.id
-        );
     }
 
     /// Get attribute for a edge
@@ -40,10 +36,6 @@ impl RUDAttribute for Attributes {
         let res = self.attr.get(attr_k);
         match res {
             Some(res) => {
-                debug!(
-                    "retrieved attribute value '{}' for '{}' for edge [{}]",
-                    res, attr_k, self.id
-                );
                 Ok(res)
             }
             None => {
@@ -57,10 +49,6 @@ impl RUDAttribute for Attributes {
     where
         T: std::fmt::Display,
     {
-        debug!(
-            "updated attribute key: {} with value {} for edge {}",
-            attr_k, attr_v, self.id
-        );
         if let Some(attr) = self.attr.get_mut(attr_k) {
             *attr = attr_v.to_string();
             return Ok(());
@@ -76,17 +64,9 @@ impl RUDAttribute for Attributes {
         match self.attr.get_mut(attr_k) {
             Some(attr) => {
                 *attr = attr_v.to_string();
-                debug!(
-                    "updated (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k, attr_v, self.id
-                );
             }
             None => {
                 self.attr.insert(attr_k.to_string(), attr_v.to_string());
-                debug!(
-                    "added (upsert) attribute key: {} with value {} for edge {}",
-                    attr_k, attr_v, self.id
-                );
             }
         }
     }
@@ -96,7 +76,6 @@ impl RUDAttribute for Attributes {
         let res = self.attr.remove(v);
         match res {
             Some(_) => {
-                debug!("Removed '{}' attribute for {}", v, self.id);
                 Ok(())
             }
             None => {
@@ -112,10 +91,6 @@ impl RUDAttribute for Attributes {
         for key in self.attr.keys() {
             key_vec.push(key.as_str());
         }
-        debug!(
-            "requested array of attributes for {} edge {:#?}",
-            self.id, key_vec
-        );
         key_vec
     }
 }

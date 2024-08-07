@@ -1,4 +1,4 @@
-use log::{debug, info};
+use log::info;
 use std::error::Error;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -30,7 +30,6 @@ impl Graphs {
 
     /// Loads the persisted Graphs on a file
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
-        debug!("Loading persisted file {}", &file_name);
         let read_file = File::open(file_name)?;
         let mut reader = BufReader::new(read_file);
         reader.fill_buf()?;
@@ -42,7 +41,6 @@ impl Graphs {
             );
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
-        debug!("Loaded persisted file with {} Graphs", readed_graph.len());
         Ok(readed_graph)
     }
 }

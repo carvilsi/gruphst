@@ -1,4 +1,4 @@
-use log::{debug, error};
+use log::error;
 use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
 use std::collections::HashMap;
@@ -30,7 +30,6 @@ impl Graphs {
             vault,
             stats: GraphsStats::init(),
         };
-        debug!("Created new Graphs: {:#?}", graphs);
         graphs
     }
 
@@ -46,7 +45,6 @@ impl Graphs {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
         self.stats = self.stats().unwrap();
-        debug!("Insertered new entry to Graphs valut: {:#?}", self);
     }
 
     /// Creates a new entry on Graphs valut with a Graph
@@ -55,7 +53,6 @@ impl Graphs {
         self.label = String::from(name);
         self.add_vertex(vertex, Some(name));
         self.stats = self.stats().unwrap();
-        debug!("Insertered new entry to Graphs valut: {:#?}", self);
     }
 
     pub fn get_label(&self) -> String {
@@ -80,17 +77,10 @@ impl Graphs {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(v) = self.vault.get_mut(&current_vault) {
             v.push(vertex.clone());
-            debug!(
-                "Added new vertex to Graphs [{}]
-                current length: {}",
-                current_vault,
-                self.len()
-            );
         } else {
             self.insert(&current_vault);
             let v = self.vault.get_mut(&current_vault).unwrap();
             v.push(vertex.clone());
-            debug!("no vertex element at vault, created one and added vertex");
         }
     }
 
@@ -121,7 +111,6 @@ impl Graphs {
 
     /// Updates the name of the Graphs
     pub fn update_label(&mut self, label: &str) {
-        debug!("Update Graph with name: {}", label);
         self.label = label.to_string();
     }
 
@@ -136,7 +125,6 @@ impl Graphs {
             let index = vertices.iter().position(|vertex| vertex.get_id() == id);
             if index.is_some() {
                 vertices.remove(index.unwrap());
-                debug!("Deleted vertex: {}", id);
                 Ok(())
             } else {
                 error!("Vertex [{}] to delete not found", id);
@@ -153,7 +141,6 @@ impl Graphs {
         vertex_to_update: &Vertex,
         vault_name: Option<&str>,
     ) -> Result<(), &'static str> {
-        debug!("Going to update Graphs with {:#?}", vertex_to_update);
         let current_vault = self.select_vault_label(vault_name);
         if let Some(vertices) = self.vault.get_mut(&current_vault) {
             let index = vertices
@@ -162,7 +149,6 @@ impl Graphs {
             if index.is_some() {
                 let i = index.unwrap();
                 vertices.remove(i);
-                debug!("Vertex to update found it at index: {i}");
                 vertices.push(vertex_to_update.clone());
                 Ok(())
             } else {

@@ -1,5 +1,5 @@
 use crate::graphs::Graphs;
-use log::{debug, error};
+use log::error;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
@@ -111,7 +111,6 @@ impl Graphs {
         for (_graphs_name, graphs) in self.vault.iter() {
             length += graphs.len();
         }
-        debug!("Requested length for vault, current length: {}", length);
         length
     }
 
@@ -146,6 +145,5 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
         uniq_rel: grphs.uniq_relations().len(),
         total_graphs: grphs.vault.len(),
     };
-    debug!("Graphs stats: {:#?}", stats);
     Ok(stats)
 }

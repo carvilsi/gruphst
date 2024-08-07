@@ -1,6 +1,5 @@
 use std::{cell::RefCell, rc::Rc};
 
-use log::debug;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -65,7 +64,6 @@ impl Vertex {
         self.from = Rc::clone(&from.edge);
         self.relation = String::from(relation);
         self.to = Rc::clone(&to.edge);
-        debug!("Added relation to Vertex: {:#?}", self);
     }
 
     /// Creates a Vertex,
@@ -80,22 +78,16 @@ impl Vertex {
 
     /// Updates the relation for the Vertex
     pub fn update_relation(&mut self, relation: &str) {
-        debug!("Updated Vertex [{}] with Relation: {}", self.id, relation);
         self.relation = relation.to_string();
     }
 
     /// Updates the "from" or source edge in Vertex 
     pub fn update_from(&mut self, from_edge: &Edge) {
-        debug!(
-            "Updated Vertex [{}] from edge: {:#?}",
-            self.id, from_edge.edge
-        );
         self.from = Rc::clone(&from_edge.edge);
     }
 
     /// Updates the "to" or target edge in Vertex 
     pub fn update_to(&mut self, to_edge: &Edge) {
-        debug!("Updated Vertex [{}] to edge: {:#?}", self.id, to_edge.edge);
         self.to = Rc::clone(&to_edge.edge);
     }
 
