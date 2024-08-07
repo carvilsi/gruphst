@@ -1,4 +1,4 @@
-use log::{debug, info};
+use log::info;
 use std::error::Error;
 use std::fs::File;
 use std::fs::OpenOptions;
@@ -11,21 +11,19 @@ use crate::graphs::Graphs;
 
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
-    ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// my_graph.persists();
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    ///  
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
+    /// 
+    /// // will write a file called 'Middle-earth.grphst' with 
+    /// // the content of the graphs
+    /// graphs.persists();
     /// ```
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
@@ -45,36 +43,20 @@ impl Graphs {
     }
 
     /// Loads the persisted Graphs on a file
-    ///
     /// # Examples
     /// ```rust
-    /// use gruphst::node::Node;
-    /// use gruphst::graph::Graph;
-    /// use gruphst::graphs::Graphs;
-    /// use crate::gruphst::*;
-    ///
-    /// let mut my_graph = Graphs::init("friends");
-    /// let alice = Node::new("Alice");
-    /// let bob = Node::new("Bob");
-    /// let alice_bob = Graph::create(&alice, "is friend of", &bob);
-    /// my_graph.add_graph(&alice_bob, None);
-    ///
-    /// let _ = my_graph.persists();
-    ///
-    /// let name = my_graph.get_label();
-    /// let file_name = format!("{}.grphst", name);
-    /// let loaded_graphs = Graphs::load(&file_name);
-    /// match loaded_graphs {
-    ///     Ok(loaded_graphs) => {
-    ///         let graphs = loaded_graphs.get_graphs(Some(&name)).unwrap();
-    ///         assert_eq!(loaded_graphs.get_label(), name);
-    ///         assert_eq!(graphs[0].get_relation(), alice_bob.get_relation());
-    ///     },
-    ///     Err(_) => panic!(),
-    /// }
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    /// 
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
+    /// graphs.persists(); 
+    /// 
+    /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
-        debug!("Loading persisted file {}", &file_name);
         let read_file = File::open(file_name)?;
         let mut reader = BufReader::new(read_file);
         reader.fill_buf()?;
@@ -86,7 +68,6 @@ impl Graphs {
             );
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
-        debug!("Loaded persisted file with {} Graphs", readed_graph.len());
         Ok(readed_graph)
     }
 }

@@ -1,5 +1,4 @@
 use dotenv::dotenv;
-use log::debug;
 
 const GRUPHST_MAX_MEM_USAGE: &str = "GRUPHST_MAX_MEM_USAGE";
 const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
@@ -24,17 +23,10 @@ pub fn get_max_mem_usage() -> usize {
     match dotenv::var(GRUPHST_MAX_MEM_USAGE) {
         Ok(value) => {
             let mut max = value.parse().unwrap();
-            debug!("max_mem usage set to {} MB", max);
             max = max * 1024 * 1024;
             max
         }
-        Err(_) => {
-            debug!(
-                "using default max_mem usage {}",
-                DEFAULT_GRUPHST_MAX_MEM_USAGE
-            );
-            DEFAULT_GRUPHST_MAX_MEM_USAGE
-        }
+        Err(_) => DEFAULT_GRUPHST_MAX_MEM_USAGE,
     }
 }
 
@@ -60,17 +52,8 @@ pub fn get_log_level() -> log::Level {
             "info" => log::Level::Info,
             "warn" | "warning" => log::Level::Warn,
             "err" | "error" => log::Level::Error,
-            _ => {
-                debug!(
-                    "unknown log configured value, using default: {}",
-                    DEFAULT_GRUPHST_LOG_LEVEL
-                );
-                DEFAULT_GRUPHST_LOG_LEVEL
-            }
+            _ => DEFAULT_GRUPHST_LOG_LEVEL,
         },
-        Err(_) => {
-            debug!("using default log level: Info");
-            DEFAULT_GRUPHST_LOG_LEVEL
-        }
+        Err(_) => DEFAULT_GRUPHST_LOG_LEVEL,
     }
 }

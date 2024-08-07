@@ -4,23 +4,11 @@
 //!
 //! Possible to persists on file (just because is something that we always expect from an in-memory databases).
 
-use attributes::Attributes;
-
 pub mod attributes;
 pub mod config;
-pub mod graph;
+pub mod edge;
 pub mod graphs;
-pub mod node;
-mod util;
-
-pub trait CURNodeGraph {
-    fn new(label: &str) -> Self;
-    fn get_id(&self) -> String;
-    fn get_label(&self) -> String;
-    fn set_label(&mut self, label: &str);
-    fn get_attributes(&self) -> Attributes;
-    fn set_attributes(&mut self, attributes: Attributes);
-}
+pub mod vertex;
 
 pub trait RUDAttribute {
     fn set_attr<T>(&mut self, key: &str, val: T)
@@ -33,18 +21,18 @@ pub trait RUDAttribute {
     fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display;
-    fn del_attr(&mut self, v: &str) -> Result<(), &'static str>;
+    fn delete_attr(&mut self, v: &str) -> Result<(), &'static str>;
     fn get_attr_keys(&self) -> Vec<&str>;
 }
 
 pub trait QueryAttribute {
-    fn has_attr(&self, attr_k: &str) -> bool;
-    fn like_attr(&self, attr_k: &str) -> bool;
-    fn equals_attr<T>(&self, attr_k: &str, attr_v: T) -> bool
+    fn has_attr_key(&self, attr_k: &str) -> bool;
+    fn has_attr_key_like(&self, attr_k: &str) -> bool;
+    fn has_attr_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone;
-    fn len_attr(&self) -> usize;
-    fn is_empty_attr(&self) -> bool;
+    fn attr_len(&self) -> usize;
+    fn attr_is_empty(&self) -> bool;
 }
 
 /// Enables logging providing a level

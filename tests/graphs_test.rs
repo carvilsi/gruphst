@@ -1,21 +1,21 @@
-use gruphst::{graph::Graph, graphs::Graphs, node::Node, *};
+use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 
 pub fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");
 
-    let mut alice = Node::new("Alice");
+    let mut alice = Vertex::new("Alice");
     alice.set_attr("phone", "555-555-555");
     alice.set_attr("address", "Elm street");
 
-    let mut bob = Node::new("Bob");
+    let mut bob = Vertex::new("Bob");
     bob.set_attr("age", 42);
 
-    let fred = Node::new("Fred");
+    let fred = Vertex::new("Fred");
 
-    graphs.add_graph(&Graph::create(&alice, "friend of", &bob), None);
-    graphs.add_graph(&Graph::create(&bob, "friend of", &alice), None);
-    graphs.add_graph(&Graph::create(&fred, "relative of", &alice), None);
-    graphs.add_graph(&Graph::create(&fred, "friend of", &bob), None);
+    graphs.add_edge(&Edge::create(&alice, "friend of", &bob), None);
+    graphs.add_edge(&Edge::create(&bob, "friend of", &alice), None);
+    graphs.add_edge(&Edge::create(&fred, "relative of", &alice), None);
+    graphs.add_edge(&Edge::create(&fred, "friend of", &bob), None);
 
     graphs
 }
@@ -23,8 +23,8 @@ pub fn prepare_graphs_test() -> Graphs {
 // fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
 pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
-    graphs.add_graph(
-        &Graph::create(&Node::new("Gandalf"), "enemy of", &Node::new("Saruman")),
+    graphs.add_edge(
+        &Edge::create(&Vertex::new("Gandalf"), "enemy of", &Vertex::new("Saruman")),
         Some("middle-earth"),
     );
     // graphs
@@ -46,7 +46,11 @@ fn lengths_of_graphs() {
 fn should_init_adding_a_graph() {
     let graphs = Graphs::init_with(
         "grpahs0",
-        &Graph::create(&Node::new("alice"), "lives in", &Node::new("Springfield")),
+        &Edge::create(
+            &Vertex::new("alice"),
+            "lives in",
+            &Vertex::new("Springfield"),
+        ),
     );
     assert_eq!(graphs.len(), 1);
 }
@@ -68,8 +72,8 @@ fn should_insert_a_graph_into_the_vault_without_init() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
     assert_eq!(graphs.len(), 4);
-    graphs.add_graph(
-        &Graph::create(&Node::new("Earth"), "has satellite", &Node::new("Moon")),
+    graphs.add_edge(
+        &Edge::create(&Vertex::new("Earth"), "has satellite", &Vertex::new("Moon")),
         Some("solar-system"),
     );
     assert_eq!(graphs.len_graphs(), 2);
@@ -85,43 +89,65 @@ fn is_empty_graphs() {
 }
 
 #[test]
-fn should_find_by_relation() {
+fn should_find_edges_by_relation() {
     let mut graphs = prepare_graphs_test();
-    let found_graph = graphs.find_by_relation("friend of", None).unwrap();
-    assert_eq!(found_graph.len(), 3);
+    let vertices_found = graphs.find_edges_by_relation("friend of", None).unwrap();
+    assert_eq!(vertices_found.len(), 3);
 }
 
 #[test]
-fn should_find_by_relation_in_graphs() {
+fn should_not_find_edges_by_relation_since_vault_does_not_exists() {
+    let mut graphs = Graphs::init("empty");
+    let e = graphs.find_edges_by_relation("friend of", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_edges_find_by_relation_in_graphs() {
     let mut graphs = prepare_graphs_test();
-    let mut found_graph = graphs.find_by_relation("friend of", None).unwrap();
-    assert_eq!(found_graph.len(), 3);
+    let mut vertices_found = graphs.find_edges_by_relation("friend of", None).unwrap();
+    assert_eq!(vertices_found.len(), 3);
     prepare_insert_graph_test(&mut graphs);
-    found_graph = graphs
-        .find_by_relation("enemy of", Some("middle-earth"))
+    vertices_found = graphs
+        .find_edges_by_relation("enemy of", Some("middle-earth"))
         .unwrap();
-    assert_eq!(found_graph.len(), 1);
+    assert_eq!(vertices_found.len(), 1);
 }
 
 #[test]
 fn should_find_by_relations_name() {
     let mut graphs = prepare_graphs_test();
     let relations = vec!["friend of", "relative of"];
-    let found_graphs = graphs.find_by_relations(relations, None).unwrap();
-    assert_eq!(found_graphs.len(), 4);
+    let vertices_found = graphs.find_edges_by_relations(relations, None).unwrap();
+    assert_eq!(vertices_found.len(), 4);
+}
+
+#[test]
+fn should_not_find_by_relations_name() {
+    let mut graphs = prepare_graphs_test();
+    let relations = vec!["foo", "bar"];
+    assert!(graphs.find_edges_by_relations(relations, None).is_err());
+}
+
+#[test]
+fn should_not_find_by_relations_name_vault_does_not_exists() {
+    let mut graphs = Graphs::init("void");
+    let relations = vec!["foo", "bar"];
+    let e = graphs.find_edges_by_relations(relations, Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
 fn should_not_find_by_relation() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.find_by_relation("lol", None).is_err());
+    assert!(graphs.find_edges_by_relation("lol", None).is_err());
 }
 
 #[test]
-fn should_return_the_unique_relations_for_whole_graphs() {
+fn should_return_the_unique_relations_labels_for_whole_graphs() {
     let mut graphs = prepare_graphs_test();
-    let unique_relations = graphs.uniq_relations();
-    assert_eq!(unique_relations, vec!["friend of", "relative of"]);
+    let unique_relations_vertices = graphs.uniq_relations();
+    assert_eq!(unique_relations_vertices, vec!["friend of", "relative of"]);
     prepare_insert_graph_test(&mut graphs);
     assert_eq!(graphs.len_graphs(), 2);
     assert_eq!(graphs.len(), 5);
@@ -133,19 +159,45 @@ fn should_return_the_unique_relations_for_whole_graphs() {
 }
 
 #[test]
-fn should_find_graphs_with_attribute() {
+fn should_find_edges_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.has_graph_node_attr("age", None).unwrap();
-    assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    let edges_found = graphs.edges_has_vertex_attr_key("age", None).unwrap();
+    assert_eq!(edges_found.len(), 3);
+    assert_eq!(edges_found[0].get_to_vertex().get_label(), "Bob");
+}
+
+#[test]
+fn should_not_find_edges_with_attribute() {
+    let mut graphs = prepare_graphs_test();
+    assert!(graphs.edges_has_vertex_attr_key("foo", None).is_err());
+}
+
+#[test]
+fn should_not_find_edges_with_attribute_since_vault_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.edges_has_vertex_attr_key("foo", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
 fn should_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.like_graph_node_attr("Ag", None).unwrap();
+    let found_graphs = graphs.like_graph_edge_attr("Ag", None).unwrap();
     assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
+}
+
+#[test]
+fn should_not_find_graphs_with_attribute_like() {
+    let mut graphs = prepare_graphs_test();
+    assert!(graphs.like_graph_edge_attr("fo", None).is_err());
+}
+
+#[test]
+fn should_not_find_graphs_with_attribute_like_since_vault_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.like_graph_edge_attr("Ag", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
@@ -153,13 +205,20 @@ fn should_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
     let found_graphs = graphs.attr_equals_to("age", 42, None).unwrap();
     assert_eq!(found_graphs.len(), 3);
-    assert_eq!(found_graphs[0].get_to_node().get_label(), "Bob");
+    assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
 }
 
 #[test]
 fn should_not_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
     assert!(graphs.attr_equals_to("age", 43, None).is_err());
+}
+
+#[test]
+fn should_not_find_graphs_with_attribute_equal_since_vault_does_not_exists() {
+    let graphs = prepare_graphs_test();
+    let e = graphs.attr_equals_to("age", 43, Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
@@ -186,7 +245,7 @@ fn equals_attributes() {
 }
 
 #[test]
-fn relation_in() {
+fn should_find_vertices_with_relation_in() {
     let graphs = prepare_graphs_test();
     let results = graphs.has_relation_in("friend of", None);
     assert_eq!(results.clone().unwrap().len(), 2);
@@ -195,7 +254,21 @@ fn relation_in() {
 }
 
 #[test]
-fn relation_out() {
+fn should_not_find_vertices_with_relation_in() {
+    let graphs = prepare_graphs_test();
+    let results = graphs.has_relation_in("foobar", None);
+    assert!(results.is_err());
+}
+
+#[test]
+fn should_not_find_vertices_with_relation_in_since_vault_does_not_exists() {
+    let graphs = prepare_graphs_test();
+    let e = graphs.has_relation_in("foobar", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_find_vertices_with_relation_out() {
     let graphs = prepare_graphs_test();
     let results = graphs.has_relation_out("friend of", None);
     assert_eq!(results.clone().unwrap().len(), 3);
@@ -205,10 +278,24 @@ fn relation_out() {
 }
 
 #[test]
+fn should_not_find_vertices_with_relation_out() {
+    let graphs = prepare_graphs_test();
+    let results = graphs.has_relation_out("foobar", None);
+    assert!(results.is_err());
+}
+
+#[test]
+fn should_not_find_vertices_with_relation_out_since_vault_does_not_exists() {
+    let graphs = prepare_graphs_test();
+    let e = graphs.has_relation_out("foobar", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
 fn should_create_new_vault_and_add_graph() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
-    let graph = Graph::create(&Node::new("foo"), "before a", &Node::new("bar"));
+    let graph = Edge::create(&Vertex::new("foo"), "before a", &Vertex::new("bar"));
     graphs.insert_with("other", &graph);
     assert_eq!(graphs.len_graphs(), 2);
 }
@@ -216,16 +303,16 @@ fn should_create_new_vault_and_add_graph() {
 #[test]
 fn should_find_in_graph_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("Earth");
-    let from_node_id = from_node.get_id();
-    graphs.add_graph(
-        &Graph::create(&from_node, "has satellite", &Node::new("Moon")),
+    let from_vertex = Vertex::new("Earth");
+    let from_vertex_id = from_vertex.get_id();
+    graphs.add_edge(
+        &Edge::create(&from_vertex, "has satellite", &Vertex::new("Moon")),
         Some("solar-system"),
     );
-    let mut found_graph = graphs.find_by_id(&from_node_id, None).unwrap();
+    let mut found_graph = graphs.find_by_id(&from_vertex_id, None).unwrap();
     assert_eq!(found_graph.get_label(), "has satellite");
-    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
-    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
+    assert_eq!(found_graph.get_from_vertex().get_label(), "Earth");
+    let default_graph_id = graphs.get_edges(Some("my graphs")).unwrap()[0].get_id();
     found_graph = graphs
         .find_by_id(&default_graph_id, Some("my graphs"))
         .unwrap();
@@ -235,17 +322,24 @@ fn should_find_in_graph_by_id() {
 #[test]
 fn should_find_in_graphs_by_id() {
     let mut graphs = prepare_graphs_test();
-    let from_node = Node::new("Earth");
-    let from_node_id = from_node.get_id();
-    graphs.add_graph(
-        &Graph::create(&from_node, "has satellite", &Node::new("Moon")),
+    let from_vertex = Vertex::new("Earth");
+    let from_vertex_id = from_vertex.get_id();
+    graphs.add_edge(
+        &Edge::create(&from_vertex, "has satellite", &Vertex::new("Moon")),
         Some("solar-system"),
     );
-    let default_graph_id = graphs.get_graphs(Some("my graphs")).unwrap()[0].get_id();
+    let default_graph_id = graphs.get_edges(Some("my graphs")).unwrap()[0].get_id();
     let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
-    found_graph = graphs.find_by_id_in_graphs(&from_node_id).unwrap();
-    assert_eq!(found_graph.get_from_node().get_label(), "Earth");
+    found_graph = graphs.find_by_id_in_graphs(&from_vertex_id).unwrap();
+    assert_eq!(found_graph.get_from_vertex().get_label(), "Earth");
+}
+
+#[test]
+fn should_not_find_edges_on_graphs() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_by_id_in_graphs("000");
+    assert_eq!(e, Err("edge not found"));
 }
 
 #[test]
@@ -253,7 +347,7 @@ fn delete_from_graph() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len(), 4);
 
-    let _ = graphs.delete_graph_by_id(graphs.get_graphs(None).unwrap()[0].get_id(), None);
+    let _ = graphs.delete_edge_by_id(graphs.get_edges(None).unwrap()[0].get_id(), None);
     assert_eq!(graphs.len(), 3);
 }
 
@@ -261,7 +355,7 @@ fn delete_from_graph() {
 fn delete_from_graph_fail() {
     let mut graphs = prepare_graphs_test();
     assert!(graphs
-        .delete_graph_by_id("foobar".to_string(), None)
+        .delete_edge_by_id("foobar".to_string(), None)
         .is_err());
 }
 
@@ -269,18 +363,18 @@ fn delete_from_graph_fail() {
 fn should_update_graph() {
     let mut my_graphs = Graphs::init("my-graphs");
 
-    let alice_node = Node::new("Alice");
-    let bob_node = Node::new("Bob");
-    let alice_bob_graph = Graph::create(&alice_node, "best friends", &bob_node);
-    my_graphs.add_graph(&alice_bob_graph, None);
+    let alice_edge = Vertex::new("Alice");
+    let bob_edge = Vertex::new("Bob");
+    let alice_bob_graph = Edge::create(&alice_edge, "best friends", &bob_edge);
+    my_graphs.add_edge(&alice_bob_graph, None);
 
-    let fred_node = Node::new("Fred");
-    let mut alice_fred_graph = Graph::create(&alice_node, "super friends", &fred_node);
-    my_graphs.add_graph(&alice_fred_graph, None);
+    let fred_edge = Vertex::new("Fred");
+    let mut alice_fred_graph = Edge::create(&alice_edge, "super friends", &fred_edge);
+    my_graphs.add_edge(&alice_fred_graph, None);
 
     assert_eq!(my_graphs.len(), 2);
 
-    let graphs = my_graphs.get_graphs(Some(&my_graphs.get_label())).unwrap();
+    let graphs = my_graphs.get_edges(Some(&my_graphs.get_label())).unwrap();
     assert_eq!(graphs[1].get_relation(), "super friends");
 
     alice_fred_graph.update_relation("besties");
@@ -292,37 +386,50 @@ fn should_update_graph() {
 }
 
 #[test]
+fn should_not_find_by_non_existing_id() {
+    let mut graphs = prepare_graphs_test();
+    assert!(graphs.find_by_id("000", None).is_err());
+}
+
+#[test]
+fn should_not_find_by_id_since_vault_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_by_id("000", Some("!exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
 fn should_fail_on_updating_graph() {
     let mut grphs = Graphs::init("foobar");
 
-    let alice = Node::new("Alice");
-    let bob = Node::new("Bob");
-    let alice_bob = Graph::create(&alice, "friend of", &bob);
-    grphs.add_graph(&alice_bob, None);
+    let alice = Vertex::new("Alice");
+    let bob = Vertex::new("Bob");
+    let alice_bob = Edge::create(&alice, "friend of", &bob);
+    grphs.add_edge(&alice_bob, None);
 
-    let bob_alice = Graph::create(&bob, "friend of", &alice);
+    let bob_alice = Edge::create(&bob, "friend of", &alice);
     assert!(grphs.update_graph(&bob_alice, None).is_err());
 }
 
 #[test]
-fn should_return_uniq_nodes_from_graph() {
+fn should_return_uniq_vertices_from_graph() {
     let mut graphs = prepare_graphs_test();
     prepare_insert_graph_test(&mut graphs);
-    let mut uniq_nodes = graphs.get_uniq_nodes(None).unwrap();
-    assert_eq!(uniq_nodes.len(), 2);
+    let mut uniq_vertices = graphs.get_uniq_vertices(None).unwrap();
+    assert_eq!(uniq_vertices.len(), 2);
     let mut labels: Vec<String> = Vec::new();
-    for node in uniq_nodes {
-        labels.push(node.get_label());
+    for edge in uniq_vertices {
+        labels.push(edge.get_label());
     }
 
     assert!(labels.contains(&"Saruman".to_string()));
     assert!(labels.contains(&"Gandalf".to_string()));
 
-    uniq_nodes = graphs.get_uniq_nodes(Some("my graphs")).unwrap();
-    assert_eq!(uniq_nodes.len(), 3);
+    uniq_vertices = graphs.get_uniq_vertices(Some("my graphs")).unwrap();
+    assert_eq!(uniq_vertices.len(), 3);
     labels.clear();
-    for node in uniq_nodes {
-        labels.push(node.get_label());
+    for edge in uniq_vertices {
+        labels.push(edge.get_label());
     }
 
     assert!(labels.contains(&"Alice".to_string()));
