@@ -39,7 +39,7 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.7.0"`
+`gruphst = "0.9.0"`
 
 Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
 
