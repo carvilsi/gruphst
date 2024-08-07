@@ -45,7 +45,14 @@ impl Graphs {
     /// Loads the persisted Graphs on a file
     /// # Examples
     /// ```rust
-    /// use gruphst::graphs::Graphs;
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    /// 
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
+    /// graphs.persists(); 
     /// 
     /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
     /// ```
