@@ -1,7 +1,6 @@
 use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 
-#[test]
-fn graphs_stats() {
+fn prepare_stats_test() -> Graphs {
     let mut graphs = Graphs::init("friends-and-enemies");
 
     let mut alice = Vertex::new("Alice");
@@ -36,10 +35,17 @@ fn graphs_stats() {
     graphs.insert("only relatives");
     graphs.add_edge(&graph, None);
 
+    graphs
+}
+
+#[test]
+fn graphs_stats() {
+    let graphs = prepare_stats_test();
+
     // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.stats().unwrap();
     assert_eq!(stats.get_len_graphs(), 5);
-    assert_eq!(stats.get_total_edges(), 10);
+    assert_eq!(stats.get_total_edges(), 5);
     assert_eq!(stats.get_total_attr(), 12);
     assert_eq!(stats.get_mem(), 1739);
     assert_eq!(stats.get_uniq_rel(), 2);

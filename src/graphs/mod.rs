@@ -61,7 +61,7 @@ impl Graphs {
     /// use gruphst::graphs::Graphs;
     ///  
     /// let mut graphs = Graphs::init("my graphs");
-    /// graphs.insert("my other graphs"); 
+    /// graphs.insert("my other graphs");
     /// ```
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
@@ -85,7 +85,8 @@ impl Graphs {
         self.label = label.to_string()
     }
 
-    pub fn get_stats(&self) -> GraphsStats {
+    pub fn get_stats(&mut self) -> GraphsStats {
+        self.stats = GraphsStats::generate_stats(self);
         self.stats.clone()
     }
 
@@ -115,7 +116,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             Ok(edges.clone())
         } else {
-            Err("no graphs found on vault")
+            Err("no graphs in vault")
         }
     }
 
@@ -152,7 +153,7 @@ impl Graphs {
                 Err("Edge to delete not found")
             }
         } else {
-            Err("no edges found on vault")
+            Err("no graphs in vault")
         }
     }
 

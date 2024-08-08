@@ -20,8 +20,8 @@ impl Graphs {
     ///     "created",
     ///     &Vertex::new("One Ring"));
     /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
-    /// 
-    /// // will write a file called 'Middle-earth.grphst' with 
+    ///
+    /// // will write a file called 'Middle-earth.grphst' with
     /// // the content of the graphs
     /// graphs.persists();
     /// ```
@@ -46,14 +46,14 @@ impl Graphs {
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
-    /// 
+    ///
     /// let edge = Edge::create(
     ///     &Vertex::new("Sauron"),
     ///     "created",
     ///     &Vertex::new("One Ring"));
     /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
-    /// graphs.persists(); 
-    /// 
+    /// graphs.persists();
+    ///
     /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {

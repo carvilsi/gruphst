@@ -360,6 +360,21 @@ fn delete_from_graph_fail() {
 }
 
 #[test]
+fn delete_from_graph_fail_no_vault() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(
+        graphs.delete_edge_by_id("foobar".to_string(), Some("foobar")),
+        Err("no graphs in vault")
+    );
+}
+
+#[test]
+fn should_fail_getting_edges_since_vault_does_note_exists() {
+    let graphs = prepare_graphs_test();
+    assert_eq!(graphs.get_edges(Some("foobar")), Err("no graphs in vault"));
+}
+
+#[test]
 fn should_update_graph() {
     let mut my_graphs = Graphs::init("my-graphs");
 
@@ -412,6 +427,18 @@ fn should_fail_on_updating_graph() {
 }
 
 #[test]
+fn should_fail_on_updating_graph_vault_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let alice = Vertex::new("Alice");
+    let bob = Vertex::new("Bob");
+    let alice_bob = Edge::create(&alice, "friend of", &bob);
+    assert_eq!(
+        graphs.update_graph(&alice_bob, Some("foobar")),
+        Err("no graphs in vault")
+    );
+}
+
+#[test]
 fn should_return_uniq_vertices_from_graph() {
     let mut graphs = prepare_graphs_test();
     prepare_insert_graph_test(&mut graphs);
@@ -435,4 +462,33 @@ fn should_return_uniq_vertices_from_graph() {
     assert!(labels.contains(&"Alice".to_string()));
     assert!(labels.contains(&"Bob".to_string()));
     assert!(labels.contains(&"Fred".to_string()));
+}
+
+#[test]
+fn should_return_stats_for_graphs() {
+    let mut graphs = prepare_graphs_test();
+    let graphs_stats = graphs.get_stats();
+    println!("{:#?}", graphs_stats);
+    assert_eq!(graphs_stats.get_mem(), 1322);
+    assert_eq!(graphs_stats.get_total_edges(), 4);
+    assert_eq!(graphs_stats.get_total_graphs(), 1);
+    assert_eq!(graphs_stats.get_total_attr(), 9);
+    assert_eq!(graphs_stats.get_total_vertices(), 8);
+    assert_eq!(graphs_stats.get_uniq_rel(), 2);
+}
+
+#[test]
+fn should_set_label_for_graphs() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.get_label(), "my graphs");
+    graphs.set_label("foobar");
+    assert_eq!(graphs.get_label(), "foobar");
+}
+
+#[test]
+fn should_update_label_for_graphs() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.get_label(), "my graphs");
+    graphs.update_label("foobar");
+    assert_eq!(graphs.get_label(), "foobar");
 }

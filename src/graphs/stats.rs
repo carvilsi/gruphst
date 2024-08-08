@@ -9,7 +9,7 @@ pub struct GraphsStats {
     /// memory used by Graphs in bytes
     mem: usize,
     /// length of the Graph's vault
-    len_graphs: usize,
+    total_edges: usize,
     /// total graphs
     total_graphs: usize,
     /// total attributes
@@ -24,7 +24,7 @@ impl GraphsStats {
     pub fn init() -> Self {
         GraphsStats {
             mem: 64,
-            len_graphs: 0,
+            total_edges: 0,
             total_graphs: 0,
             total_attr: 0,
             total_vertices: 0,
@@ -37,7 +37,7 @@ impl GraphsStats {
     }
 
     pub fn get_len_graphs(&self) -> usize {
-        self.len_graphs
+        self.total_edges
     }
 
     pub fn get_total_graphs(&self) -> usize {
@@ -49,11 +49,15 @@ impl GraphsStats {
     }
 
     pub fn get_total_edges(&self) -> usize {
-        self.total_vertices
+        self.total_edges
     }
 
     pub fn get_uniq_rel(&self) -> usize {
         self.uniq_rel
+    }
+
+    pub fn get_total_vertices(&self) -> usize {
+        self.total_vertices
     }
 
     pub fn generate_stats(graphs: &Graphs) -> Self {
@@ -139,7 +143,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
 
     let stats = GraphsStats {
         mem: bytes.len(),
-        len_graphs: grphs.len(),
+        total_edges: grphs.len(),
         total_attr: attr_counter,
         total_vertices: grphs.len() * 2,
         uniq_rel: grphs.uniq_relations().len(),
