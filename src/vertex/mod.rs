@@ -9,10 +9,12 @@ use std::rc::Rc;
 
 mod query;
 
-// TODO: this should be private
-/// Representation of a vertex
+/// Representation of a vertex.
+/// A vertex or node, vertices in plural,
+/// is the fundamental unit of a graph.
+#[doc(hidden)]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Vertex_ {
+pub(crate) struct Vertex_ {
     /// a vertex id is an uuid as identifier
     id: String,
     /// And a name
@@ -36,7 +38,7 @@ impl Vertex_ {
 // wrapper for Edge_
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vertex {
-    pub vrtx: Rc<RefCell<Vertex_>>,
+    pub(crate) vrtx: Rc<RefCell<Vertex_>>,
 }
 
 impl Vertex {
@@ -44,8 +46,8 @@ impl Vertex {
     /// # Examples
     /// ```rust
     /// use gruphst::edge::Edge;
-    /// 
-    /// Edge::new("Gandalf"); 
+    ///
+    /// Edge::new("Gandalf");
     /// ```
     pub fn new(label: &str) -> Self {
         Vertex {
@@ -53,7 +55,7 @@ impl Vertex {
         }
     }
 
-    pub fn create(label: &str) -> Rc<RefCell<Vertex_>> {
+    pub(crate) fn create(label: &str) -> Rc<RefCell<Vertex_>> {
         Vertex_::new(label)
     }
 
@@ -73,11 +75,11 @@ impl Vertex {
     /// # Examples
     /// ```rust
     /// use gruphst::vertex::Vertex;
-    /// 
+    ///
     /// let mut gandalf = Vertex::new("Gandalf");
-    /// gandalf.set_attr("known as", "The Gray"); 
-    /// gandalf.set_attr("years old", 24000); 
-    /// ``` 
+    /// gandalf.set_attr("known as", "The Gray");
+    /// gandalf.set_attr("years old", 24000);
+    /// ```
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
@@ -92,11 +94,11 @@ impl Vertex {
     /// # Examples
     /// ```rust
     /// use gruphst::vertex::Vertex;
-    /// 
+    ///
     /// let mut gandalf = Vertex::new("Gandalf");
-    /// gandalf.set_attr("known as", "The Gray"); 
-    /// gandalf.set_attr("years old", 24000); 
-    /// 
+    /// gandalf.set_attr("known as", "The Gray");
+    /// gandalf.set_attr("years old", 24000);
+    ///
     /// let gandalf_years = gandalf.get_attr("years old").unwrap();
     /// assert_eq!(gandalf_years, "24000");
     /// ```
@@ -164,7 +166,7 @@ impl Vertex {
         kv
     }
 
-    /// Retrieves the vertices that has relation out for the given vertex on a collection of edges 
+    /// Retrieves the vertices that has relation out for the given vertex on a collection of edges
     pub fn get_relations_out_on_edges(
         &self,
         edges: Vec<Edge>,
@@ -187,7 +189,7 @@ impl Vertex {
         }
     }
 
-    /// Retrieves the vertices that has relation in for the given vertex on edges 
+    /// Retrieves the vertices that has relation in for the given vertex on edges
     pub fn get_relations_in_on_edges(
         &self,
         edges: Vec<Edge>,

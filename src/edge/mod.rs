@@ -51,8 +51,8 @@ impl Edge {
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex};
-    /// 
-    /// let mut edge = Edge::new(""); 
+    ///
+    /// let mut edge = Edge::new("");
     /// edge.add_relation(
     ///     &Vertex::new("Frodo"),
     ///     "friend of",
@@ -73,8 +73,8 @@ impl Edge {
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex};
-    /// 
-    /// let mut edge = Edge::new(""); 
+    ///
+    /// let mut edge = Edge::new("");
     /// edge.add_relation(
     ///     &Vertex::new("Frodo"),
     ///     "friend of",
@@ -92,8 +92,8 @@ impl Edge {
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex};
-    /// 
-    /// Edge::create( 
+    ///
+    /// Edge::create(
     ///     &Vertex::new("Theoden"),
     ///     "kinf of",
     ///     &Vertex::new("Rohan"));
