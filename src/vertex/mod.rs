@@ -42,12 +42,12 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    /// Creates a edge with the given label, the id is generated
+    /// Creates a vertex with the given label, the id is generated
     /// # Examples
     /// ```rust
-    /// use gruphst::edge::Edge;
+    /// use gruphst::vertex::Vertex;
     ///
-    /// Edge::new("Gandalf");
+    /// Vertex::new("Gandalf");
     /// ```
     pub fn new(label: &str) -> Self {
         Vertex {
