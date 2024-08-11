@@ -469,7 +469,7 @@ fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
     println!("{:#?}", graphs_stats);
-    assert_eq!(graphs_stats.get_mem(), 1322);
+    assert_eq!(graphs_stats.get_mem(), 1146);
     assert_eq!(graphs_stats.get_total_edges(), 4);
     assert_eq!(graphs_stats.get_total_graphs(), 1);
     assert_eq!(graphs_stats.get_total_attr(), 9);

@@ -1,13 +1,10 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
+use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{
-    attributes::Attributes,
-    vertex::{Vertex, Vertex_},
-    RUDAttribute,
-};
+use crate::vertex::{Vertex, Vertex_};
 
 mod query;
 
@@ -23,7 +20,7 @@ pub struct Edge {
     /// Target vertex
     to: Rc<RefCell<Vertex_>>,
     /// Attributes for the Edge
-    attr: Attributes,
+    attr: HashMap<String, String>,
 }
 
 impl Edge {
@@ -37,14 +34,6 @@ impl Edge {
 
     pub fn set_label(&mut self, label: &str) {
         self.relation = label.to_string()
-    }
-
-    pub fn get_attributes(&self) -> Attributes {
-        self.attr.clone()
-    }
-
-    pub fn set_attributes(&mut self, attributes: Attributes) {
-        self.attr = attributes;
     }
 
     /// Creates a new instance
@@ -64,7 +53,7 @@ impl Edge {
             relation: label.to_string(),
             from: Vertex::create(""),
             to: Vertex::create(""),
-            attr: Attributes::new(),
+            attr: HashMap::new(),
         }
     }
 
@@ -139,39 +128,68 @@ impl Edge {
     pub fn set_relation(&mut self, relation_label: &str) {
         self.relation = relation_label.to_string();
     }
-}
 
-impl RUDAttribute for Edge {
-    fn set_attr<T>(&mut self, key: &str, val: T)
+    /// Set attributes for a edge
+    pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.set_attr(key, val);
+        self.attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
-    fn get_attr(&self, key: &str) -> Result<&String, &'static str> {
-        self.attr.get_attr(key)
+    /// Get attribute for a edge
+    pub fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
+        let res = self.attr.get(attr_k);
+        match res {
+            Some(res) => Ok(res),
+            None => {
+                warn!("attribute '{}' not found", attr_k);
+                Err("attribute not found")
+            }
+        }
     }
-
-    fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    /// Updates the value of an attribute
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
     {
-        self.attr.update_attr(attr_k, attr_v)
+        if let Some(attr) = self.attr.get_mut(attr_k) {
+            *attr = attr_v.to_string();
+            return Ok(());
+        }
+        Err("not attribute found to update")
     }
 
-    fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
+    /// Updates the value of an attribute or creates a new one if attribute key does not exists
+    pub fn upsert_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
     {
-        self.attr.upsert_attr(attr_k, attr_v)
+        if let Some(attr) = self.attr.get_mut(attr_k) {
+            *attr = attr_v.to_string();
+        } else {
+            self.attr.insert(attr_k.to_string(), attr_v.to_string());
+        }
     }
 
-    fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
-        self.attr.delete_attr(v)
+    /// Deletes an attribute
+    pub fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
+        let res = self.attr.remove(v);
+        match res {
+            Some(_) => Ok(()),
+            None => {
+                warn!("attribute {} not found for remove", v);
+                Err("attribute not found for remove")
+            }
+        }
     }
 
-    fn get_attr_keys(&self) -> Vec<&str> {
-        self.attr.get_attr_keys()
+    /// Returns an Array containing all attribute keys
+    pub fn get_attr_keys(&self) -> Vec<&str> {
+        let mut key_vec = Vec::new();
+        for key in self.attr.keys() {
+            key_vec.push(key.as_str());
+        }
+        key_vec
     }
 }

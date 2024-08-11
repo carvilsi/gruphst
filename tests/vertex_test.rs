@@ -176,6 +176,12 @@ fn get_vertex_relation_in() {
             vertex = n.clone();
         }
     }
+
+    graphs.add_edge(
+        &Edge::create(&Vertex::new("Peter"), "friend of", &vertex),
+        Some("my graphs"),
+    );
+
     let relations_in: HashMap<String, Vec<Vertex>> = vertex
         .get_relations_in_on_edges(graphs.get_edges(Some("my graphs")).unwrap())
         .unwrap();
@@ -189,7 +195,7 @@ fn get_vertex_relation_in() {
         assert!(false);
     }
     if let Some(vertexs) = relations_in.get("friend of") {
-        assert_eq!(vertexs.len(), 1);
+        assert_eq!(vertexs.len(), 2);
         assert_eq!(vertexs[0].get_label(), "Bob".to_string());
     } else {
         assert!(false);
