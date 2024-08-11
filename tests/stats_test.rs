@@ -47,7 +47,7 @@ fn graphs_stats() {
     assert_eq!(stats.get_len_graphs(), 5);
     assert_eq!(stats.get_total_edges(), 5);
     assert_eq!(stats.get_total_attr(), 12);
-    assert_eq!(stats.get_mem(), 1739);
+    assert_eq!(stats.get_mem(), 1519);
     assert_eq!(stats.get_uniq_rel(), 2);
     assert_eq!(stats.get_total_graphs(), 2);
 }

@@ -84,9 +84,7 @@ impl Vertex {
     where
         T: std::fmt::Display,
     {
-        self.vrtx
-            .borrow_mut()
-            .attr
+        self.vrtx.borrow_mut().attr
             .insert(attr_k.to_string(), attr_v.to_string());
     }
 
@@ -132,14 +130,10 @@ impl Vertex {
         T: std::fmt::Display,
     {
         let mut binding = self.vrtx.borrow_mut();
-        let attr = binding.attr.get_mut(attr_k);
-        match attr {
-            Some(attr) => {
-                *attr = attr_v.to_string();
-            }
-            None => {
-                binding.attr.insert(attr_k.to_string(), attr_v.to_string());
-            }
+        if let Some(attr) = binding.attr.get_mut(attr_k) {
+            *attr = attr_v.to_string();
+        } else {
+            binding.attr.insert(attr_k.to_string(), attr_v.to_string());
         }
     }
 

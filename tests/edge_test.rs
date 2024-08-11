@@ -1,4 +1,4 @@
-use gruphst::{attributes::Attributes, edge::Edge, vertex::Vertex, *};
+use gruphst::{edge::Edge, vertex::Vertex};
 
 fn prepare_edge_test() -> (Edge, String) {
     let mut alice = Vertex::new("alice");
@@ -100,34 +100,20 @@ fn edge_attribute_keys() {
 }
 
 #[test]
-fn edge_get_attributes() {
-    let (edge, _id) = prepare_edge_test();
-    let attributes = edge.get_attributes();
-    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
-    assert_eq!(attributes.get_attr("value").unwrap(), "2");
+fn edge_set_attributes() {
+    let (mut edge, _id) = prepare_edge_test();
+    assert_eq!(edge.get_attr("type").unwrap(), "friendship");
+    assert_eq!(edge.get_attr("value").unwrap(), "2");
+    edge.set_attr("color", "black");
+    edge.set_attr("weight", 5);
+    assert_eq!(edge.get_attr("color").unwrap(), "black");
+    assert_eq!(edge.get_attr("weight").unwrap(), "5");
 }
 
 #[test]
-fn edge_set_attributes() {
-    let (mut edge, _id) = prepare_edge_test();
-    let attributes = edge.get_attributes();
-    assert_eq!(attributes.get_attr("type").unwrap(), "friendship");
-    assert_eq!(attributes.get_attr("value").unwrap(), "2");
-    assert_eq!(edge.get_attr("type").unwrap(), "friendship");
-    assert_eq!(edge.get_attr("value").unwrap(), "2");
-    let mut new_attributes = Attributes::new();
-    new_attributes.set_attr("color", "black");
-    new_attributes.set_attr("weight", 5);
-    edge.set_attributes(new_attributes);
-    let update_attributes = edge.get_attributes();
-    assert!(update_attributes.get_attr("type").is_err());
-    assert!(update_attributes.get_attr("value").is_err());
-    assert_eq!(update_attributes.get_attr("color").unwrap(), "black");
-    assert_eq!(update_attributes.get_attr("weight").unwrap(), "5");
-    assert!(edge.get_attr("type").is_err());
-    assert!(edge.get_attr("value").is_err());
-    assert_eq!(edge.get_attr("color").unwrap(), "black");
-    assert_eq!(edge.get_attr("weight").unwrap(), "5");
+fn edge_get_attribute_should_fail_since_does_not_exists() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.get_attr("foobar").is_err());
 }
 
 #[test]
