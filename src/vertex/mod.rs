@@ -35,6 +35,9 @@ impl Vertex_ {
     }
 }
 
+/// Representation of a vertex.
+/// A vertex or node, vertices in plural,
+/// is the fundamental unit of a graph.
 // wrapper for Edge_
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vertex {
