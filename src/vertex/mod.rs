@@ -87,7 +87,9 @@ impl Vertex {
     where
         T: std::fmt::Display,
     {
-        self.vrtx.borrow_mut().attr
+        self.vrtx
+            .borrow_mut()
+            .attr
             .insert(attr_k.to_string(), attr_v.to_string());
     }
 

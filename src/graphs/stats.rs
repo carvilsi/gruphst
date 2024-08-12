@@ -127,11 +127,19 @@ impl Graphs {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
+    
+    /// function to retrieve memory usage by graphs
+    pub fn get_mem(&self) -> Result<usize, &'static str> {
+        let bytes = bincode::serialize(self);
+        match bytes {
+            Ok(b) => Ok(b.len()),
+            Err(_) => Err("not possible to get memory usage"),
+        }
+    }
 }
 
 /// private function to generate stats
 fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
-    let bytes = bincode::serialize(grphs)?;
     // lets count the amount of attributes in the graph
     let mut attr_counter = 0;
     for (_graph_name, edges) in grphs.vault.iter() {
@@ -142,7 +150,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
     }
 
     let stats = GraphsStats {
-        mem: bytes.len(),
+        mem: grphs.get_mem().unwrap(),
         total_edges: grphs.len(),
         total_attr: attr_counter,
         total_vertices: grphs.len() * 2,

@@ -81,6 +81,17 @@ fn should_insert_a_graph_into_the_vault_without_init() {
 }
 
 #[test]
+fn insert_lot_of_edges_into_the_vault() {
+    let mut graphs = prepare_graphs_test();
+    for _i in 1..500 {
+        graphs.add_edge(
+            &Edge::create(&Vertex::new("Earth"), "has satellite", &Vertex::new("Moon")),
+            Some("solar-system"),
+        );
+    }
+}
+
+#[test]
 fn is_empty_graphs() {
     let mut graphs = Graphs::init("empty");
     assert!(graphs.is_empty());
@@ -468,13 +479,19 @@ fn should_return_uniq_vertices_from_graph() {
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
-    println!("{:#?}", graphs_stats);
     assert_eq!(graphs_stats.get_mem(), 1146);
     assert_eq!(graphs_stats.get_total_edges(), 4);
     assert_eq!(graphs_stats.get_total_graphs(), 1);
     assert_eq!(graphs_stats.get_total_attr(), 9);
     assert_eq!(graphs_stats.get_total_vertices(), 8);
     assert_eq!(graphs_stats.get_uniq_rel(), 2);
+}
+
+#[test]
+fn should_retrieve_memory_used_by_graphs() {
+    let graphs = prepare_graphs_test();
+    let mem_usage = graphs.get_mem().unwrap();
+    assert_eq!(mem_usage, 1146); 
 }
 
 #[test]

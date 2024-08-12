@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use stats::GraphsStats;
 use std::collections::HashMap;
 
-use crate::{edge::Edge, vertex::Vertex};
+use crate::{edge::Edge, util::graphs_memory_watcher, vertex::Vertex};
 
 mod persistence;
 mod query;
@@ -66,7 +66,7 @@ impl Graphs {
     pub fn insert(&mut self, name: &str) {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
-        self.stats = self.stats().unwrap();
+        graphs_memory_watcher(self);
     }
 
     /// Creates a new entry on Graphs valut with a Graph
@@ -74,7 +74,7 @@ impl Graphs {
         self.vault.insert(String::from(name), vec![]);
         self.label = String::from(name);
         self.add_edge(edge, Some(name));
-        self.stats = self.stats().unwrap();
+        graphs_memory_watcher(self);
     }
 
     pub fn get_label(&self) -> String {
@@ -105,6 +105,7 @@ impl Graphs {
             let v = self.vault.get_mut(&current_vault).unwrap();
             v.push(edge.clone());
         }
+        graphs_memory_watcher(self);
     }
 
     // TODO: create method to add a collection of Edges
@@ -147,6 +148,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get_mut(&current_vault) {
             if let Some(index) = edges.iter().position(|edge| edge.get_id() == id) {
                 edges.remove(index);
+                graphs_memory_watcher(self);
                 Ok(())
             } else {
                 error!("Edge [{}] to delete not found", id);
@@ -172,6 +174,7 @@ impl Graphs {
                 let i = index.unwrap();
                 edges.remove(i);
                 edges.push(edge_to_update.clone());
+                graphs_memory_watcher(self);
                 Ok(())
             } else {
                 error!(

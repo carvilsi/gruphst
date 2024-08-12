@@ -8,4 +8,5 @@ pub mod config;
 pub mod edge;
 pub mod graphs;
 pub mod logger;
+pub mod util;
 pub mod vertex;
