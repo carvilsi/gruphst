@@ -3,7 +3,7 @@ use gruphst::config::*;
 #[test]
 fn should_retrieve_max_memory_configuration() {
     let config_mem = get_max_mem_usage();
-    assert_eq!(config_mem, 50 * 1024 * 1024);
+    assert_eq!(config_mem, 5 * 1024 * 1024);
 }
 
 #[test]

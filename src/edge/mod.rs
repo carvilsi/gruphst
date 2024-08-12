@@ -23,8 +23,6 @@ pub struct Edge {
     attr: HashMap<String, String>,
 }
 
-unsafe impl Send for Edge {}
-
 impl Edge {
     pub fn get_id(&self) -> String {
         self.id.clone()
