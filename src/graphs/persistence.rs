@@ -58,8 +58,10 @@ impl Graphs {
     /// ```
     pub fn load(file_name: &str) -> Result<Graphs, Box<dyn Error>> {
         let read_file = File::open(file_name)?;
-        let mut reader = BufReader::new(read_file);
+        let file_size: usize = read_file.metadata().unwrap().len().try_into().unwrap();
+        let mut reader = BufReader::with_capacity(file_size, read_file);
         reader.fill_buf()?;
+        println!("the size of the reader buffer: {:#?}", reader.buffer().len());
         let max_mem = get_max_mem_usage();
         // checks if trying to load a file over the limit of memory
         if reader.buffer().len() > max_mem {
@@ -68,6 +70,7 @@ impl Graphs {
             );
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
+        println!("------ {:#?}", readed_graph.get_mem().unwrap());
         Ok(readed_graph)
     }
 }

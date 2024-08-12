@@ -1,3 +1,5 @@
+#[rustfmt::skip]
+
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -87,10 +89,7 @@ impl Vertex {
     where
         T: std::fmt::Display,
     {
-        self.vrtx
-            .borrow_mut()
-            .attr
-            .insert(attr_k.to_string(), attr_v.to_string());
+        self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
     /// Get attribute for a vertex
