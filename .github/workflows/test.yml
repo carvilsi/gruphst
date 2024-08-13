@@ -19,5 +19,5 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Tests
-      run: mv .env-test .env
-      run: cargo test --verbose 
+      - run: mv .env-test .env
+      - run: cargo test --verbose 
