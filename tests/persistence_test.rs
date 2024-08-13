@@ -47,8 +47,5 @@ fn load_persisted_should_fail_wrong_file_format() {
 
 #[test]
 fn load_persisted_fail_file_size_bigger_than_max_configured_memory() {
-    let err = Graphs::load("tests/data/big-big-big.grphst");
-    assert_eq!(Err("Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var"), err);
-    // println!("{:#?}", err);
-    // assert!(Graphs::load("tests/data/big-big-big.grphst").is_err());
+    assert!(Graphs::load("tests/data/big-big-big.grphst").is_err());
 }

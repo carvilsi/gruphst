@@ -22,9 +22,9 @@ pub fn get_max_mem_usage() -> usize {
     dotenv().ok();
     match dotenv::var(GRUPHST_MAX_MEM_USAGE) {
         Ok(value) => {
-            let mut max = value.parse().unwrap();
-            max = max * 1024 * 1024;
-            max
+            let mut max_conf: f32 = value.parse().unwrap();
+            max_conf = max_conf * 1024.0_f32 * 1024.0_f32;
+            max_conf as usize 
         }
         Err(_) => DEFAULT_GRUPHST_MAX_MEM_USAGE,
     }

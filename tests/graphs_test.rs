@@ -1,5 +1,4 @@
 use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
-use gruphst::logger::enable_logging;
 
 pub fn prepare_graphs_test() -> Graphs {
     let mut graphs = Graphs::init("my graphs");
@@ -82,21 +81,17 @@ fn should_insert_a_graph_into_the_vault_without_init() {
 }
 
 #[test]
+#[should_panic(expected = "memory usage critical, auto-persisted current graphs")]
 fn insert_lot_of_edges_into_the_vault() {
-
-    enable_logging(log::Level::Trace);
     let mut graphs = prepare_graphs_test();
     graphs.update_label("big-big-big");
-    for i in 1..5500 {
+    for _i in 1..5500 {
         graphs.add_edge(
             &Edge::create(&Vertex::new("Earth"), "has satellite", &Vertex::new("Moon")),
             None,
         );
-        println!("Inserted {} of 500", i);
     }
-    println!("Done");
     println!("{:#?}", graphs.get_stats());
-    graphs.persists();
 }
 
 #[test]

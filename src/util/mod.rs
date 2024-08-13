@@ -1,5 +1,4 @@
 use log::{debug, error, info, trace, warn};
-use std::process;
 
 use crate::config::get_max_mem_usage;
 use crate::graphs::Graphs;
@@ -16,7 +15,6 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
     let mem = graphs.get_mem().unwrap();
     let mem_prss = (mem as f32 * 100_f32) / max_mem as f32;
     trace!("memory preassure: {:.2}", mem_prss);
-    println!("memory preassure: {:.2}", mem_prss);
     match mem_prss {
         mem_prss if mem_prss <= 70_f32 => debug!("memory ok: {:.2}", mem_prss),
         mem_prss if (70_f32..95_f32).contains(&mem_prss) => {
@@ -31,8 +29,8 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
                 "auto persisting current graphs: {}, and stoping execution",
                 graphs.get_label()
             );
-            // let _ = graphs.persists();
-            //process::exit(1);
+            let _ = graphs.persists();
+            panic!("memory usage critical, auto-persisted current graphs");
         }
         _ => todo!(),
     }

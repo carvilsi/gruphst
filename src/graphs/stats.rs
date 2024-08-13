@@ -61,10 +61,7 @@ impl GraphsStats {
     }
 
     pub fn generate_stats(graphs: &Graphs) -> Self {
-        match get_stats(graphs) {
-            Ok(stats) => stats,
-            Err(_) => panic!("not possible to generate stats for graphs"),
-        }
+        get_stats(graphs).unwrap()
     }
 }
 
@@ -130,11 +127,8 @@ impl Graphs {
     
     /// function to retrieve memory usage by graphs
     pub fn get_mem(&self) -> Result<usize, &'static str> {
-        let bytes = bincode::serialize(self);
-        match bytes {
-            Ok(b) => Ok(b.len()),
-            Err(_) => Err("not possible to get memory usage"),
-        }
+        let bytes = bincode::serialize(self).unwrap();
+        Ok(bytes.len())
     }
 }
 
