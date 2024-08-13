@@ -4,4 +4,6 @@
 
 - added changelog 
 - fixed graphs load from persisted file when file was big 
+- put back memory watcher
+- added benchmarking for *add_edge* method
 
