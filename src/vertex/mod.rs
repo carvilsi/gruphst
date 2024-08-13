@@ -1,3 +1,5 @@
+#[rustfmt::skip]
+
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -35,6 +37,9 @@ impl Vertex_ {
     }
 }
 
+/// Representation of a vertex.
+/// A vertex or node, vertices in plural,
+/// is the fundamental unit of a graph.
 // wrapper for Edge_
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Vertex {
@@ -84,8 +89,7 @@ impl Vertex {
     where
         T: std::fmt::Display,
     {
-        self.vrtx.borrow_mut().attr
-            .insert(attr_k.to_string(), attr_v.to_string());
+        self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
     /// Get attribute for a vertex

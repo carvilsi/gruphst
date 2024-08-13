@@ -36,7 +36,16 @@ fn persistence() {
 }
 
 #[test]
-fn load_persisted_fail() {
+fn load_persisted_should_fail_fail_does_not_exists() {
     assert!(Graphs::load("tests/does-not-exists.grphst").is_err());
+}
+
+#[test]
+fn load_persisted_should_fail_wrong_file_format() {
     assert!(Graphs::load("tests/data/wrong-persisted-file.grphst").is_err());
+}
+
+#[test]
+fn load_persisted_fail_file_size_bigger_than_max_configured_memory() {
+    assert!(Graphs::load("tests/data/big-big-big.grphst").is_err());
 }
