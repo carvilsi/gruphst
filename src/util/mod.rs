@@ -25,10 +25,7 @@ pub fn graphs_memory_watcher(graphs: &Graphs) {
         }
         mem_prss if mem_prss >= 99_f32 => {
             error!("memory usage critical: {:.2}", mem_prss);
-            error!(
-                "auto persisting current graphs: {}, and stoping execution",
-                graphs.get_label()
-            );
+            error!("auto persisting current graphs: {}, then panicking", graphs.get_label());
             let _ = graphs.persists();
             panic!("memory usage critical, auto-persisted current graphs");
         }
