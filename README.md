@@ -39,7 +39,7 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.10.0"`
+`gruphst = "0.11.1"`
 
 
 ### Examples
