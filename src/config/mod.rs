@@ -31,7 +31,7 @@ pub fn get_max_mem_usage() -> usize {
 }
 
 const GRUPHST_LOG_LEVEL: &str = "GRUPHST_LOG_LEVEL";
-const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Info;
+const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Error;
 
 /// Read log level configuration from .env file
 /// or setted environmental variable

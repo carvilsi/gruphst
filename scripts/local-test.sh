@@ -2,5 +2,5 @@
 
 mv .env .env-tmp
 cp .env-test .env
-cargo test --verbose
+cargo test
 mv .env-tmp .env
