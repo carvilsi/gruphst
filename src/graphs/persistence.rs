@@ -34,11 +34,7 @@ impl Graphs {
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
-        info!(
-            "Current Graphs persisted at {} file with {} bytes written",
-            file_name,
-            bytes.len()
-        );
+        info!("Current Graphs persisted at {} file with {} bytes written", file_name, bytes.len());
         Ok(())
     }
 
@@ -64,9 +60,7 @@ impl Graphs {
         let max_mem = get_max_mem_usage();
         // checks if trying to load a file over the limit of memory
         if reader.buffer().len() > max_mem {
-            return Err(
-                "Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var".into(),
-            );
+            return Err("Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var".into());
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
         Ok(readed_graph)
