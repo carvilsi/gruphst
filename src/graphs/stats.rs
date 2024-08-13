@@ -124,7 +124,7 @@ impl Graphs {
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    
+
     /// function to retrieve memory usage by graphs
     pub fn get_mem(&self) -> Result<usize, &'static str> {
         let bytes = bincode::serialize(self).unwrap();

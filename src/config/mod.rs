@@ -24,7 +24,7 @@ pub fn get_max_mem_usage() -> usize {
         Ok(value) => {
             let mut max_conf: f32 = value.parse().unwrap();
             max_conf = max_conf * 1024.0_f32 * 1024.0_f32;
-            max_conf as usize 
+            max_conf as usize
         }
         Err(_) => DEFAULT_GRUPHST_MAX_MEM_USAGE,
     }

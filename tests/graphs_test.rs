@@ -494,7 +494,7 @@ fn should_return_stats_for_graphs() {
 fn should_retrieve_memory_used_by_graphs() {
     let graphs = prepare_graphs_test();
     let mem_usage = graphs.get_mem().unwrap();
-    assert_eq!(mem_usage, 1146); 
+    assert_eq!(mem_usage, 1146);
 }
 
 #[test]
