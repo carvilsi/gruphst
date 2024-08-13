@@ -177,10 +177,7 @@ impl Graphs {
                 graphs_memory_watcher(self);
                 Ok(())
             } else {
-                error!(
-                    "Edge to update with id: [{}] not found",
-                    edge_to_update.get_id()
-                );
+                error!("Edge to update with id: [{}] not found", edge_to_update.get_id());
                 Err("edge to update not found")
             }
         } else {
