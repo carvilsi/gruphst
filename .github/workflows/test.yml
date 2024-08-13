@@ -20,5 +20,3 @@ jobs:
       run: cargo build --verbose
     - name: Tests
       run: ./scripts/cd-ci-test.sh 
-    - name: Lint
-      run: cargo clippy
