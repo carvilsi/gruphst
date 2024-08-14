@@ -1,4 +1,4 @@
-use crate::edge::Edge;
+use crate::{edge::Edge, vertex::Vertex};
 
 impl Edge {
     /// Checks if "from" or "to" vertices has an attribute
@@ -59,5 +59,15 @@ impl Edge {
     /// Checks if attributes for a edge is empty
     pub fn attr_is_empty(&self) -> bool {
         self.attr_len() == 0
+    }
+
+    pub fn find_vertex_by_id(&self, id: &str) -> Result<Vertex, &'static str> {
+        if self.get_from_vertex().get_id() == id.to_string() {
+            Ok(self.get_from_vertex())
+        } else if self.get_to_vertex().get_id() == id.to_string() {
+            Ok(self.get_to_vertex())
+        } else {
+            Err("Vertex not found")
+        }
     }
 }
