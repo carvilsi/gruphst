@@ -20,34 +20,38 @@ fn prepare_stats_test() -> Graphs {
     let relation_friend_of = "friend of";
     let relation_relative_of = "relative of";
 
-    let mut graph = Edge::create(&alice, relation_friend_of, &bob);
-    graphs.add_edge(&graph, None);
+    let mut edge = Edge::create(&alice, relation_friend_of, &bob);
+    edge.set_attr("foo", "bar 0");
+    graphs.add_edge(&edge, None);
 
-    graph = Edge::create(&alice, relation_relative_of, &fred);
-    graphs.add_edge(&graph, None);
+    edge = Edge::create(&alice, relation_relative_of, &fred);
+    graphs.add_edge(&edge, None);
 
-    graph = Edge::create(&alice, relation_friend_of, &john);
-    graphs.add_edge(&graph, None);
+    edge = Edge::create(&alice, "enemy of", &john);
+    graphs.add_edge(&edge, None);
 
-    graph = Edge::create(&peter, relation_relative_of, &john);
-    graphs.add_edge(&graph, None);
+    edge = Edge::create(&peter, relation_relative_of, &john);
+    graphs.add_edge(&edge, None);
 
     graphs.insert("only relatives");
-    graphs.add_edge(&graph, None);
+    edge.set_attr("foo one", "bar 1");
+    graphs.add_edge(&edge, None);
+    edge = Edge::create(&bob, "brother of", &john);
+    graphs.add_edge(&edge, None);
 
     graphs
 }
 
 #[test]
 fn graphs_stats() {
-    let graphs = prepare_stats_test();
+    let mut graphs = prepare_stats_test();
 
     // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
-    let stats = graphs.stats().unwrap();
-    assert_eq!(stats.get_len_graphs(), 5);
-    assert_eq!(stats.get_total_edges(), 5);
-    assert_eq!(stats.get_total_attr(), 12);
-    assert_eq!(stats.get_mem(), 1519);
-    assert_eq!(stats.get_uniq_rel(), 2);
+    let stats = graphs.get_stats();
+    assert_eq!(stats.get_total_edges(), 6);
+    assert_eq!(stats.get_total_attr(), 17);
+    assert_eq!(stats.get_mem(), 1863);
+    assert_eq!(stats.get_uniq_rel(), 4);
     assert_eq!(stats.get_total_graphs(), 2);
+    assert_eq!(stats.get_total_vertices(), 12);
 }

@@ -1,77 +1,7 @@
 use crate::graphs::Graphs;
 use log::error;
-use serde::{Deserialize, Serialize};
-use std::error::Error;
-
-/// Represents stats data from the Graphs
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GraphsStats {
-    /// memory used by Graphs in bytes
-    mem: usize,
-    /// length of the Graph's vault
-    total_edges: usize,
-    /// total graphs
-    total_graphs: usize,
-    /// total attributes
-    total_attr: usize,
-    /// total edges
-    total_vertices: usize,
-    /// unique relations
-    uniq_rel: usize,
-}
-
-impl GraphsStats {
-    pub fn init() -> Self {
-        GraphsStats {
-            mem: 64,
-            total_edges: 0,
-            total_graphs: 0,
-            total_attr: 0,
-            total_vertices: 0,
-            uniq_rel: 0,
-        }
-    }
-
-    pub fn get_mem(&self) -> usize {
-        self.mem
-    }
-
-    pub fn get_len_graphs(&self) -> usize {
-        self.total_edges
-    }
-
-    pub fn get_total_graphs(&self) -> usize {
-        self.total_graphs
-    }
-
-    pub fn get_total_attr(&self) -> usize {
-        self.total_attr
-    }
-
-    pub fn get_total_edges(&self) -> usize {
-        self.total_edges
-    }
-
-    pub fn get_uniq_rel(&self) -> usize {
-        self.uniq_rel
-    }
-
-    pub fn get_total_vertices(&self) -> usize {
-        self.total_vertices
-    }
-
-    pub fn generate_stats(graphs: &Graphs) -> Self {
-        get_stats(graphs).unwrap()
-    }
-}
 
 impl Graphs {
-    /// Returns stats from Graphs; size in bytes, amount of graph, name, total number of attributes
-    /// and total amount of edges
-    pub fn stats(&self) -> Result<GraphsStats, Box<dyn Error>> {
-        get_stats(self)
-    }
-
     /// Returns an array with the unique relations in the current graph
     /// or the one provided
     pub fn uniq_graph_relations(
@@ -130,26 +60,4 @@ impl Graphs {
         let bytes = bincode::serialize(self).unwrap();
         Ok(bytes.len())
     }
-}
-
-/// private function to generate stats
-fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
-    // lets count the amount of attributes in the graph
-    let mut attr_counter = 0;
-    for (_graph_name, edges) in grphs.vault.iter() {
-        for edge in edges {
-            attr_counter += edge.get_from_vertex().attr_len();
-            attr_counter += edge.get_to_vertex().attr_len();
-        }
-    }
-
-    let stats = GraphsStats {
-        mem: grphs.get_mem().unwrap(),
-        total_edges: grphs.len(),
-        total_attr: attr_counter,
-        total_vertices: grphs.len() * 2,
-        uniq_rel: grphs.uniq_relations().len(),
-        total_graphs: grphs.vault.len(),
-    };
-    Ok(stats)
 }

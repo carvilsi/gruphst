@@ -7,6 +7,7 @@
 pub mod config;
 pub mod edge;
 pub mod graphs;
+pub mod graphs_stats;
 pub mod logger;
-pub mod util;
+mod util;
 pub mod vertex;

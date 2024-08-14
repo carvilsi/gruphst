@@ -20,14 +20,12 @@ pub fn prepare_graphs_test() -> Graphs {
     graphs
 }
 
-// fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
 pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
     graphs.add_edge(
         &Edge::create(&Vertex::new("Gandalf"), "enemy of", &Vertex::new("Saruman")),
         Some("middle-earth"),
     );
-    // graphs
 }
 
 #[test]
@@ -91,7 +89,6 @@ fn insert_lot_of_edges_into_the_vault() {
             None,
         );
     }
-    println!("{:#?}", graphs.get_stats());
 }
 
 #[test]
