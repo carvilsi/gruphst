@@ -1,6 +1,5 @@
 use log::{debug, error, trace, warn};
 
-use crate::config::get_max_mem_usage;
 use crate::graphs::Graphs;
 
 /// Watches the memory that is in use for Graphs
@@ -11,8 +10,8 @@ use crate::graphs::Graphs;
 /// In case that the memory is close to the configured max value,
 /// the data will be persisted on fs, and the process will exit.
 pub(crate) fn graphs_memory_watcher(graphs: &Graphs) {
-    let max_mem = get_max_mem_usage();
     let mem = graphs.get_mem().unwrap();
+    let max_mem = graphs.get_graphs_stats().get_max_mem();
     let mem_prss = (mem as f32 * 100_f32) / max_mem as f32;
     trace!("memory preassure: {:.2}", mem_prss);
     match mem_prss {

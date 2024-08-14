@@ -50,8 +50,10 @@ fn graphs_stats() {
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 6);
     assert_eq!(stats.get_total_attr(), 17);
-    assert_eq!(stats.get_mem(), 1863);
+    assert_eq!(stats.get_mem(), 1871);
     assert_eq!(stats.get_uniq_rel(), 4);
     assert_eq!(stats.get_total_graphs(), 2);
     assert_eq!(stats.get_total_vertices(), 12);
+    let max_mem = 0.1_f32 * 1024.0_f32 * 1024.0_f32;
+    assert_eq!(stats.get_max_mem(), max_mem as usize);
 }
