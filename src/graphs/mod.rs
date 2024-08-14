@@ -87,8 +87,14 @@ impl Graphs {
     }
 
     /// Returns the stats for a grpahs
+    /// the stats are generated 
     pub fn get_stats(&mut self) -> GraphsStats {
         self.stats = GraphsStats::generate_stats(self);
+        self.stats.clone()
+    }
+
+    /// Returns the GraphsStats object
+    pub fn get_graphs_stats(&self) -> GraphsStats {
         self.stats.clone()
     }
 

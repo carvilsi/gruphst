@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use crate::graphs::Graphs;
+use crate::config::get_max_mem_usage;
 
 /// Represents stats data from the Graphs
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,6 +18,8 @@ pub struct GraphsStats {
     total_vertices: usize,
     /// unique relations
     uniq_rel: usize,
+    /// maximum memory usage
+    max_mem: usize,
 }
 
 impl GraphsStats {
@@ -29,6 +32,7 @@ impl GraphsStats {
             total_attr: 0,
             total_vertices: 0,
             uniq_rel: 0,
+            max_mem: get_max_mem_usage(),
         }
     }
 
@@ -36,7 +40,11 @@ impl GraphsStats {
     pub fn get_mem(&self) -> usize {
         self.mem
     }
-
+    
+    /// Retrieves the maximum memory allow usage for the Graphs
+    pub fn get_max_mem(&self) -> usize {
+        self.max_mem
+    }
     /// Retrieves the length of elements in the vault
     pub fn get_total_graphs(&self) -> usize {
         self.total_graphs
@@ -88,6 +96,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
         total_vertices: grphs.len() * 2,
         uniq_rel: grphs.uniq_relations().len(),
         total_graphs: grphs.get_vaults().len(),
+        max_mem: get_max_mem_usage(), 
     };
     Ok(stats)
 }

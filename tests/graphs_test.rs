@@ -479,7 +479,7 @@ fn should_return_uniq_vertices_from_graph() {
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
-    assert_eq!(graphs_stats.get_mem(), 1146);
+    assert_eq!(graphs_stats.get_mem(), 1154);
     assert_eq!(graphs_stats.get_total_edges(), 4);
     assert_eq!(graphs_stats.get_total_graphs(), 1);
     assert_eq!(graphs_stats.get_total_attr(), 9);
@@ -491,7 +491,7 @@ fn should_return_stats_for_graphs() {
 fn should_retrieve_memory_used_by_graphs() {
     let graphs = prepare_graphs_test();
     let mem_usage = graphs.get_mem().unwrap();
-    assert_eq!(mem_usage, 1146);
+    assert_eq!(mem_usage, 1154);
 }
 
 #[test]
