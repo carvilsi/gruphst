@@ -18,6 +18,7 @@ Possible to persists on file (just because is something that we always expect fr
 Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
 
 [Documentation](https://docs.rs/gruphst/latest/gruphst/)
+
 [Code Coverage](https://app.codecov.io/github/carvilsi/gruphst)
 
 ## Basic Usage
@@ -172,9 +173,10 @@ Right now only covers *add_edge* method.
 ### Examples
 
 Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
+
 Check the [Middle-Earth](https://github.com/carvilsi/gruphst/tree/main/examples/middle-earth) example.
 
-Also worth to check the tests folder.
+Also worth to check the [tests](https://github.com/carvilsi/gruphst/tree/main/tests) folder.
 
 ---
 
