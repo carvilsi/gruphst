@@ -1,10 +1,11 @@
 use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
+use std::error::Error;
 
 // The idea it's to create some graph related with 
 // the Middle-Earth, relating some characters and
 // places
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     // Create a new vertex
     let frodo = Vertex::new("Frodo");
        
@@ -37,9 +38,11 @@ fn main() {
 
     // Lets create more vertices for places and characters and edges
     // for the relation between them
+    let mut sam = Vertex::new("Samwise");
+    sam.set_attr("surname", "Gamgee");
     graphs.add_edge(
         &Edge::create(
-            &Vertex::new("Sam"),
+            &sam,
             "has best friend",
             &frodo),
         None);
@@ -57,9 +60,52 @@ fn main() {
     graphs.add_edge(&Edge::create(&Vertex::new("Saruman"), "lives at", &vertex), None); 
 
     // we can use the id or the label to retrieve a Vertex that we have on Graph
-    let the_shire = graphs.fin
+    let the_shire = graphs.find_vertex_by_id(id_vertex_the_shire.as_str(), None)?;
+
+    graphs.add_edge(&Edge::create(&sam, "lives at", &the_shire), None); 
+
+    // Now we can do things like get stats of the Graphs
+    let stats = graphs.get_stats();
+
+    // and print it
+    println!("{:#?}", stats);
+    // GraphsStats {
+    //    mem: 1578,
+    //    total_edges: 6,
+    //    total_graphs: 1,
+    //    total_attr: 8,
+    //    total_vertices: 12,
+    //    uniq_rel: 3,
+    //    max_mem: 104857600,
+    // }
+    
+    // or get some value from stats
+    // like the amount of vertices
+    assert_eq!(stats.get_total_vertices(), 12);
 
     // We can print the current Graphs object
     println!("{:#?}", graphs);
 
+    // We can retrieve the uniq relations from the graph
+    let unique_relations_vertices = graphs.uniq_relations();
+    assert_eq!(unique_relations_vertices, vec!["friend of", "has best friend", "lives at"]);
+
+    // Also possible to retrieve the vertices that has a certain
+    // relation in
+    let vertices_with_relation_in = graphs.has_relation_in("lives at", None)?; 
+    assert_eq!(vertices_with_relation_in[0].get_label(), "The Shire");
+    assert_eq!(vertices_with_relation_in[1].get_label(), "Isengard");
+
+    // Or get the edge that has a vertex with an attribute equals to
+    let found = graphs.attr_equals_to("years old", 24000, None)?;
+    assert_eq!(found[0].get_from_vertex().get_label(), "Gandalf");
+
+    // Since we have a humble middle-earth network
+    // we can persists it for another day
+    // a file called "middle-earth.grphst" will be created, 
+    // later we can load it with:
+    // let loaded_graphs = Graphs::load("middle-earth.grphst")?;
+    graphs.persists()?;
+
+    Ok(())
 }
