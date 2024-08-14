@@ -1,9 +1,6 @@
-#[rustfmt::skip]
-
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
 use crate::edge::Edge;
 use std::cell::RefCell;
 use std::collections::HashMap;
