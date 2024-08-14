@@ -237,3 +237,9 @@ impl Graphs {
         }
     }
 }
+
+// TODO: review this whole query
+// needs methods:
+// - retrieve vertex by attrs
+// - retrieve vertex by id on whole graphs 
+// 
