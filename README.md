@@ -18,20 +18,17 @@ Possible to persists on file (just because is something that we always expect fr
 Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
 
 [Documentation](https://docs.rs/gruphst/latest/gruphst/)
+[Code Coverage](https://app.codecov.io/github/carvilsi/gruphst)
 
-## Tests
+## Basic Usage
 
-**To run tests**
+```rust
+use gruphst::vertex::Vertex;
 
-`$ cargo test`
 
-To run tests with debug output:
+```
 
-`$ cargo test -- --show-output`
-
-## Usage
-
-**Install**
+## Install
 
 Run the following Cargo command in your project directory:
 
@@ -39,14 +36,38 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.11.1"`
+`gruphst = "0.11.2"`
 
+## Tests & Coverage & Benchmarking
+
+**To run tests locally**
+This will show output, if a test name is provided as argument will run this tests 
+
+`$ ./scripts/local-test.sh`
+
+If nodemon is installed, you can use the tests in watch mode:
+
+`$ ./scripts/dev-watch.sh`
+
+**Coverage**
+
+`$ ./scripts/test-coverage.sh`
+
+It will generate a report called *tarpauling-report.html*
+
+**Benchmarking**
+
+`$ ./scripts/benchmarking.sh`
+
+Right now only covers *add_edge* method.
 
 ### Examples
 
 Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
 
 ---
+
+Thanks [@ChrisMcMStone](https://github.com/ChrisMcMStone) for all the help and memory tips ;-)
 
 Feedback from usage and contributions are very welcome.
 Also if you like it, please leave a :star: I would appreciate it ;)
