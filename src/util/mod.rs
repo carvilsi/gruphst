@@ -1,4 +1,4 @@
-use log::{debug, error, info, trace, warn};
+use log::{debug, error, trace, warn};
 
 use crate::config::get_max_mem_usage;
 use crate::graphs::Graphs;
