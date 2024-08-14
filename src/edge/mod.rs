@@ -24,18 +24,6 @@ pub struct Edge {
 }
 
 impl Edge {
-    pub fn get_id(&self) -> String {
-        self.id.clone()
-    }
-
-    pub fn get_label(&self) -> String {
-        self.relation.clone()
-    }
-
-    pub fn set_label(&mut self, label: &str) {
-        self.relation = label.to_string()
-    }
-
     /// Creates a new instance
     /// # Examples
     /// ```rust
@@ -55,6 +43,21 @@ impl Edge {
             to: Vertex::create(""),
             attr: HashMap::new(),
         }
+    }
+
+    /// Retrieves the generated uuid for the edge
+    pub fn get_id(&self) -> String {
+        self.id.clone()
+    }
+
+    /// Retrieves the label for the edge
+    pub fn get_label(&self) -> String {
+        self.relation.clone()
+    }
+
+    /// Sets the label for the edge
+    pub fn set_label(&mut self, label: &str) {
+        self.relation = label.to_string()
     }
 
     /// Adds "From" and "To" vertices
@@ -84,7 +87,7 @@ impl Edge {
     ///
     /// Edge::create(
     ///     &Vertex::new("Theoden"),
-    ///     "kinf of",
+    ///     "king of",
     ///     &Vertex::new("Rohan"));
     /// ```
     pub fn create(from: &Vertex, relation: &str, to: &Vertex) -> Self {
@@ -109,27 +112,31 @@ impl Edge {
         self.to = Rc::clone(&to_vertex.vrtx);
     }
 
+    /// Retrieves the "From" or source vertex of edge or the relation
     pub fn get_from_vertex(&self) -> Vertex {
         Vertex {
             vrtx: self.from.clone(),
         }
     }
 
+    /// Retrieves the "To" or target vertex of the edge or relation
     pub fn get_to_vertex(&self) -> Vertex {
         Vertex {
             vrtx: self.to.clone(),
         }
     }
 
+    /// Retrieves the name or label of the relation of the edge
     pub fn get_relation(&self) -> String {
         self.relation.clone()
     }
 
+    /// Sets the name or label of the relation of the edge
     pub fn set_relation(&mut self, relation_label: &str) {
         self.relation = relation_label.to_string();
     }
 
-    /// Set attributes for a edge
+    /// Set an attribute for a edge
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
     where
         T: std::fmt::Display,
@@ -148,6 +155,7 @@ impl Edge {
             }
         }
     }
+
     /// Updates the value of an attribute
     pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where

@@ -20,14 +20,12 @@ pub fn prepare_graphs_test() -> Graphs {
     graphs
 }
 
-// fn prepare_insert_graph_test(graphs: &mut Graphs) -> &mut Graphs {
 pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     graphs.insert("middle-earth");
     graphs.add_edge(
         &Edge::create(&Vertex::new("Gandalf"), "enemy of", &Vertex::new("Saruman")),
         Some("middle-earth"),
     );
-    // graphs
 }
 
 #[test]
@@ -91,7 +89,6 @@ fn insert_lot_of_edges_into_the_vault() {
             None,
         );
     }
-    println!("{:#?}", graphs.get_stats());
 }
 
 #[test]
@@ -482,7 +479,7 @@ fn should_return_uniq_vertices_from_graph() {
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
-    assert_eq!(graphs_stats.get_mem(), 1146);
+    assert_eq!(graphs_stats.get_mem(), 1154);
     assert_eq!(graphs_stats.get_total_edges(), 4);
     assert_eq!(graphs_stats.get_total_graphs(), 1);
     assert_eq!(graphs_stats.get_total_attr(), 9);
@@ -494,7 +491,7 @@ fn should_return_stats_for_graphs() {
 fn should_retrieve_memory_used_by_graphs() {
     let graphs = prepare_graphs_test();
     let mem_usage = graphs.get_mem().unwrap();
-    assert_eq!(mem_usage, 1146);
+    assert_eq!(mem_usage, 1154);
 }
 
 #[test]

@@ -1,9 +1,8 @@
 use log::error;
 use serde::{Deserialize, Serialize};
-use stats::GraphsStats;
 use std::collections::HashMap;
 
-use crate::{edge::Edge, util::graphs_memory_watcher, vertex::Vertex};
+use crate::{edge::Edge, graphs_stats::GraphsStats, util::graphs_memory_watcher, vertex::Vertex};
 
 mod persistence;
 mod query;
@@ -77,17 +76,30 @@ impl Graphs {
         graphs_memory_watcher(self);
     }
 
+    /// Returns the label or name for the graphs
     pub fn get_label(&self) -> String {
         self.label.clone()
     }
 
+    /// Sets the label or name for the graphs
     pub fn set_label(&mut self, label: &str) {
         self.label = label.to_string()
     }
 
+    /// Returns the stats for a grpahs
+    /// the stats are generated 
     pub fn get_stats(&mut self) -> GraphsStats {
         self.stats = GraphsStats::generate_stats(self);
         self.stats.clone()
+    }
+
+    /// Returns the GraphsStats object
+    pub fn get_graphs_stats(&self) -> GraphsStats {
+        self.stats.clone()
+    }
+
+    pub fn get_vaults(&self) -> HashMap<String, Vec<Edge>> {
+        self.vault.clone()
     }
 
     /// Adds a Edge element to the Graphs' vault

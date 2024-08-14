@@ -1,9 +1,6 @@
-#[rustfmt::skip]
-
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
 use crate::edge::Edge;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -64,14 +61,43 @@ impl Vertex {
         Vertex_::new(label)
     }
 
+    /// Retrieves the generated uuid for a vertex
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let vertex = Vertex::new("Gandalf");
+    /// let _id: String = vertex.get_id();
+    /// ```
     pub fn get_id(&self) -> String {
         self.vrtx.borrow().id.clone()
     }
-
+    
+    /// Retrieves the label for a vertex
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let vertex = Vertex::new("Gandalf");
+    /// let label: String = vertex.get_label();
+    /// assert_eq!(label, "Gandalf");
+    /// ```
     pub fn get_label(&self) -> String {
         self.vrtx.borrow().label.clone()
     }
-
+ 
+    /// Sets the label for a vertex
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut vertex = Vertex::new("Gandalf");
+    /// let mut label: String = vertex.get_label();
+    /// assert_eq!(label, "Gandalf");
+    /// vertex.set_label("Gandalf the Gray");
+    /// label = vertex.get_label();
+    /// assert_eq!(label, "Gandalf the Gray");
+    /// ```
     pub fn set_label(&mut self, label: &str) {
         self.vrtx.borrow_mut().label = label.to_string();
     }
@@ -117,6 +143,21 @@ impl Vertex {
     }
 
     /// Updates the value of an attribute
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut gandalf = Vertex::new("Gandalf");
+    /// gandalf.set_attr("known as", "The Gray");
+    /// gandalf.set_attr("years old", 24000);
+    ///
+    /// let mut gandalf_years = gandalf.get_attr("years old").unwrap();
+    /// assert_eq!(gandalf_years, "24000");
+    ///
+    /// gandalf.update_attr("years old", 24001);
+    /// gandalf_years = gandalf.get_attr("years old").unwrap();
+    /// assert_eq!(gandalf_years, "24001");
+    /// ```
     pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
     where
         T: std::fmt::Display,
