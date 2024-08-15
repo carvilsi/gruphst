@@ -202,3 +202,17 @@ fn should_fail_to_delete_an_attribute_for_edge_if_does_not_exists() {
     let (mut edge, _id) = prepare_edge_test();
     assert!(edge.delete_attr("foobar").is_err());
 }
+
+#[test]
+fn should_find_vertex_by_id() {
+    let (edge, _id) = prepare_edge_test();
+    let vertex_id = edge.get_to_vertex().get_id();
+    let found_vertex = edge.find_vertex_by_id(vertex_id.as_str()).unwrap();
+    assert_eq!(found_vertex.get_id(), vertex_id); 
+}
+
+#[test]
+fn should_not_find_vertex_by_id() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.find_vertex_by_id("foobar").is_err());
+}

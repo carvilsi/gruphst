@@ -320,12 +320,12 @@ fn should_find_in_graph_by_id() {
         &Edge::create(&from_vertex, "has satellite", &Vertex::new("Moon")),
         Some("solar-system"),
     );
-    let mut found_graph = graphs.find_by_id(&from_vertex_id, None).unwrap();
+    let mut found_graph = graphs.find_edge_by_id(&from_vertex_id, None).unwrap();
     assert_eq!(found_graph.get_label(), "has satellite");
     assert_eq!(found_graph.get_from_vertex().get_label(), "Earth");
     let default_graph_id = graphs.get_edges(Some("my graphs")).unwrap()[0].get_id();
     found_graph = graphs
-        .find_by_id(&default_graph_id, Some("my graphs"))
+        .find_edge_by_id(&default_graph_id, Some("my graphs"))
         .unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
 }
@@ -340,16 +340,16 @@ fn should_find_in_graphs_by_id() {
         Some("solar-system"),
     );
     let default_graph_id = graphs.get_edges(Some("my graphs")).unwrap()[0].get_id();
-    let mut found_graph = graphs.find_by_id_in_graphs(&default_graph_id).unwrap();
+    let mut found_graph = graphs.find_edge_by_id_in_graphs(&default_graph_id).unwrap();
     assert_eq!(found_graph.get_label(), "friend of");
-    found_graph = graphs.find_by_id_in_graphs(&from_vertex_id).unwrap();
+    found_graph = graphs.find_edge_by_id_in_graphs(&from_vertex_id).unwrap();
     assert_eq!(found_graph.get_from_vertex().get_label(), "Earth");
 }
 
 #[test]
 fn should_not_find_edges_on_graphs() {
     let mut graphs = prepare_graphs_test();
-    let e = graphs.find_by_id_in_graphs("000");
+    let e = graphs.find_edge_by_id_in_graphs("000");
     assert_eq!(e, Err("edge not found"));
 }
 
@@ -407,20 +407,20 @@ fn should_update_graph() {
     let _ = my_graphs.update_graph(&alice_fred_graph, None);
 
     assert_eq!(my_graphs.len(), 2);
-    let updated_graph = my_graphs.find_by_id(&alice_fred_graph.get_id(), None);
+    let updated_graph = my_graphs.find_edge_by_id(&alice_fred_graph.get_id(), None);
     assert_eq!(updated_graph.unwrap().get_relation(), "besties");
 }
 
 #[test]
 fn should_not_find_by_non_existing_id() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.find_by_id("000", None).is_err());
+    assert!(graphs.find_edge_by_id("000", None).is_err());
 }
 
 #[test]
 fn should_not_find_by_id_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
-    let e = graphs.find_by_id("000", Some("!exists"));
+    let e = graphs.find_edge_by_id("000", Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
@@ -508,4 +508,29 @@ fn should_update_label_for_graphs() {
     assert_eq!(graphs.get_label(), "my graphs");
     graphs.update_label("foobar");
     assert_eq!(graphs.get_label(), "foobar");
+}
+
+#[test]
+fn should_find_vertex_by_id() {
+    let mut graphs = prepare_graphs_test();
+    let a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
+    assert_eq!(a_vertex.get_label(), "Alice".to_string());
+    let found_vertex = graphs.find_vertex_by_id(a_vertex.get_id().as_str(), None).unwrap();
+    assert_eq!(found_vertex.get_id(), a_vertex.get_id());
+}
+
+#[test]
+fn should_not_find_vertex_by_id_that_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let an_edge_id= graphs.get_edges(None).unwrap()[0].get_id();
+    let e = graphs.find_vertex_by_id(an_edge_id.as_str(), None);
+    assert_eq!(e, Err("Vertex not found"));
+                    
+}
+
+#[test]
+fn should_not_find_vertex_by_id_vault_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_vertex_by_id("foobar", Some("!Exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }

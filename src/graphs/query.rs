@@ -130,7 +130,7 @@ impl Graphs {
     }
 
     /// Returns an Edge that provided id matches with Edge Id, or From, To vertices
-    pub fn find_by_id(
+    pub fn find_edge_by_id(
         &mut self,
         id: &str,
         vault_name: Option<&str>,
@@ -152,8 +152,27 @@ impl Graphs {
         }
     }
 
+    /// Returns a Vertex that provided id matches with id of From, To vertices
+    pub fn find_vertex_by_id(
+        &mut self,
+        id: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vertex, &'static str> {
+
+        match self.find_edge_by_id(id, vault_name) {
+            Ok(edge) => {
+                if let Ok(vertex) = edge.find_vertex_by_id(id) {
+                    Ok(vertex)
+                } else {
+                    Err("Vertex not found")
+                }
+            },
+            Err(error) => Err(error),
+        }  
+    }
+
     /// Find in any graph on vault by id
-    pub fn find_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, &'static str> {
+    pub fn find_edge_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, &'static str> {
         for (_vault_name, edges) in self.vault.iter_mut() {
             if let Some(edge) = edges.iter_mut().find(|vrtx| {
                 vrtx.get_id() == id
@@ -218,3 +237,9 @@ impl Graphs {
         }
     }
 }
+
+// TODO: review this whole query
+// needs methods:
+// - retrieve vertex by attrs
+// - retrieve vertex by id on whole graphs 
+// 
