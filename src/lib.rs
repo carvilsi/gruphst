@@ -1,8 +1,4 @@
-//! Gruphst
-//!
-//! An in-memory graph database.
-//!
-//! Possible to persists on file (just because is something that we always expect from an in-memory databases).
+#![doc = include_str!("../README.md")]
 
 pub mod config;
 pub mod edge;

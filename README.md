@@ -1,7 +1,9 @@
 <div class="text" align="center">
     <img src="https://img.shields.io/github/actions/workflow/status/carvilsi/gruphst/test.yml?logo=github&label=tests" alt="test">
     <img src="https://img.shields.io/crates/v/gruphst.svg" alt="crates">
-    <img src="https://codecov.io/github/carvilsi/gruphst/graph/badge.svg?token=W1XVSQB3H0"/> 
+    <img src="https://img.shields.io/docsrs/gruphst/latest" alt="docs">
+    <img src="https://codecov.io/github/carvilsi/gruphst/graph/badge.svg?token=W1XVSQB3H0" alt="cov"/> 
+    <img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="cov"/> 
     <p></p>
     <p>GruPHst</p>
     <p>An in-memory graph database</p>
@@ -11,8 +13,6 @@
 
 # GruPHst
 
-An in-memory graph database.
- 
 Possible to persists on file (just because is something that we always expect from an in-memory databases).
 
 Early state of development with lot of TODOs, just doing nerdy things with Graph Databases while trying to learn some Rust.
