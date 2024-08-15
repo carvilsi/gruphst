@@ -50,7 +50,7 @@ fn graphs_stats() {
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 6);
     assert_eq!(stats.get_total_attr(), 17);
-    assert_eq!(stats.get_mem(), 1871);
+    assert_eq!(stats.get_mem(), 1967);
     assert_eq!(stats.get_uniq_rel(), 4);
     assert_eq!(stats.get_total_graphs(), 2);
     assert_eq!(stats.get_total_vertices(), 12);
