@@ -203,9 +203,18 @@ fn get_vertex_relation_in() {
 }
 
 #[test]
-fn vertex_vec_u8_attr() {
+fn should_set_and_get_vertex_vec_u8_attr() {
     let (mut vertex, _id) = prepare_vertex_test();
     let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     assert_eq!(vertex.get_attr_vec_u8("vector_u8").unwrap(), vector);
+}
+
+#[test]
+fn should_not_get_vertex_vec_u8_attr() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
+    vertex.set_attr_vec_u8("vector_u8", &vector); 
+    let e = vertex.get_attr_vec_u8("not exists");
+    assert_eq!(e, Err("attribute not found"));
 }
