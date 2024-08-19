@@ -5,6 +5,7 @@ use crate::edge::Edge;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::vec;
 
 mod query;
 
@@ -20,6 +21,7 @@ pub(crate) struct Vertex_ {
     label: String,
     /// The attributes for a vertex
     attr: HashMap<String, String>,
+    attr_vec_u8: HashMap<String, Vec<u8>>,
 }
 
 impl Vertex_ {
@@ -29,6 +31,7 @@ impl Vertex_ {
             label: String::from(label),
             id: Uuid::new_v4().to_string(),
             attr: HashMap::new(),
+            attr_vec_u8: HashMap::new(),
         };
         Rc::new(RefCell::new(edge))
     }
@@ -112,10 +115,14 @@ impl Vertex {
     /// gandalf.set_attr("years old", 24000);
     /// ```
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
-    where
+    where 
         T: std::fmt::Display,
     {
         self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+    }
+
+    pub fn set_attr_vec_u8(&mut self, attr_k: &str, attr_v: &Vec<u8>) {
+        self.vrtx.borrow_mut().attr_vec_u8.insert(attr_k.to_string(), attr_v.clone());
     }
 
     /// Get attribute for a vertex
@@ -133,6 +140,19 @@ impl Vertex {
     pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
         let binding = self.vrtx.borrow();
         let res = binding.attr.get(attr_k);
+        match res {
+            Some(resp) => Ok(resp.clone()),
+            None => {
+                warn!("attribute '{}' not found", attr_k);
+                Err("attribute not found")
+            }
+        }
+    }
+
+    /// Get attribute of type Vev<u8>
+    pub fn get_attr_vec_u8(&self, attr_k: &str) -> Result<Vec<u8>, &'static str> {
+        let binding = self.vrtx.borrow();
+        let res = binding.attr_vec_u8.get(attr_k);
         match res {
             Some(resp) => Ok(resp.clone()),
             None => {
