@@ -1,5 +1,9 @@
 # Changelog
 
+# [v0.13.0](https://github.com/carvilsi/gruphst/releases/tag/v0.13.0) (2024-08-19)
+
+- supports Vec<u8> for Vertex attribute content
+
 # [v0.12.0](https://github.com/carvilsi/gruphst/releases/tag/v0.12.0) (2024-08-15)
 
 - updating README and lib for rust docs
