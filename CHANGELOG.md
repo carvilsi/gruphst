@@ -2,7 +2,7 @@
 
 # [v0.13.0](https://github.com/carvilsi/gruphst/releases/tag/v0.13.0) (2024-08-19)
 
-- supports Vec<u8> for Vertex attribute content: *set_attr_vec_u8* and *get_attr_vec_u8"
+- supports Vec<u8> for Vertex attribute content: *set_attr_vec_u8* and *get_attr_vec_u8*
 
 # [v0.12.0](https://github.com/carvilsi/gruphst/releases/tag/v0.12.0) (2024-08-15)
 
