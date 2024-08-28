@@ -19,5 +19,5 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Tests
-      run: pwd; ls ./tests/data/; mv .env-test .env; cargo test --verbose
+      run: cp -R ./tests/data/ ./tests; mv .env-test .env; cargo test --verbose
 
