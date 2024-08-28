@@ -58,7 +58,8 @@ fn should_persists_on_custom_path() {
         Ok(grphs) => {
             assertion_persisted_graphs(grphs, name, edge1, edge2);
         }
-        Err(_) => {
+        Err(err) => {
+            println!("{err}");
             panic!()
         },
     }
