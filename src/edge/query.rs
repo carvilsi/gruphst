@@ -63,9 +63,9 @@ impl Edge {
 
     // finds a Vertex by Id on an Edge
     pub fn find_vertex_by_id(&self, id: &str) -> Result<Vertex, &'static str> {
-        if self.get_from_vertex().get_id() == id.to_string() {
+        if self.get_from_vertex().get_id() == *id {
             Ok(self.get_from_vertex())
-        } else if self.get_to_vertex().get_id() == id.to_string() {
+        } else if self.get_to_vertex().get_id() == *id {
             Ok(self.get_to_vertex())
         } else {
             Err("Vertex not found")

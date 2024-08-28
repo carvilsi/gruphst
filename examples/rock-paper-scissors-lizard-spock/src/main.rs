@@ -86,7 +86,7 @@ fn main() {
 
     // maybe now you want to persists the game rules
     // to use it other day ;)
-    let _ = rules.persists();
+    let _ = rules.persists(None);
 
     // get the characters
     let characters = rules.get_uniq_vertices(None).unwrap();

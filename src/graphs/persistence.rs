@@ -23,10 +23,13 @@ impl Graphs {
     ///
     /// // will write a file called 'Middle-earth.grphst' with
     /// // the content of the graphs
-    /// graphs.persists();
+    /// graphs.persists(None);
     /// ```
-    pub fn persists(&self) -> Result<(), Box<dyn Error>> {
-        let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
+    pub fn persists(&self, file_path: Option<&str>) -> Result<(), Box<dyn Error>> {
+        let file_name = match file_path {
+            Some(fp) => format!("{}{}.grphst", fp, self.get_label().replace(' ', "_")),
+            None => format!("{}.grphst", self.get_label().replace(' ', "_")),
+        };
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
@@ -48,7 +51,7 @@ impl Graphs {
     ///     "created",
     ///     &Vertex::new("One Ring"));
     /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
-    /// graphs.persists();
+    /// graphs.persists(None);
     ///
     /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
     /// ```
