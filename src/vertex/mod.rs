@@ -121,8 +121,8 @@ impl Vertex {
         self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
-    pub fn set_attr_vec_u8(&mut self, attr_k: &str, attr_v: &Vec<u8>) {
-        self.vrtx.borrow_mut().attr_vec_u8.insert(attr_k.to_string(), attr_v.clone());
+    pub fn set_attr_vec_u8(&mut self, attr_k: &str, attr_v: &[u8]) {
+        self.vrtx.borrow_mut().attr_vec_u8.insert(attr_k.to_string(), attr_v.to_owned());
     }
 
     /// Get attribute for a vertex

@@ -105,7 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // a file called "middle-earth.grphst" will be created, 
     // later we can load it with:
     // let loaded_graphs = Graphs::load("middle-earth.grphst")?;
-    graphs.persists()?;
+    graphs.persists(None)?;
 
     Ok(())
 }

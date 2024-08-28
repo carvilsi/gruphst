@@ -1,6 +1,6 @@
 [package]
 name = "gruphst"
-version = "0.13.0"
+version = "1.0.0"
 edition = "2021"
 description = "An in-memory graph database"
 license = "MIT"
@@ -10,8 +10,6 @@ repository = "https://github.com/carvilsi/gruphst"
 homepage = "https://github.com/carvilsi/gruphst"
 keywords = ["graph-database", "in-memory-database", "persistence"]
 categories = ["database"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 bincode = "1.0"
