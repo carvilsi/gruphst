@@ -1,5 +1,9 @@
 # Changelog
 
+# [v1.0.0](https://github.com/carvilsi/gruphst/releases/tag/v1.0.0) (2024-08-28)
+
+- added custom path to persists file
+
 # [v0.13.0](https://github.com/carvilsi/gruphst/releases/tag/v0.13.0) (2024-08-19)
 
 - supports Vec<u8> for Vertex attribute content: *set_attr_vec_u8* and *get_attr_vec_u8*
