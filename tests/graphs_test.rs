@@ -534,3 +534,29 @@ fn should_not_find_vertex_by_id_vault_does_not_exists() {
     let e = graphs.find_vertex_by_id("foobar", Some("!Exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
+
+#[test]
+fn should_add_a_collection_of_edges() {
+    let mut graphs = Graphs::init("collection-edges");
+    
+    let v1 = Vertex::new("v1");
+    let v2 = Vertex::new("v2");
+    let v3 = Vertex::new("v3");
+    
+    let mut edges: Vec<Edge> = Vec::new();
+    
+    let e1 = Edge::create(&v1, "v1->v2", &v2);
+    edges.push(e1);
+    let e2 = Edge::create(&v1, "v1->v3", &v3);
+    edges.push(e2);
+    let e3 = Edge::create(&v2, "v2->v1", &v1);
+    edges.push(e3);
+    let e4 = Edge::create(&v2, "v2->v3", &v3);
+    edges.push(e4);
+
+    graphs.add_edges(&mut edges, None);
+
+    let stats = graphs.get_stats();
+    assert_eq!(stats.get_total_edges(), 4);
+    assert_eq!(stats.get_total_vertices(), 8);
+}

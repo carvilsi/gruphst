@@ -120,7 +120,23 @@ impl Graphs {
         graphs_memory_watcher(self);
     }
 
-    // TODO: create method to add a collection of Edges
+    /// Adds a collection of Edges to the Graphs' vault
+    /// for the provided graphs vault name
+    /// if does not exists it creates a new entry
+    /// at vault.
+    /// If None name is provided, the current one
+    /// is use for the addition.
+    pub fn add_edges(&mut self, edges: &mut Vec<Edge>, vault_name: Option<&str>) {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(e) = self.vault.get_mut(&current_vault) {
+            e.append(edges);
+        } else {
+            self.insert(&current_vault);
+            let v = self.vault.get_mut(&current_vault).unwrap();
+            v.append(edges);
+        }
+        graphs_memory_watcher(self);
+    }
 
     /// Retrieves the collection of edges
     /// the default one or by name
