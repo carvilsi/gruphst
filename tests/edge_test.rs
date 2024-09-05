@@ -152,6 +152,13 @@ fn should_check_if_str_attribute_key_exists_on_any_vertex_on_edge() {
 }
 
 #[test]
+fn should_check_if_vec_u8_attribute_key_exists_on_any_vertex_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_vec_u8_key("code"));
+    assert!(!edge.has_vertex_with_attr_vec_u8_key("foo"));
+}
+
+#[test]
 fn should_check_if_any_attribute_key_exists_on_any_vertex_on_edge() {
     let (edge, _id) = prepare_edge_test();
     assert!(edge.has_vertex_with_attr_key("age"));
@@ -173,6 +180,13 @@ fn should_check_if_string_attribute_key_like_on_any_vertex_on_edge() {
 }
 
 #[test]
+fn should_check_if_vec_u8_attribute_key_like_on_any_vertex_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_vec_u8_key_like("OdE"));
+    assert!(!edge.has_vertex_with_attr_vec_u8_key_like("fOo"));
+}
+
+#[test]
 fn should_check_if_any_attribute_key_like_on_any_vertex_on_edge() {
     let (edge, _id) = prepare_edge_test();
     assert!(edge.has_vertex_with_attr_key_like("Ag"));
@@ -189,11 +203,21 @@ fn should_check_if_attribute_is_equals_to() {
 }
 
 #[test]
-fn should_check_in_edge_if_attribute_is_equals_to() {
+fn should_check_in_edge_if_a_str_attribute_is_equals_to() {
     let (edge, _id) = prepare_edge_test();
     assert!(edge.has_vertex_with_attr_str_value_equals_to("age", 42));
     assert!(!edge.has_vertex_with_attr_str_value_equals_to("age", 43));
     assert!(!edge.has_vertex_with_attr_str_value_equals_to("foo", 25));
+}
+
+#[test]
+fn should_check_in_edge_if_a_vec_u8_attribute_is_equals_to() {
+    let (edge, _id) = prepare_edge_test();
+    let v_ok: Vec<u8> = vec![3, 1, 3, 3, 7];
+    let v_nok: Vec<u8> = vec![1, 0, 1];
+    assert!(edge.has_vertex_with_attr_vec_u8_value_equals_to("code", &v_ok));
+    assert!(!edge.has_vertex_with_attr_vec_u8_value_equals_to("code", &v_nok));
+    assert!(!edge.has_vertex_with_attr_vec_u8_value_equals_to("foo", &v_ok));
 }
 
 #[test]
