@@ -18,10 +18,23 @@ impl Vertex {
         self.vrtx.borrow().attr.contains_key(attr_k)
     }
 
-    // TODO
     /// Checks if an Vec<u8> attribute key exists
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut vertex = Vertex::new("Frodo");
+    /// vertex.set_attr("surname", "Baggins");
+    /// 
+    /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
+    /// vertex.set_attr_vec_u8("code", &vu8);
+    ///
+    /// assert!(vertex.has_attr_vec_u8_key_equals_to("code"));
+    /// assert!(!vertex.has_attr_vec_u8_key_equals_to("edoc"));
+    /// ```
     pub fn has_attr_vec_u8_key_equals_to(&self, attr_k: &str) -> bool {
-        todo!()
+        self.vrtx.borrow().attr_vec_u8.contains_key(attr_k)
     }
     
     /// Checks if an attribute key exists
@@ -91,10 +104,28 @@ impl Vertex {
         false
     }
 
-    // TODO
     /// Checks if an Vec<u8> attribute key is like on a vertex 
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut vertex = Vertex::new("Frodo");
+    /// vertex.set_attr("surname", "Baggins");
+    /// 
+    /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
+    /// vertex.set_attr_vec_u8("code", &vu8);
+    ///
+    /// assert!(vertex.has_attr_vec_u8_key_like("oDe"));
+    /// assert!(!vertex.has_attr_vec_u8_key_like("dOC"));
+    /// ```
     pub fn has_attr_vec_u8_key_like(&self, attr_k: &str) -> bool {
-        todo!()
+        for key in self.vrtx.borrow().attr_vec_u8.keys() {
+            if key.to_lowercase().contains(&attr_k.to_lowercase()) {
+                return true;
+            }
+        }
+        false
     }
 
     /// Checks if an String attribute value matches on a vertex
@@ -123,10 +154,31 @@ impl Vertex {
         }
     }
 
-    // TODO
     /// Checks if a Vec<u8> attribute value matches on a vertex
-    pub fn has_attr_vec_u8_equals_to(&self, attr_k: &str, attr_v: Vec<u8>) -> bool {
-        todo!()
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut vertex = Vertex::new("Frodo");
+    /// vertex.set_attr("surname", "Baggins");
+    /// 
+    /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
+    /// let v_nok: Vec<u8> = vec![1, 0, 1];
+    /// vertex.set_attr_vec_u8("code", &vu8);
+    ///
+    /// assert!(vertex.has_attr_vec_u8_equals_to("code", &vu8));
+    /// assert!(!vertex.has_attr_vec_u8_equals_to("code", &v_nok));
+    /// assert!(!vertex.has_attr_vec_u8_equals_to("edoc", &vu8));
+    /// ```
+    pub fn has_attr_vec_u8_equals_to(&self, attr_k: &str, attr_v: &Vec<u8>) -> bool {
+        match self.vrtx.borrow().attr_vec_u8.get(attr_k) {
+            Some(val) => {
+                // let v = attr_v.clone();
+                *val == *attr_v
+            }
+            None => false,
+        }
     }
     
 

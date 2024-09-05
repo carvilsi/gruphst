@@ -10,6 +10,8 @@ fn prepare_vertex_test() -> (Vertex, String) {
     let mut vertex = Vertex::new("alice");
     vertex.set_attr("name", "Alice");
     vertex.set_attr("age", 42);
+    let v: Vec<u8> = vec![3, 1, 3, 3, 7];
+    vertex.set_attr_vec_u8("code", &v);
     (vertex.clone(), vertex.get_id())
 }
 
@@ -36,7 +38,7 @@ fn vertex_get_id() {
 #[test]
 fn vertex_attribute_len() {
     let (vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.attrs_len(), 2);
+    assert_eq!(vertex.attrs_len(), 3);
 }
 
 #[test]
@@ -228,13 +230,32 @@ fn should_check_if_vertex_has_an_attribute_value_like() {
 
 #[test]
 fn should_find_attributes_keys_for_all_type_of_attributes() {
-    let mut vertex = Vertex::new("Frodo");
-    vertex.set_attr("surname", "Baggins");
-    
-    let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
-    vertex.set_attr_vec_u8("code", &vu8);
-    
-    assert!(vertex.has_attr_key("surname"));
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_key("name"));
     assert!(vertex.has_attr_key("code"));
-    assert!(!vertex.has_attr_key("age"));
+    assert!(!vertex.has_attr_key("foo"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_key() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_vec_u8_key_equals_to("code"));
+    assert!(!vertex.has_attr_vec_u8_key_equals_to("foobar"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_key_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_vec_u8_key_like("oDe"));
+    assert!(!vertex.has_attr_vec_u8_key_like("bAr"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_value_equals_to() {
+    let (vertex, _id) = prepare_vertex_test();
+    let v_ok: Vec<u8> = vec![3, 1, 3, 3, 7];
+    let v_nok: Vec<u8> = vec![1, 0, 1];
+    assert!(vertex.has_attr_vec_u8_equals_to("code", &v_ok));
+    assert!(!vertex.has_attr_vec_u8_equals_to("code", &v_nok));
+    assert!(!vertex.has_attr_vec_u8_equals_to("foobar", &v_ok));
 }
