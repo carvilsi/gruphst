@@ -23,7 +23,7 @@ fn assertion_persisted_graphs(grphs: Graphs, name: String, edge1: Edge, edge2: E
     assert_eq!(grphs.get_label(), name);
     assert_eq!(graphs[0].get_relation(), edge1.get_relation());
     assert_eq!(graphs[0].get_from_vertex().get_label(), "a edge");
-    assert_eq!(graphs[0].get_from_vertex().attr_len(), 1);
+    assert_eq!(graphs[0].get_from_vertex().attrs_len(), 1);
     assert_eq!(graphs[0].get_from_vertex().get_attr("foo").unwrap(), "bar");
     assert_eq!(graphs[1], edge2);
 }

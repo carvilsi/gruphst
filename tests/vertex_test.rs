@@ -36,15 +36,15 @@ fn vertex_get_id() {
 #[test]
 fn vertex_attribute_len() {
     let (vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.attr_len(), 2);
+    assert_eq!(vertex.attrs_len(), 2);
 }
 
 #[test]
 fn vertex_attribute_emptiness() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(!vertex.attr_is_empty());
+    assert!(!vertex.attrs_empty());
     let ed = Vertex::new("Ed");
-    assert!(ed.attr_is_empty());
+    assert!(ed.attrs_empty());
 }
 
 #[test]
@@ -217,4 +217,24 @@ fn should_not_get_vertex_vec_u8_attr() {
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     let e = vertex.get_attr_vec_u8("not exists");
     assert_eq!(e, Err("attribute not found"));
+}
+
+#[test]
+fn should_check_if_vertex_has_an_attribute_value_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_like("aLi"));
+    assert!(!vertex.has_attr_like("oo"));
+}
+
+#[test]
+fn should_find_attributes_keys_for_all_type_of_attributes() {
+    let mut vertex = Vertex::new("Frodo");
+    vertex.set_attr("surname", "Baggins");
+    
+    let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
+    vertex.set_attr_vec_u8("code", &vu8);
+    
+    assert!(vertex.has_attr_key("surname"));
+    assert!(vertex.has_attr_key("code"));
+    assert!(!vertex.has_attr_key("age"));
 }

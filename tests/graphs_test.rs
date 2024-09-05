@@ -28,6 +28,25 @@ pub fn prepare_insert_graph_test(graphs: &mut Graphs) {
     );
 }
 
+pub fn prepare_vector_edges() -> Vec<Edge> {
+    let v1 = Vertex::new("v1");
+    let v2 = Vertex::new("v2");
+    let v3 = Vertex::new("v3");
+    
+    let mut edges: Vec<Edge> = Vec::new();
+    
+    let e1 = Edge::create(&v1, "v1->v2", &v2);
+    edges.push(e1);
+    let e2 = Edge::create(&v1, "v1->v3", &v3);
+    edges.push(e2);
+    let e3 = Edge::create(&v2, "v2->v1", &v1);
+    edges.push(e3);
+    let e4 = Edge::create(&v2, "v2->v3", &v3);
+    edges.push(e4);
+
+    edges
+}
+
 #[test]
 fn get_label() {
     let graphs = prepare_graphs_test();
@@ -303,11 +322,11 @@ fn should_not_find_vertices_with_relation_out_since_vault_does_not_exists() {
 }
 
 #[test]
-fn should_create_new_vault_and_add_graph() {
+fn should_create_new_vault_and_add_an_edge() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
-    let graph = Edge::create(&Vertex::new("foo"), "before a", &Vertex::new("bar"));
-    graphs.insert_with("other", &graph);
+    let edge = Edge::create(&Vertex::new("foo"), "before a", &Vertex::new("bar"));
+    graphs.insert_with("other", &edge);
     assert_eq!(graphs.len_graphs(), 2);
 }
 
@@ -539,24 +558,24 @@ fn should_not_find_vertex_by_id_vault_does_not_exists() {
 fn should_add_a_collection_of_edges() {
     let mut graphs = Graphs::init("collection-edges");
     
-    let v1 = Vertex::new("v1");
-    let v2 = Vertex::new("v2");
-    let v3 = Vertex::new("v3");
-    
-    let mut edges: Vec<Edge> = Vec::new();
-    
-    let e1 = Edge::create(&v1, "v1->v2", &v2);
-    edges.push(e1);
-    let e2 = Edge::create(&v1, "v1->v3", &v3);
-    edges.push(e2);
-    let e3 = Edge::create(&v2, "v2->v1", &v1);
-    edges.push(e3);
-    let e4 = Edge::create(&v2, "v2->v3", &v3);
-    edges.push(e4);
+    let mut edges = prepare_vector_edges();
 
     graphs.add_edges(&mut edges, None);
 
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 4);
     assert_eq!(stats.get_total_vertices(), 8);
+}
+
+
+#[test]
+fn should_create_new_vault_and_add_a_colection_of_edges() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    let mut edges = prepare_vector_edges();
+    graphs.add_edges(&mut edges, Some("new-vault"));
+    assert_eq!(graphs.len_graphs(), 2);
+    let stats = graphs.get_stats();
+    assert_eq!(stats.get_total_edges(), 8);
+    assert_eq!(stats.get_total_vertices(), 16);
 }

@@ -3,10 +3,13 @@ use gruphst::{edge::Edge, vertex::Vertex};
 fn prepare_edge_test() -> (Edge, String) {
     let mut alice = Vertex::new("alice");
     alice.set_attr("age", 42);
+    let v: Vec<u8> = vec![3, 1, 3, 3, 7];
+    alice.set_attr_vec_u8("code", &v);
     let bob = Vertex::new("bob");
     let mut edge = Edge::create(&alice, "friend of", &bob);
     edge.set_attr("type", "friendship");
     edge.set_attr("value", 2);
+    
     (edge.clone(), edge.get_id())
 }
 
@@ -142,12 +145,19 @@ fn should_check_if_attribute_exists_on_edge() {
 }
 
 #[test]
-fn should_check_if_attribute_exists_on_any_edge_on_edge() {
+fn should_check_if_str_attribute_key_exists_on_any_vertex_on_edge() {
     let (edge, _id) = prepare_edge_test();
-    assert!(edge.has_vertex_with_attr_key("age"));
-    assert!(!edge.has_vertex_with_attr_key("foo"));
+    assert!(edge.has_vertex_with_attr_str_key("age"));
+    assert!(!edge.has_vertex_with_attr_str_key("foo"));
 }
 
+#[test]
+fn should_check_if_any_attribute_key_exists_on_any_vertex_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_key("age"));
+    assert!(edge.has_vertex_with_attr_key("code"));
+    assert!(!edge.has_vertex_with_attr_key("foo"));
+}
 #[test]
 fn should_check_if_attribute_like_on_edge() {
     let (edge, _id) = prepare_edge_test();
@@ -156,10 +166,10 @@ fn should_check_if_attribute_like_on_edge() {
 }
 
 #[test]
-fn should_check_if_attribute_like_on_any_edge_on_edge() {
+fn should_check_if_attribute_key_like_on_any_vertex_on_edge() {
     let (edge, _id) = prepare_edge_test();
     assert!(edge.has_vertex_with_attr_key_like("Ag"));
-    assert!(!edge.has_vertex_with_attr_key("foo"));
+    assert!(!edge.has_vertex_with_attr_key_like("foo"));
 }
 
 #[test]

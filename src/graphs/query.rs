@@ -64,7 +64,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
                 .iter()
-                .filter(|edge| edge.has_vertex_with_attr_key(attr_k))
+                .filter(|edge| edge.has_vertex_with_attr_str_key(attr_k))
                 .collect::<Vec<&Edge>>();
             if !edges.is_empty() {
                 Ok(edges)
@@ -77,7 +77,8 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of graphs like an attribute edge by key
+    /// Returns a collection of edges that has an attribute
+    /// key like 
     pub fn like_graph_edge_attr(
         &mut self,
         attr_k: &str,
@@ -158,7 +159,6 @@ impl Graphs {
         id: &str,
         vault_name: Option<&str>,
     ) -> Result<Vertex, &'static str> {
-
         match self.find_edge_by_id(id, vault_name) {
             Ok(edge) => {
                 if let Ok(vertex) = edge.find_vertex_by_id(id) {
