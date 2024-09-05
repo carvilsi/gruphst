@@ -191,7 +191,7 @@ fn should_return_the_unique_relations_labels_for_whole_graphs() {
 #[test]
 fn should_find_edges_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    let edges_found = graphs.edges_has_vertex_attr_key("age", None).unwrap();
+    let edges_found = graphs.find_edges_with_vertex_attr_str_key("age", None).unwrap();
     assert_eq!(edges_found.len(), 3);
     assert_eq!(edges_found[0].get_to_vertex().get_label(), "Bob");
 }
@@ -199,20 +199,20 @@ fn should_find_edges_with_attribute() {
 #[test]
 fn should_not_find_edges_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.edges_has_vertex_attr_key("foo", None).is_err());
+    assert!(graphs.find_edges_with_vertex_attr_str_key("foo", None).is_err());
 }
 
 #[test]
 fn should_not_find_edges_with_attribute_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
-    let e = graphs.edges_has_vertex_attr_key("foo", Some("!exists"));
+    let e = graphs.find_edges_with_vertex_attr_str_key("foo", Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
 fn should_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.like_graph_edge_attr("Ag", None).unwrap();
+    let found_graphs = graphs.find_edges_with_vertex_attr_str_key_like("Ag", None).unwrap();
     assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
 }
@@ -220,20 +220,20 @@ fn should_find_graphs_with_attribute_like() {
 #[test]
 fn should_not_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.like_graph_edge_attr("fo", None).is_err());
+    assert!(graphs.find_edges_with_vertex_attr_str_key_like("fo", None).is_err());
 }
 
 #[test]
 fn should_not_find_graphs_with_attribute_like_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
-    let e = graphs.like_graph_edge_attr("Ag", Some("!exists"));
+    let e = graphs.find_edges_with_vertex_attr_str_key_like("Ag", Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
 fn should_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
-    let found_graphs = graphs.attr_equals_to("age", 42, None).unwrap();
+    let found_graphs = graphs.find_edges_with_vertex_attr_str_equals_to("age", 42, None).unwrap();
     assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
 }
@@ -241,13 +241,13 @@ fn should_find_graphs_with_attribute_equal() {
 #[test]
 fn should_not_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
-    assert!(graphs.attr_equals_to("age", 43, None).is_err());
+    assert!(graphs.find_edges_with_vertex_attr_str_equals_to("age", 43, None).is_err());
 }
 
 #[test]
 fn should_not_find_graphs_with_attribute_equal_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    let e = graphs.attr_equals_to("age", 43, Some("!exists"));
+    let e = graphs.find_edges_with_vertex_attr_str_equals_to("age", 43, Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
@@ -270,7 +270,7 @@ fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
 #[test]
 fn equals_attributes() {
     let graphs = prepare_graphs_test();
-    let results = graphs.attr_equals_to("age", 42, None).unwrap();
+    let results = graphs.find_edges_with_vertex_attr_str_equals_to("age", 42, None).unwrap();
     assert_eq!(results.len(), 3);
 }
 
