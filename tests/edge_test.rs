@@ -166,9 +166,17 @@ fn should_check_if_attribute_like_on_edge() {
 }
 
 #[test]
-fn should_check_if_attribute_key_like_on_any_vertex_on_edge() {
+fn should_check_if_string_attribute_key_like_on_any_vertex_on_edge() {
+    let (edge, _id) = prepare_edge_test();
+    assert!(edge.has_vertex_with_attr_str_key_like("Ag"));
+    assert!(!edge.has_vertex_with_attr_str_key_like("foo"));
+}
+
+#[test]
+fn should_check_if_any_attribute_key_like_on_any_vertex_on_edge() {
     let (edge, _id) = prepare_edge_test();
     assert!(edge.has_vertex_with_attr_key_like("Ag"));
+    assert!(edge.has_vertex_with_attr_key_like("OdE"));
     assert!(!edge.has_vertex_with_attr_key_like("foo"));
 }
 
@@ -183,9 +191,9 @@ fn should_check_if_attribute_is_equals_to() {
 #[test]
 fn should_check_in_edge_if_attribute_is_equals_to() {
     let (edge, _id) = prepare_edge_test();
-    assert!(edge.has_vertex_with_attr_value_equals_to("age", 42));
-    assert!(!edge.has_vertex_with_attr_value_equals_to("age", 43));
-    assert!(!edge.has_vertex_with_attr_value_equals_to("foo", 25));
+    assert!(edge.has_vertex_with_attr_str_value_equals_to("age", 42));
+    assert!(!edge.has_vertex_with_attr_str_value_equals_to("age", 43));
+    assert!(!edge.has_vertex_with_attr_str_value_equals_to("foo", 25));
 }
 
 #[test]

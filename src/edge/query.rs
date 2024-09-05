@@ -10,13 +10,19 @@ impl Edge {
     pub fn has_vertex_with_attr_key(&self, attr_k: &str) -> bool {
         self.get_from_vertex().has_attr_key(attr_k) || self.get_to_vertex().has_attr_key(attr_k)
     }
-    /// Checks if "from" or "to" vertex has an attribute like
-    pub fn has_vertex_with_attr_key_like(&self, attr_k: &str) -> bool {
+
+    /// Checks if "from" or "to" vertex has a string attribute like
+    pub fn has_vertex_with_attr_str_key_like(&self, attr_k: &str) -> bool {
         self.get_from_vertex().has_attr_str_key_like(attr_k) || self.get_to_vertex().has_attr_str_key_like(attr_k)
     }
 
+    /// Checks if "from" or "to" vertex has any attribute like
+    pub fn has_vertex_with_attr_key_like(&self, attr_k: &str) -> bool {
+        self.get_from_vertex().has_attr_key_like(attr_k) || self.get_to_vertex().has_attr_key_like(attr_k)
+    }
+
     /// Checks if "from" or "to" vertex has an attribute and equal for value
-    pub fn has_vertex_with_attr_value_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
+    pub fn has_vertex_with_attr_str_value_equals_to<T>(&self, attr_k: &str, attr_v: T) -> bool
     where
         T: std::fmt::Display + std::clone::Clone,
     {

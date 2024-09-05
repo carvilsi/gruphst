@@ -88,7 +88,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
                 .iter()
-                .filter(|grph| grph.has_vertex_with_attr_key_like(attr_k))
+                .filter(|grph| grph.has_vertex_with_attr_str_key_like(attr_k))
                 .collect::<Vec<&Edge>>();
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
@@ -117,7 +117,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
                 .iter()
-                .filter(|grph| grph.has_vertex_with_attr_value_equals_to(attr_k, attr_v.clone()))
+                .filter(|grph| grph.has_vertex_with_attr_str_value_equals_to(attr_k, attr_v.clone()))
                 .collect::<Vec<&Edge>>();
             if !vrtcs.is_empty() {
                 Ok(vrtcs)

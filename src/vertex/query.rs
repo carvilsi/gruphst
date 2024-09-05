@@ -200,7 +200,6 @@ impl Vertex {
             None => false,
         }
     }
-    
 
     /// Retrieves the lenght of attributes for a vertex
     ///
