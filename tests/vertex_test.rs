@@ -259,3 +259,11 @@ fn should_check_if_vertex_has_a_vector_u8_attribute_value_equals_to() {
     assert!(!vertex.has_attr_vec_u8_equals_to("code", &v_nok));
     assert!(!vertex.has_attr_vec_u8_equals_to("foobar", &v_ok));
 }
+
+#[test]
+fn should_check_if_vertex_has_aany_attribute_key_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_key_like("oDe"));
+    assert!(vertex.has_attr_key_like("AmE"));
+    assert!(!vertex.has_attr_key_like("bAr"));
+}

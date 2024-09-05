@@ -128,6 +128,26 @@ impl Vertex {
         false
     }
 
+    /// Checks if any attribute key is like on a vertex 
+    ///
+    /// # Examples
+    /// ```rust
+    /// use gruphst::vertex::Vertex;
+    ///
+    /// let mut vertex = Vertex::new("Frodo");
+    /// vertex.set_attr("surname", "Baggins");
+    /// 
+    /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
+    /// vertex.set_attr_vec_u8("code", &vu8);
+    ///
+    /// assert!(vertex.has_attr_key_like("oDe"));
+    /// assert!(vertex.has_attr_key_like("RNA"));
+    /// assert!(!vertex.has_attr_key_like("dOC"));
+    /// ```
+    pub fn has_attr_key_like(&self, attr_k: &str) -> bool {
+       self.has_attr_str_key_like(attr_k) || self.has_attr_vec_u8_key_like(attr_k) 
+    }
+
     /// Checks if an String attribute value matches on a vertex
     ///
     /// # Examples
