@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::vertex::{Vertex, Vertex_};
 
-mod query;
+mod queries;
 
 /// Representation of a Edge, that consists on the relation of two vertices
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
