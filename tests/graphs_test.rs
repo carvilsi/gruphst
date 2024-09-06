@@ -277,7 +277,7 @@ fn equals_attributes() {
 #[test]
 fn should_find_vertices_with_relation_in() {
     let graphs = prepare_graphs_test();
-    let results = graphs.has_relation_in("friend of", None);
+    let results = graphs.find_vertices_with_relation_in("friend of", None);
     assert_eq!(results.clone().unwrap().len(), 2);
     assert_eq!(results.clone().unwrap()[0].get_label(), "Bob");
     assert_eq!(results.unwrap()[1].get_label(), "Alice");
@@ -286,21 +286,21 @@ fn should_find_vertices_with_relation_in() {
 #[test]
 fn should_not_find_vertices_with_relation_in() {
     let graphs = prepare_graphs_test();
-    let results = graphs.has_relation_in("foobar", None);
+    let results = graphs.find_vertices_with_relation_in("foobar", None);
     assert!(results.is_err());
 }
 
 #[test]
 fn should_not_find_vertices_with_relation_in_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    let e = graphs.has_relation_in("foobar", Some("!exists"));
+    let e = graphs.find_vertices_with_relation_in("foobar", Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
 #[test]
 fn should_find_vertices_with_relation_out() {
     let graphs = prepare_graphs_test();
-    let results = graphs.has_relation_out("friend of", None);
+    let results = graphs.find_vertices_with_relation_out("friend of", None);
     assert_eq!(results.clone().unwrap().len(), 3);
     assert_eq!(results.clone().unwrap()[0].get_label(), "Alice");
     assert_eq!(results.clone().unwrap()[1].get_label(), "Bob");
@@ -310,14 +310,14 @@ fn should_find_vertices_with_relation_out() {
 #[test]
 fn should_not_find_vertices_with_relation_out() {
     let graphs = prepare_graphs_test();
-    let results = graphs.has_relation_out("foobar", None);
+    let results = graphs.find_vertices_with_relation_out("foobar", None);
     assert!(results.is_err());
 }
 
 #[test]
 fn should_not_find_vertices_with_relation_out_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    let e = graphs.has_relation_out("foobar", Some("!exists"));
+    let e = graphs.find_vertices_with_relation_out("foobar", Some("!exists"));
     assert_eq!(e, Err("provided vault does not exists"));
 }
 
@@ -552,6 +552,31 @@ fn should_not_find_vertex_by_id_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_vertex_by_id("foobar", Some("!Exists"));
     assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_find_vertex_by_id_on_any_graphs_vault() {
+    let mut graphs = prepare_graphs_test();
+    let mut a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
+    assert_eq!(a_vertex.get_label(), "Alice".to_string());
+    prepare_insert_graph_test(&mut graphs);
+    let mut found_vertex = graphs.find_vertex_by_id_in_graphs(a_vertex.get_id().as_str()).unwrap();
+    assert_eq!(found_vertex.get_id(), a_vertex.get_id());
+    a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
+    assert_eq!(a_vertex.get_label(), "Gandalf".to_string());
+    found_vertex = graphs.find_vertex_by_id_in_graphs(a_vertex.get_id().as_str()).unwrap();
+    assert_eq!(found_vertex.get_id(), a_vertex.get_id());
+}
+
+#[test]
+fn should_not_find_vertex_by_id_that_does_not_exists_on_any_graphs_vault() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+    let an_edge_id= graphs.get_edges(None).unwrap()[0].get_id();
+    let e = graphs.find_vertex_by_id(an_edge_id.as_str(), None);
+    println!("{:#?}", e);
+    assert_eq!(e, Err("Vertex not found"));
+                    
 }
 
 #[test]
