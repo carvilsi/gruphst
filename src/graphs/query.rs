@@ -54,8 +54,33 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of edges that matches an attribute vertex by key
-    pub fn edges_has_vertex_attr_key(
+    /// Returns a collection of edges that matches any attribute vertex by key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_key(
+        &mut self,
+        attr_k: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vec<&Edge>, &'static str> {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            let edges = edges
+                .iter()
+                .filter(|edge| edge.has_vertex_with_attr_key(attr_k))
+                .collect::<Vec<&Edge>>();
+            if !edges.is_empty() {
+                Ok(edges)
+            } else {
+                error!("Any edge found for attribute: {}", attr_k);
+                Err("Any edge found for attribute")
+            }
+        } else {
+            Err("provided vault does not exists")
+        }
+    }
+
+    /// Returns a collection of edges that matches a string attribute vertex by key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_str_key(
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
@@ -77,9 +102,33 @@ impl Graphs {
         }
     }
 
-    /// Returns a collection of edges that has an attribute
-    /// key like 
-    pub fn like_graph_edge_attr(
+    /// Returns a collection of edges that matches a vector u8 attribute vertex by key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_vector_u8_key(
+        &mut self,
+        attr_k: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vec<&Edge>, &'static str> {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            let edges = edges
+                .iter()
+                .filter(|edge| edge.has_vertex_with_attr_vec_u8_key(attr_k))
+                .collect::<Vec<&Edge>>();
+            if !edges.is_empty() {
+                Ok(edges)
+            } else {
+                error!("Any edge found for attribute: {}", attr_k);
+                Err("Any edge found for attribute")
+            }
+        } else {
+            Err("provided vault does not exists")
+        }
+    }
+
+    /// Returns a collection of edges like string attribute vertex key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_str_key_like(
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
@@ -88,7 +137,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
                 .iter()
-                .filter(|grph| grph.has_vertex_with_attr_str_key_like(attr_k))
+                .filter(|edge| edge.has_vertex_with_attr_str_key_like(attr_k))
                 .collect::<Vec<&Edge>>();
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
@@ -100,11 +149,58 @@ impl Graphs {
             Err("provided vault does not exists")
         }
     }
-
-    /// Returns a collection of edges that matches an attribute
-    /// and value
-    // XXX: add a method to find attr on all graphs????
-    pub fn attr_equals_to<T>(
+    
+    /// Returns a collection of edges like vector u8 attribute vertex key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_vec_u8_key_like(
+        &mut self,
+        attr_k: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vec<&Edge>, &'static str> {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            let vrtcs = edges
+                .iter()
+                .filter(|edge| edge.has_vertex_with_attr_vec_u8_key_like(attr_k))
+                .collect::<Vec<&Edge>>();
+            if !vrtcs.is_empty() {
+                Ok(vrtcs)
+            } else {
+                error!("Any edge found for attribute: {}", attr_k);
+                Err("Any edge found for attribute")
+            }
+        } else {
+            Err("provided vault does not exists")
+        }
+    }
+ 
+    /// Returns a collection of edges like any attribute vertex key
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_key_like(
+        &mut self,
+        attr_k: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vec<&Edge>, &'static str> {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            let vrtcs = edges
+                .iter()
+                .filter(|edge| edge.has_vertex_with_attr_key_like(attr_k))
+                .collect::<Vec<&Edge>>();
+            if !vrtcs.is_empty() {
+                Ok(vrtcs)
+            } else {
+                error!("Any edge found for attribute: {}", attr_k);
+                Err("Any edge found for attribute")
+            }
+        } else {
+            Err("provided vault does not exists")
+        }
+    }
+ 
+    /// Returns a collection of edges that matches a string attribute vertex 
+    /// for some provided vault_name or default when None
+    pub fn find_edges_with_vertex_attr_str_equals_to<T>(
         &self,
         attr_k: &str,
         attr_v: T,
@@ -117,7 +213,7 @@ impl Graphs {
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
                 .iter()
-                .filter(|grph| grph.has_vertex_with_attr_str_value_equals_to(attr_k, attr_v.clone()))
+                .filter(|edge| edge.has_vertex_with_attr_str_value_equals_to(attr_k, attr_v.clone()))
                 .collect::<Vec<&Edge>>();
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
