@@ -287,14 +287,17 @@ impl Graphs {
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// on any graphs' vault
     pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, &'static str> {
-        for (_vault_name, edges) in self.vault.iter_mut() {
-            for edge in edges {
-                if let Ok(vertex) = edge.find_vertex_by_id(id) {
-                    return Ok(vertex);
+        for (vault_name, edges) in self.vault.iter_mut() {
+            edges.iter_mut().find(|dg| {
+                if dg.get_from_vertex().get_id() == id {
+                    return dg.get_from_vertex();
                 }
-            }
+                if dg.get_to_vertex().get_id() == id {
+                    return dg.get_to_vertex();
+                }
+            });
         }
-        Err("Vertex found")
+        Err("edge not found")
     }
 
     /// Retrieves all the vertices with incoming relation
