@@ -123,7 +123,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     assert_eq!(vertices_with_relation_in[1].get_label(), "Isengard");
 
     // Or get the edge that has a vertex with an attribute equals to
-    let found = graphs.attr_equals_to("years old", 24000, None)?;
+    let found = graphs.find_edges_with_vertex_attr_str_equals_to("years old", 24000, None)?;
     assert_eq!(found[0].get_from_vertex().get_label(), "Gandalf");
 
     // Since we have a humble middle-earth network

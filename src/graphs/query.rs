@@ -198,9 +198,8 @@ impl Graphs {
         }
     }
  
-    /// Returns a collection of edges that matches an attribute
-    /// and value
-    // XXX: add a method to find attr on all graphs????
+    /// Returns a collection of edges that matches a string attribute vertex 
+    /// for some provided vault_name or default when None
     pub fn find_edges_with_vertex_attr_str_equals_to<T>(
         &self,
         attr_k: &str,
