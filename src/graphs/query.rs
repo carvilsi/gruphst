@@ -227,6 +227,7 @@ impl Graphs {
     }
 
     /// Returns an Edge that provided id matches with Edge Id, or From, To vertices
+    /// for some provided vault_name or default when None
     pub fn find_edge_by_id(
         &mut self,
         id: &str,
@@ -250,6 +251,7 @@ impl Graphs {
     }
 
     /// Returns a Vertex that provided id matches with id of From, To vertices
+    /// for some provided vault_name or default when None
     pub fn find_vertex_by_id(
         &mut self,
         id: &str,
@@ -267,7 +269,7 @@ impl Graphs {
         }  
     }
 
-    /// Find in any graph on vault by id
+    /// Find edge by id on any graphs' vault
     pub fn find_edge_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, &'static str> {
         for (_vault_name, edges) in self.vault.iter_mut() {
             if let Some(edge) = edges.iter_mut().find(|vrtx| {
@@ -281,7 +283,14 @@ impl Graphs {
         Err("edge not found")
     }
 
+    /// Returns a Vertex that provided id matches with id of From, To vertices
+    /// on any graphs' vault
+    pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Vertex, &'static str> {
+        todo!()
+    }
+
     /// Retrieves all the vertices with incoming relation
+    /// for some provided vault_name or default when None
     pub fn has_relation_in(
         &self,
         relation_in: &str,
@@ -308,6 +317,7 @@ impl Graphs {
     }
 
     /// Retrieves all the vertices with outcoming relation
+    /// for some provided vault_name or default when None
     pub fn has_relation_out(
         &self,
         relation_out: &str,
