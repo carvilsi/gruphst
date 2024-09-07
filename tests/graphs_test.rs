@@ -538,13 +538,11 @@ fn should_find_vertex_by_id() {
     assert_eq!(found_vertex.get_id(), a_vertex.get_id());
 }
 
-// #[test]
+#[test]
 fn should_not_find_vertex_by_id_that_does_not_exists() {
     let mut graphs = prepare_graphs_test();
-    let an_edge_id= graphs.get_edges(None).unwrap()[0].get_id();
     let e = graphs.find_vertex_by_id("foobar", None);
     assert_eq!(e, Err("Vertex not found"));
-     // TODO fix this test               
 }
 
 #[test]
@@ -572,11 +570,8 @@ fn should_find_vertex_by_id_on_any_graphs_vault() {
 fn should_not_find_vertex_by_id_that_does_not_exists_on_any_graphs_vault() {
     let mut graphs = prepare_graphs_test();
     prepare_insert_graph_test(&mut graphs);
-    let an_edge_id= graphs.get_edges(None).unwrap()[0].get_id();
     let e = graphs.find_vertex_by_id_in_graphs("foobar");
-    println!("{:#?}", e);
     assert_eq!(e, Err("Vertex not found"));
-                    
 }
 
 #[test]

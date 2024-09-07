@@ -272,22 +272,23 @@ impl Graphs {
         id: &str,
         vault_name: Option<&str>,
     ) -> Result<Vertex, &'static str> {
-        match self.find_edge_by_id(id, vault_name) {
-            Ok(edge) => {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            for edge in edges { 
                 if let Ok(vertex) = edge.find_vertex_by_id(id) {
-                    Ok(vertex)
-                } else {
-                    Err("Vertex not found")
+                    return Ok(vertex);
                 }
-            },
-            Err(error) => Err(error),
-        }  
+            }
+            Err("Vertex not found")
+        } else {
+            Err("provided vault does not exists")
+        }
     }
 
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// on any graphs' vault
     pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, &'static str> {
-        for (vault_name, edges) in self.vault.clone() {
+        for (_vault_name, edges) in self.vault.clone() {
             for edge in edges {
                 if edge.get_from_vertex().get_id() == id {
                     return Ok(edge.get_from_vertex());
