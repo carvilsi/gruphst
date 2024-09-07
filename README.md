@@ -118,7 +118,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Also possible to retrieve the vertices that has a certain
     // relation in
-    let vertices_with_relation_in = graphs.has_relation_in("lives at", None)?; 
+    let vertices_with_relation_in = graphs.find_vertices_with_relation_in("lives at", None)?; 
     assert_eq!(vertices_with_relation_in[0].get_label(), "The Shire");
     assert_eq!(vertices_with_relation_in[1].get_label(), "Isengard");
 

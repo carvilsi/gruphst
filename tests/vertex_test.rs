@@ -121,7 +121,7 @@ fn get_vertex_relation_out() {
     prepare_insert_graph_test(&mut graphs);
 
     let find_results = graphs
-        .has_relation_out("relative of", Some("my graphs"))
+        .find_vertices_with_relation_out("relative of", Some("my graphs"))
         .unwrap();
     assert_eq!(find_results.len(), 1);
     assert_eq!(find_results[0].get_label(), "Fred");
@@ -169,7 +169,7 @@ fn get_vertex_relation_in() {
     prepare_insert_graph_test(&mut graphs);
 
     let find_results = graphs
-        .has_relation_in("friend of", Some("my graphs"))
+        .find_vertices_with_relation_in("friend of", Some("my graphs"))
         .unwrap();
     assert_eq!(find_results.len(), 2);
     let mut vertex: Vertex = Vertex::new("tmp");

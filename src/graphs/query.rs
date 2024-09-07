@@ -250,25 +250,6 @@ impl Graphs {
         }
     }
 
-    /// Returns a Vertex that provided id matches with id of From, To vertices
-    /// for some provided vault_name or default when None
-    pub fn find_vertex_by_id(
-        &mut self,
-        id: &str,
-        vault_name: Option<&str>,
-    ) -> Result<Vertex, &'static str> {
-        match self.find_edge_by_id(id, vault_name) {
-            Ok(edge) => {
-                if let Ok(vertex) = edge.find_vertex_by_id(id) {
-                    Ok(vertex)
-                } else {
-                    Err("Vertex not found")
-                }
-            },
-            Err(error) => Err(error),
-        }  
-    }
-
     /// Find edge by id on any graphs' vault
     pub fn find_edge_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, &'static str> {
         for (_vault_name, edges) in self.vault.iter_mut() {
@@ -283,15 +264,41 @@ impl Graphs {
         Err("edge not found")
     }
 
+    // TODO: check and try to improve performance; instead match find_edge_by_id
+    /// Returns a Vertex that provided id matches with id of From, To vertices
+    /// for some provided vault_name or default when None
+    pub fn find_vertex_by_id(
+        &mut self,
+        id: &str,
+        vault_name: Option<&str>,
+    ) -> Result<Vertex, &'static str> {
+        let current_vault = self.select_vault_label(vault_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
+            for edge in edges { 
+                if let Ok(vertex) = edge.find_vertex_by_id(id) {
+                    return Ok(vertex);
+                }
+            }
+            Err("Vertex not found")
+        } else {
+            Err("provided vault does not exists")
+        }
+    }
+
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// on any graphs' vault
-    pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Vertex, &'static str> {
-        todo!()
+    pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, &'static str> {
+        for (vault_name, _edges) in self.vault.clone() {
+            if let Ok(vertex) = self.find_vertex_by_id(id, Some(vault_name.as_str())) {
+                return Ok(vertex);
+            }
+        }
+        Err("Vertex not found")
     }
 
     /// Retrieves all the vertices with incoming relation
     /// for some provided vault_name or default when None
-    pub fn has_relation_in(
+    pub fn find_vertices_with_relation_in(
         &self,
         relation_in: &str,
         vault_name: Option<&str>,
@@ -318,7 +325,7 @@ impl Graphs {
 
     /// Retrieves all the vertices with outcoming relation
     /// for some provided vault_name or default when None
-    pub fn has_relation_out(
+    pub fn find_vertices_with_relation_out(
         &self,
         relation_out: &str,
         vault_name: Option<&str>,
@@ -344,8 +351,3 @@ impl Graphs {
     }
 }
 
-// TODO: review this whole query
-// needs methods:
-// - retrieve vertex by attrs
-// - retrieve vertex by id on whole graphs 
-// 
