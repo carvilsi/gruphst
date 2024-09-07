@@ -10,7 +10,9 @@ pub fn prepare_graphs_test() -> Graphs {
     let mut bob = Vertex::new("Bob");
     bob.set_attr("age", 42);
 
-    let fred = Vertex::new("Fred");
+    let mut fred = Vertex::new("Fred");
+    let code: Vec<u8> = vec![3, 1, 3, 3, 7];
+    fred.set_attr_vec_u8("code", &code);
 
     graphs.add_edge(&Edge::create(&alice, "friend of", &bob), None);
     graphs.add_edge(&Edge::create(&bob, "friend of", &alice), None);
@@ -498,10 +500,10 @@ fn should_return_uniq_vertices_from_graph() {
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
-    assert_eq!(graphs_stats.get_mem(), 1218);
+    assert_eq!(graphs_stats.get_mem(), 1268);
     assert_eq!(graphs_stats.get_total_edges(), 4);
     assert_eq!(graphs_stats.get_total_graphs(), 1);
-    assert_eq!(graphs_stats.get_total_attr(), 9);
+    assert_eq!(graphs_stats.get_total_attr(), 11);
     assert_eq!(graphs_stats.get_total_vertices(), 8);
     assert_eq!(graphs_stats.get_uniq_rel(), 2);
 }
@@ -510,7 +512,7 @@ fn should_return_stats_for_graphs() {
 fn should_retrieve_memory_used_by_graphs() {
     let graphs = prepare_graphs_test();
     let mem_usage = graphs.get_mem().unwrap();
-    assert_eq!(mem_usage, 1218);
+    assert_eq!(mem_usage, 1268);
 }
 
 #[test]
@@ -598,4 +600,102 @@ fn should_create_new_vault_and_add_a_colection_of_edges() {
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 8);
     assert_eq!(stats.get_total_vertices(), 16);
+}
+
+#[test]
+fn should_find_edges_with_vertex_that_has_any_attr() {
+    let mut graphs = prepare_graphs_test();
+    let mut found_edges = graphs.find_edges_with_vertex_attr_key("phone", None).unwrap();
+    assert_eq!(found_edges.len(), 3);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Alice");
+    found_edges = graphs.find_edges_with_vertex_attr_key("code", None).unwrap();
+    assert_eq!(found_edges.len(), 2);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_any_attr_that_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let mut e = graphs.find_edges_with_vertex_attr_key("foo", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+    e = graphs.find_edges_with_vertex_attr_key("bar", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_any_attr_since_vault_doest_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_key("phone", Some("!Exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_find_edges_with_vertex_that_has_vec_u8_attr() {
+    let mut graphs = prepare_graphs_test();
+    let found_edges = graphs.find_edges_with_vertex_attr_vector_u8_key("code", None).unwrap();
+    assert_eq!(found_edges.len(), 2);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_that_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_vector_u8_key("bar", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_since_vault_doest_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_vector_u8_key("phone", Some("!Exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_find_edges_with_vertex_that_has_vec_u8_attr_like() {
+    let mut graphs = prepare_graphs_test();
+    let found_edges = graphs.find_edges_with_vertex_attr_vec_u8_key_like("oDe", None).unwrap();
+    assert_eq!(found_edges.len(), 2);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_that_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_vec_u8_key_like("bAr", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_since_vault_doest_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_vec_u8_key_like("phone", Some("!Exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
+}
+
+#[test]
+fn should_find_edges_with_vertex_that_has_any_attr_like() {
+    let mut graphs = prepare_graphs_test();
+    let mut found_edges = graphs.find_edges_with_vertex_attr_key_like("Hon", None).unwrap();
+    assert_eq!(found_edges.len(), 3);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Alice");
+    found_edges = graphs.find_edges_with_vertex_attr_key_like("oDe", None).unwrap();
+    assert_eq!(found_edges.len(), 2);
+    assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_any_attr_like_that_does_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let mut e = graphs.find_edges_with_vertex_attr_key_like("fOO", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+    e = graphs.find_edges_with_vertex_attr_key_like("baR", None);
+    assert_eq!(e, Err("Any edge found for attribute"));
+}
+
+#[test]
+fn should_not_find_edges_with_vertex_that_has_any_attr_like_since_vault_doest_not_exists() {
+    let mut graphs = prepare_graphs_test();
+    let e = graphs.find_edges_with_vertex_attr_key_like("phone", Some("!Exists"));
+    assert_eq!(e, Err("provided vault does not exists"));
 }

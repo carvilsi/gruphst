@@ -288,14 +288,10 @@ impl Graphs {
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// on any graphs' vault
     pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, &'static str> {
-        for (_vault_name, edges) in self.vault.clone() {
-            for edge in edges {
-                if edge.get_from_vertex().get_id() == id {
-                    return Ok(edge.get_from_vertex());
-                } else if edge.get_to_vertex().get_id() == id {
-                    return Ok(edge.get_to_vertex());
-                }
-             }
+        for (vault_name, _edges) in self.vault.clone() {
+            if let Ok(vertex) = self.find_vertex_by_id(id, Some(vault_name.as_str())) {
+                return Ok(vertex);
+            }
         }
         Err("Vertex not found")
     }
@@ -355,7 +351,3 @@ impl Graphs {
     }
 }
 
-// TODO: review this whole query
-// needs methods:
-// - retrieve vertex by attrs
-// 
