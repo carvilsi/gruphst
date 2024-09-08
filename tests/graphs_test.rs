@@ -131,7 +131,7 @@ fn should_find_edges_by_relation() {
 fn should_not_find_edges_by_relation_since_vault_does_not_exists() {
     let mut graphs = Graphs::init("empty");
     let e = graphs.find_edges_by_relation("friend of", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -166,7 +166,7 @@ fn should_not_find_by_relations_name_vault_does_not_exists() {
     let mut graphs = Graphs::init("void");
     let relations = vec!["foo", "bar"];
     let e = graphs.find_edges_by_relations(relations, Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -208,7 +208,7 @@ fn should_not_find_edges_with_attribute() {
 fn should_not_find_edges_with_attribute_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_key("foo", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -229,7 +229,7 @@ fn should_not_find_graphs_with_attribute_like() {
 fn should_not_find_graphs_with_attribute_like_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_key_like("Ag", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -250,7 +250,7 @@ fn should_not_find_graphs_with_attribute_equal() {
 fn should_not_find_graphs_with_attribute_equal_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_equals_to("age", 43, Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -296,7 +296,7 @@ fn should_not_find_vertices_with_relation_in() {
 fn should_not_find_vertices_with_relation_in_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_vertices_with_relation_in("foobar", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -320,7 +320,7 @@ fn should_not_find_vertices_with_relation_out() {
 fn should_not_find_vertices_with_relation_out_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_vertices_with_relation_out("foobar", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -442,7 +442,7 @@ fn should_not_find_by_non_existing_id() {
 fn should_not_find_by_id_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edge_by_id("000", Some("!exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -551,7 +551,7 @@ fn should_not_find_vertex_by_id_that_does_not_exists() {
 fn should_not_find_vertex_by_id_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_vertex_by_id("foobar", Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -626,7 +626,7 @@ fn should_not_find_edges_with_vertex_that_has_any_attr_that_does_not_exists() {
 fn should_not_find_edges_with_vertex_that_has_any_attr_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_key("phone", Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -648,7 +648,7 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_that_does_not_exists()
 fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_vec_u8_key("phone", Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -670,7 +670,7 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_that_does_not_exi
 fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_vec_u8_key_like("phone", Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -697,7 +697,7 @@ fn should_not_find_edges_with_vertex_that_has_any_attr_like_that_does_not_exists
 fn should_not_find_edges_with_vertex_that_has_any_attr_like_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_key_like("phone", Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }
 
 #[test]
@@ -730,5 +730,5 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_equals_to_vault_does_n
     let mut graphs = prepare_graphs_test();
     let vec_u8_attr_nok: Vec<u8> = vec![1, 3, 3, 7];
     let e = graphs.find_edges_with_vertex_attr_vec_u8_equals_to("code", &vec_u8_attr_nok, Some("!Exists"));
-    assert_eq!(e, Err("provided vault does not exists"));
+    assert_eq!(e, Err("Provided vault does not exists"));
 }

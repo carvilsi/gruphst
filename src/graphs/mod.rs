@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use crate::{edge::Edge, graphs_stats::GraphsStats, util::graphs_memory_watcher, vertex::Vertex};
 
 mod persistence;
-mod query;
+mod queries;
 mod stats;
 
 /// A colection of Graph
