@@ -49,7 +49,6 @@ fn prepare_stats_test() -> Graphs {
 fn graphs_stats() {
     let mut graphs = prepare_stats_test();
 
-    // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 6);
     assert_eq!(stats.get_total_attr(), 19);

@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 
-// TODO: add something to auto-persists, like a deamon
+// TODO: add something to auto-persists, like a deamon? or something on every CUD?
 
 const GRUPHST_MAX_MEM_USAGE: &str = "GRUPHST_MAX_MEM_USAGE";
 const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;

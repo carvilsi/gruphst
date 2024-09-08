@@ -264,7 +264,6 @@ impl Graphs {
         Err("edge not found")
     }
 
-    // TODO: check and try to improve performance; instead match find_edge_by_id
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// for some provided vault_name or default when None
     pub fn find_vertex_by_id(
