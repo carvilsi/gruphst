@@ -11,11 +11,6 @@ impl Edge {
         self.get_from_vertex().has_attr_str_key_equals_to(attr_k) || self.get_to_vertex().has_attr_str_key_equals_to(attr_k)
     }
     
-    /// Checks if "from" or "to" vertices has a Vec<u8> attribute key
-    pub fn has_vertex_with_attr_vec_u8_key(&self, attr_k: &str) -> bool {
-        self.get_from_vertex().has_attr_vec_u8_key_equals_to(attr_k) || self.get_to_vertex().has_attr_vec_u8_key_equals_to(attr_k)
-    }
-
     /// Checks if "from" or "to" vertex has any attribute like
     pub fn has_vertex_with_attr_key_like(&self, attr_k: &str) -> bool {
         self.get_from_vertex().has_attr_key_like(attr_k) || self.get_to_vertex().has_attr_key_like(attr_k)
@@ -24,11 +19,6 @@ impl Edge {
     /// Checks if "from" or "to" vertex has a string attribute key like
     pub fn has_vertex_with_attr_str_key_like(&self, attr_k: &str) -> bool {
         self.get_from_vertex().has_attr_str_key_like(attr_k) || self.get_to_vertex().has_attr_str_key_like(attr_k)
-    }
-
-    /// Checks if "from" or "to" vertex has a vec_u8 attribute key like
-    pub fn has_vertex_with_attr_vec_u8_key_like(&self, attr_k: &str) -> bool {
-        self.get_from_vertex().has_attr_vec_u8_key_like(attr_k) || self.get_to_vertex().has_attr_vec_u8_key_like(attr_k)
     }
 
     /// Checks if "from" or "to" vertex has a string attribute and equal for value
@@ -41,6 +31,16 @@ impl Edge {
             || self.get_to_vertex().has_attr_str_equals_to(attr_k, attr_v.clone())
     }
 
+    /// Checks if "from" or "to" vertices has a Vec<u8> attribute key
+    pub fn has_vertex_with_attr_vec_u8_key(&self, attr_k: &str) -> bool {
+        self.get_from_vertex().has_attr_vec_u8_key_equals_to(attr_k) || self.get_to_vertex().has_attr_vec_u8_key_equals_to(attr_k)
+    }
+
+    /// Checks if "from" or "to" vertex has a vec_u8 attribute key like
+    pub fn has_vertex_with_attr_vec_u8_key_like(&self, attr_k: &str) -> bool {
+        self.get_from_vertex().has_attr_vec_u8_key_like(attr_k) || self.get_to_vertex().has_attr_vec_u8_key_like(attr_k)
+    }
+
     /// Checks if "from" or "to" vertex has a Vec<u8> attribute and equal for value
     pub fn has_vertex_with_attr_vec_u8_value_equals_to(&self, attr_k: &str, attr_v: &Vec<u8>) -> bool {
         self.get_from_vertex()
@@ -48,7 +48,7 @@ impl Edge {
             || self.get_to_vertex().has_attr_vec_u8_equals_to(attr_k, attr_v)
     }
 
-    // finds a Vertex by Id on an Edge
+    /// finds a Vertex by id on an Edge on "from" and "to" vertices
     pub fn find_vertex_by_id(&self, id: &str) -> Result<Vertex, &'static str> {
         if self.get_from_vertex().get_id() == *id {
             Ok(self.get_from_vertex())
