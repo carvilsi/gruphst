@@ -104,7 +104,7 @@ impl Graphs {
 
     /// Returns a collection of edges that matches a vector u8 attribute vertex by key
     /// for some provided vault_name or default when None
-    pub fn find_edges_with_vertex_attr_vector_u8_key(
+    pub fn find_edges_with_vertex_attr_vec_u8_key(
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
