@@ -107,12 +107,32 @@ fn vertex_delete_attributes_fail_since_attribute_does_not_exists() {
 }
 
 #[test]
-fn vertex_attribute_keys() {
+fn vertex_attribute_str_keys() {
     let (vertex, _id) = prepare_vertex_test();
-    let keys = vertex.get_attr_keys();
+    let keys = vertex.get_attr_str_keys();
     assert!(keys.contains(&"name".to_string()));
     assert!(keys.contains(&"age".to_string()));
     assert!(!keys.contains(&"surname".to_string()));
+    assert_eq!(keys.len(), 2);
+}
+
+#[test]
+fn vertex_attribute_vec_u8_keys() {
+    let (vertex, _id) = prepare_vertex_test();
+    let keys = vertex.get_attr_vec_u8_keys();
+    assert!(keys.contains(&"code".to_string()));
+    assert_eq!(keys.len(), 1);
+}
+
+#[test]
+fn vertex_attribute_keys() {
+    let (vertex, _id) = prepare_vertex_test();
+    let keys = vertex.get_attr_keys();
+    assert!(keys.contains(&"code".to_string()));
+    assert!(keys.contains(&"name".to_string()));
+    assert!(keys.contains(&"age".to_string()));
+    assert!(!keys.contains(&"surname".to_string()));
+    assert_eq!(keys.len(), 3);
 }
 
 #[test]

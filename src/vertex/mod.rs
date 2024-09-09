@@ -215,7 +215,8 @@ impl Vertex {
     }
 
     /// Returns an collection containing all attribute keys
-    pub fn get_attr_keys(&self) -> Vec<String> {
+    /// of String attributes
+    pub fn get_attr_str_keys(&self) -> Vec<String> {
         let binding = self.vrtx.borrow();
         // FIXME: clippy has a warning here:
         // let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
@@ -223,6 +224,24 @@ impl Vertex {
 
         let kv: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
         kv
+    }
+
+    /// Returns an collection containing all attribute keys
+    /// of Vec<u8> attributes
+    pub fn get_attr_vec_u8_keys(&self) -> Vec<String> {
+        let binding = self.vrtx.borrow();
+        let kv: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        kv
+    }
+
+    /// Returns an collection containing all attribute keys
+    /// of any type of attributes
+    pub fn get_attr_keys(&self) -> Vec<String> {
+        let binding = self.vrtx.borrow();
+        let mut kv_attr: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
+        let mut kv_attr_vec_u8: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        kv_attr.append(&mut kv_attr_vec_u8);
+        kv_attr 
     }
 
     /// Retrieves the vertices that has relation out for the given vertex on a collection of edges
