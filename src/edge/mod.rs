@@ -151,7 +151,7 @@ impl Edge {
             Some(res) => Ok(res),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err("Attribute not found")
             }
         }
     }
@@ -187,7 +187,7 @@ impl Edge {
             Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
-                Err("attribute not found for remove")
+                Err("Attribute not found for remove")
             }
         }
     }

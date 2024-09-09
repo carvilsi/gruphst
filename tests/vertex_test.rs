@@ -238,7 +238,7 @@ fn should_not_get_vertex_vec_u8_attr() {
     let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     let e = vertex.get_attr_vec_u8("not exists");
-    assert_eq!(e, Err("attribute not found"));
+    assert_eq!(e, Err("Attribute not found"));
 }
 
 #[test]
@@ -286,4 +286,15 @@ fn should_check_if_vertex_has_aany_attribute_key_like() {
     assert!(vertex.has_attr_key_like("oDe"));
     assert!(vertex.has_attr_key_like("AmE"));
     assert!(!vertex.has_attr_key_like("bAr"));
+}
+
+#[test]
+fn should_store_and_validate_a_cryptographic_hashed_value() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    let attr_hash_key = "hash_argon2";
+    let plain_text = "1. The world is all that is the case.";
+    vertex.set_hash(attr_hash_key, plain_text);
+    assert!(vertex.is_hash_valid(attr_hash_key, plain_text).unwrap());
+    assert!(!vertex.is_hash_valid(attr_hash_key, "foo bar plain text").unwrap());
+    assert!(vertex.is_hash_valid("foo bar attr", plain_text).is_err());
 }

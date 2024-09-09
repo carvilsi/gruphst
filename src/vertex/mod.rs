@@ -8,6 +8,7 @@ use std::rc::Rc;
 use std::vec;
 
 mod query;
+mod cryptography;
 
 /// Representation of a vertex.
 /// A vertex or node, vertices in plural,
@@ -144,7 +145,7 @@ impl Vertex {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err("Attribute not found")
             }
         }
     }
@@ -157,7 +158,7 @@ impl Vertex {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err("Attribute not found")
             }
         }
     }
@@ -209,7 +210,7 @@ impl Vertex {
             Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
-                Err("attribute not found for remove")
+                Err("Attribute not found for remove")
             }
         }
     }
