@@ -9,5 +9,4 @@ mod util;
 pub mod vertex;
 
 // TODO: add an importer/exporter thingy; to_csv, from_csv
-// TODO: implement argon2 for hashing things
 // TODO: Improve Error handling
