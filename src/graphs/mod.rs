@@ -226,4 +226,14 @@ impl Graphs {
         }
         current_vault.to_string()
     }
+
+    fn select_vautl(&mut self, vault_label: Option<&str>) -> Result<&mut Vec<Edge>, GruPHstError> {
+        let vault = self.select_vault_label(vault_label);
+        if let Some(edges) = self.vault.get_mut(&vault) {
+            Ok(edges)
+        } else {
+            warn!("Vault {} does not exists", vault);
+            Err(GruPHstError::VaultNotExists(vault))
+        }
+    }
 }

@@ -11,22 +11,16 @@ impl Graphs {
         &mut self,
         relation_name: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get(&current_vault) {
-            let edges = edges
-                .iter()
-                .filter(|edge| edge.get_relation() == relation_name)
-                .collect::<Vec<&Edge>>();
-            if !edges.is_empty() {
-                Ok(edges)
-            } else {
-                warn!("Any edge found for relation: {}", relation_name);
-                Err(GruPHstError::EdgeNotFound)
-            }
+    ) -> Result<Vec<Edge>, GruPHstError> {
+        let edges = self.select_vautl(vault_name)?;
+        edges.iter()
+            .filter(|edge| edge.get_relation() == relation_name)
+            .collect::<Vec<&Edge>>();
+        if !edges.is_empty() {
+            Ok(edges)
         } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
+            warn!("Any edge found for relation: {}", relation_name);
+            Err(GruPHstError::EdgeNotFound)
         }
     }
 
