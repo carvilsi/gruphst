@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
-use gruphst::{edge::Edge, vertex::Vertex};
-use gruphst::errors::attributes::AttributeError;
+use gruphst::{edge::Edge, errors::GruPHstError, vertex::Vertex};
 
 #[path = "./graphs_test.rs"]
 mod graphs_test;
@@ -240,7 +239,7 @@ fn should_not_get_vertex_vec_u8_attr() {
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     let e = vertex.get_attr_vec_u8("not exists");
     assert!(e.is_err());
-    assert_eq!(e, Err(AttributeError));
+    assert_eq!(e, Err(GruPHstError::AttributeError));
 }
 
 #[test]

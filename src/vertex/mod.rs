@@ -2,7 +2,7 @@ use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::edge::Edge;
-use crate::errors::attributes::AttributeError;
+use crate::errors::GruPHstError;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -139,27 +139,27 @@ impl Vertex {
     /// let gandalf_years = gandalf.get_attr("years old").unwrap();
     /// assert_eq!(gandalf_years, "24000");
     /// ```
-    pub fn get_attr(&self, attr_k: &str) -> Result<String, AttributeError> {
+    pub fn get_attr(&self, attr_k: &str) -> Result<String, GruPHstError> {
         let binding = self.vrtx.borrow();
         let res = binding.attr.get(attr_k);
         match res {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err(AttributeError)
+                Err(GruPHstError::AttributeError)
             }
         }
     }
 
     /// Get attribute of type Vev<u8>
-    pub fn get_attr_vec_u8(&self, attr_k: &str) -> Result<Vec<u8>, AttributeError> {
+    pub fn get_attr_vec_u8(&self, attr_k: &str) -> Result<Vec<u8>, GruPHstError> {
         let binding = self.vrtx.borrow();
         let res = binding.attr_vec_u8.get(attr_k);
         match res {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err(AttributeError)
+                Err(GruPHstError::AttributeError)
             }
         }
     }
@@ -180,7 +180,7 @@ impl Vertex {
     /// gandalf_years = gandalf.get_attr("years old").unwrap();
     /// assert_eq!(gandalf_years, "24001");
     /// ```
-    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), AttributeError>
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), GruPHstError>
     where
         T: std::fmt::Display,
     {
@@ -188,7 +188,7 @@ impl Vertex {
             *attr = attr_v.to_string();
             return Ok(());
         }
-        Err(AttributeError)
+        Err(GruPHstError::AttributeError)
     }
 
     /// Updates the value of an attribute or creates a new one if attribute key does not exists
@@ -205,13 +205,13 @@ impl Vertex {
     }
 
     /// Deletes an attribute
-    pub fn del_attr(&mut self, v: &str) -> Result<(), AttributeError> {
+    pub fn del_attr(&mut self, v: &str) -> Result<(), GruPHstError> {
         let res = self.vrtx.borrow_mut().attr.remove(v);
         match res {
             Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
-                Err(AttributeError)
+                Err(GruPHstError::AttributeError)
             }
         }
     }

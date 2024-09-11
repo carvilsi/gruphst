@@ -19,6 +19,7 @@ log = "0.4.21"
 simple_logger = "5.0.0"
 dotenv = "0.15.0"
 argon2 = "0.5.3"
+thiserror = "1.0.63"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
