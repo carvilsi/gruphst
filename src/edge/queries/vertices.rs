@@ -1,4 +1,4 @@
-use crate::{edge::Edge, vertex::Vertex};
+use crate::{edge::Edge, errors::GruPHstError, vertex::Vertex};
 
 impl Edge {
     /// Checks if "from" or "to" vertices has any attribute key
@@ -49,13 +49,13 @@ impl Edge {
     }
 
     /// finds a Vertex by id on an Edge on "from" and "to" vertices
-    pub fn find_vertex_by_id(&self, id: &str) -> Result<Vertex, &'static str> {
+    pub fn find_vertex_by_id(&self, id: &str) -> Result<Vertex, GruPHstError> {
         if self.get_from_vertex().get_id() == *id {
             Ok(self.get_from_vertex())
         } else if self.get_to_vertex().get_id() == *id {
             Ok(self.get_to_vertex())
         } else {
-            Err("Vertex not found")
+            Err(GruPHstError::VertexError)
         }
     }
 }
