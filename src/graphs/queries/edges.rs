@@ -1,6 +1,7 @@
-use log::error;
+use log::warn;
 
 use crate::edge::Edge;
+use crate::errors::GruPHstError;
 use crate::graphs::Graphs;
 
 impl Graphs {
@@ -10,7 +11,7 @@ impl Graphs {
         &mut self,
         relation_name: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
@@ -20,11 +21,12 @@ impl Graphs {
             if !edges.is_empty() {
                 Ok(edges)
             } else {
-                error!("Any edge found for relation: {}", relation_name);
-                Err("Any edge found for relation")
+                warn!("Any edge found for relation: {}", relation_name);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -35,7 +37,7 @@ impl Graphs {
         &mut self,
         relations: Vec<&str>,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
@@ -45,11 +47,12 @@ impl Graphs {
             if !edges.is_empty() {
                 Ok(edges)
             } else {
-                error!("Any edge found for relations: {:#?}", relations);
-                Err("Any edge found for relation")
+                warn!("Any edge found for relations: {}", relations.join(", "));
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
  
@@ -59,7 +62,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
@@ -69,11 +72,12 @@ impl Graphs {
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -83,7 +87,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
@@ -93,11 +97,12 @@ impl Graphs {
             if !edges.is_empty() {
                 Ok(edges)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -107,7 +112,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
@@ -117,11 +122,12 @@ impl Graphs {
             if !edges.is_empty() {
                 Ok(edges)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -131,7 +137,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
@@ -141,11 +147,12 @@ impl Graphs {
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
  
@@ -157,7 +164,7 @@ impl Graphs {
         attr_k: &str,
         attr_v: T,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str>
+    ) -> Result<Vec<&Edge>, GruPHstError>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
@@ -170,11 +177,12 @@ impl Graphs {
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }   
  
@@ -184,7 +192,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let edges = edges
@@ -194,11 +202,12 @@ impl Graphs {
             if !edges.is_empty() {
                 Ok(edges)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -208,7 +217,7 @@ impl Graphs {
         &mut self,
         attr_k: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
@@ -218,11 +227,12 @@ impl Graphs {
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -233,7 +243,7 @@ impl Graphs {
         attr_k: &str,
         attr_v: &Vec<u8>,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, &'static str> {
+    ) -> Result<Vec<&Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             let vrtcs = edges
@@ -243,11 +253,12 @@ impl Graphs {
             if !vrtcs.is_empty() {
                 Ok(vrtcs)
             } else {
-                error!("Any edge found for attribute: {}", attr_k);
-                Err("Any edge found for attribute")
+                warn!("Any edge found for attribute: {}", attr_k);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -258,7 +269,7 @@ impl Graphs {
         &mut self,
         id: &str,
         vault_name: Option<&str>,
-    ) -> Result<&mut Edge, &'static str> {
+    ) -> Result<&mut Edge, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get_mut(&current_vault) {
             if let Some(edge) = edges.iter_mut().find(|edge| {
@@ -268,16 +279,17 @@ impl Graphs {
             }) {
                 Ok(edge)
             } else {
-                error!("edge with id [{}] not found", id);
-                Err("edge not found")
+                warn!("edge with id [{}] not found", id);
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
     /// Find edge by id on any graphs' vault
-    pub fn find_edge_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, &'static str> {
+    pub fn find_edge_by_id_in_graphs(&mut self, id: &str) -> Result<&mut Edge, GruPHstError> {
         for (_vault_name, edges) in self.vault.iter_mut() {
             if let Some(edge) = edges.iter_mut().find(|vrtx| {
                 vrtx.get_id() == id
@@ -287,7 +299,8 @@ impl Graphs {
                 return Ok(edge);
             }
         }
-        Err("edge not found")
+        warn!("edge with id {} not found in graphs", id);
+        Err(GruPHstError::EdgeNotFound)
     }
 }
 

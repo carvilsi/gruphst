@@ -1,3 +1,6 @@
+use log::warn;
+
+use crate::errors::GruPHstError;
 use crate::graphs::Graphs;
 use crate::vertex::Vertex;
 
@@ -8,7 +11,7 @@ impl Graphs {
         &mut self,
         id: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vertex, &'static str> {
+    ) -> Result<Vertex, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             for edge in edges { 
@@ -16,21 +19,24 @@ impl Graphs {
                     return Ok(vertex);
                 }
             }
-            Err("Vertex not found")
+            warn!("Vertex with id: {} not found", id);
+            Err(GruPHstError::VertexNotFound)
         } else {
-            Err("Provided vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
     /// Returns a Vertex that provided id matches with id of From, To vertices
     /// on any graphs' vault
-    pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, &'static str> {
+    pub fn find_vertex_by_id_in_graphs(&mut self, id: &str) -> Result<Vertex, GruPHstError> {
         for (vault_name, _edges) in self.vault.clone() {
             if let Ok(vertex) = self.find_vertex_by_id(id, Some(vault_name.as_str())) {
                 return Ok(vertex);
             }
         }
-        Err("Vertex not found")
+        warn!("Vertex with id: {} not found in graphs", id);
+        Err(GruPHstError::VertexNotFound)
     }
 
     /// Retrieves all the vertices with incoming relation
@@ -39,7 +45,7 @@ impl Graphs {
         &self,
         relation_in: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<Vertex>, &'static str> {
+    ) -> Result<Vec<Vertex>, GruPHstError> {
         let mut relations_in: Vec<Vertex> = Vec::new();
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
@@ -51,12 +57,14 @@ impl Graphs {
                 }
             }
         } else {
-            return Err("Provided vault does not exists");
+            warn!("Vault {} does not exists", current_vault);
+            return Err(GruPHstError::VaultNotExists(current_vault));
         }
         if !relations_in.is_empty() {
             Ok(relations_in)
         } else {
-            Err("Any vertex found with relation in")
+            warn!("Vertex with relation in: {} not found", relation_in);
+            Err(GruPHstError::VertexNotFound)
         }
     }
 
@@ -66,7 +74,7 @@ impl Graphs {
         &self,
         relation_out: &str,
         vault_name: Option<&str>,
-    ) -> Result<Vec<Vertex>, &'static str> {
+    ) -> Result<Vec<Vertex>, GruPHstError> {
         let mut relations_out: Vec<Vertex> = Vec::new();
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
@@ -78,12 +86,14 @@ impl Graphs {
                 }
             }
         } else {
-            return Err("Provided vault does not exists");
+            warn!("Vault {} does not exists", current_vault);
+            return Err(GruPHstError::VaultNotExists(current_vault));
         }
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
-            Err("Any vertex found with relation out")
+            warn!("Vertex with relation out: {} not found", relation_out);
+            Err(GruPHstError::VertexNotFound)
         }
     }
 }

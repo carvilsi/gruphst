@@ -1,4 +1,5 @@
 use dotenv::dotenv;
+use log::warn;
 
 // TODO: add something to auto-persists, like a deamon? or something on every CUD?
 
@@ -28,7 +29,10 @@ pub fn get_max_mem_usage() -> usize {
             max_conf = max_conf * 1024.0_f32 * 1024.0_f32;
             max_conf as usize
         }
-        Err(_) => DEFAULT_GRUPHST_MAX_MEM_USAGE,
+        Err(_) => {
+            warn!("No config for {}, using default value: {}", GRUPHST_MAX_MEM_USAGE, DEFAULT_GRUPHST_MAX_MEM_USAGE);
+            DEFAULT_GRUPHST_MAX_MEM_USAGE
+        },
     }
 }
 
@@ -56,6 +60,9 @@ pub fn get_log_level() -> log::Level {
             "err" | "error" => log::Level::Error,
             _ => DEFAULT_GRUPHST_LOG_LEVEL,
         },
-        Err(_) => DEFAULT_GRUPHST_LOG_LEVEL,
+        Err(_) => {
+            warn!("No config for {}, using default value: {}", GRUPHST_LOG_LEVEL, DEFAULT_GRUPHST_LOG_LEVEL);
+            DEFAULT_GRUPHST_LOG_LEVEL
+        },
     }
 }

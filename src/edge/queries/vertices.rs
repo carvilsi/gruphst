@@ -1,4 +1,5 @@
 use crate::{edge::Edge, errors::GruPHstError, vertex::Vertex};
+use log::warn;
 
 impl Edge {
     /// Checks if "from" or "to" vertices has any attribute key
@@ -55,7 +56,8 @@ impl Edge {
         } else if self.get_to_vertex().get_id() == *id {
             Ok(self.get_to_vertex())
         } else {
-            Err(GruPHstError::VertexError)
+            warn!("Vertex not found for id: {}", id);
+            Err(GruPHstError::VertexNotFound)
         }
     }
 }

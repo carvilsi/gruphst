@@ -1,5 +1,5 @@
-use crate::graphs::Graphs;
-use log::error;
+use crate::{errors::GruPHstError, graphs::Graphs};
+use log::warn;
 
 impl Graphs {
     /// Returns an array with the unique relations in the current graph
@@ -7,10 +7,10 @@ impl Graphs {
     pub fn uniq_graph_relations(
         &self,
         graphs_name: Option<&str>,
-    ) -> Result<Vec<String>, &'static str> {
+    ) -> Result<Vec<String>, GruPHstError> {
         let mut uniq_rel = Vec::new();
-        let current_graph = self.select_vault_label(graphs_name);
-        if let Some(edges) = self.vault.get(&current_graph) {
+        let current_vault = self.select_vault_label(graphs_name);
+        if let Some(edges) = self.vault.get(&current_vault) {
             for edge in edges.iter() {
                 uniq_rel.push(edge.get_relation());
             }
@@ -18,8 +18,9 @@ impl Graphs {
             uniq_rel.dedup();
             Ok(uniq_rel)
         } else {
-            error!("no graphs in vault");
-            Err("vault does not exists")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
+
         }
     }
 

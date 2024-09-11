@@ -239,7 +239,7 @@ fn should_not_get_vertex_vec_u8_attr() {
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     let e = vertex.get_attr_vec_u8("not exists");
     assert!(e.is_err());
-    assert_eq!(e, Err(GruPHstError::AttributeError));
+    assert_eq!(e, Err(GruPHstError::AttributeNotFound));
 }
 
 #[test]

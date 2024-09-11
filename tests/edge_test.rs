@@ -1,4 +1,4 @@
-use gruphst::{edge::Edge, vertex::Vertex};
+use gruphst::{edge::Edge, errors::GruPHstError, vertex::Vertex};
 
 fn prepare_edge_test() -> (Edge, String) {
     let mut alice = Vertex::new("alice");
@@ -94,12 +94,20 @@ fn edge_upsert_attribute() {
 }
 
 #[test]
-fn edge_attribute_keys() {
+fn should_get_attribute_keys_from_edge() {
     let (edge, _id) = prepare_edge_test();
-    let keys = edge.get_attr_keys();
+    let keys = edge.get_attr_keys().unwrap();
     assert!(keys.contains(&&"type"));
     assert!(keys.contains(&&"value"));
     assert!(!keys.contains(&&"foo"));
+}
+
+#[test]
+fn should_fail_getting_attribute_keys_from_edge_without_attributes() {
+    let edge = Edge::new("empty attributes");
+    let e = edge.get_attr_keys();
+    assert!(e.is_err());
+    assert_eq!(e, Err(GruPHstError::AttributesEmpty));
 }
 
 #[test]

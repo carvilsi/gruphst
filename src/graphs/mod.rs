@@ -1,8 +1,8 @@
-use log::error;
+use log::{error, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::{edge::Edge, graphs_stats::GraphsStats, util::graphs_memory_watcher, vertex::Vertex};
+use crate::{edge::Edge, errors::GruPHstError, graphs_stats::GraphsStats, util::graphs_memory_watcher, vertex::Vertex};
 
 mod persistence;
 mod queries;
@@ -140,16 +140,18 @@ impl Graphs {
 
     /// Retrieves the collection of edges
     /// the default one or by name
-    pub fn get_edges(&self, vault_name: Option<&str>) -> Result<Vec<Edge>, &'static str> {
+    pub fn get_edges(&self, vault_name: Option<&str>) -> Result<Vec<Edge>, GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get(&current_vault) {
             Ok(edges.clone())
         } else {
-            Err("no graphs in vault")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
     /// Returns a collection with the unique vertices on a vault
+    // FIXME: missing error returning
     pub fn get_uniq_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
         let edges = self.get_edges(vault_name).unwrap();
         let mut vertices_map: HashMap<String, Vertex> = HashMap::new();
@@ -171,7 +173,7 @@ impl Graphs {
         &mut self,
         id: String,
         vault_name: Option<&str>,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get_mut(&current_vault) {
             if let Some(index) = edges.iter().position(|edge| edge.get_id() == id) {
@@ -180,10 +182,11 @@ impl Graphs {
                 Ok(())
             } else {
                 error!("Edge [{}] to delete not found", id);
-                Err("Edge to delete not found")
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("no graphs in vault")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
@@ -192,7 +195,7 @@ impl Graphs {
         &mut self,
         edge_to_update: &Edge,
         vault_name: Option<&str>,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), GruPHstError> {
         let current_vault = self.select_vault_label(vault_name);
         if let Some(edges) = self.vault.get_mut(&current_vault) {
             let index = edges
@@ -206,14 +209,16 @@ impl Graphs {
                 Ok(())
             } else {
                 error!("Edge to update with id: [{}] not found", edge_to_update.get_id());
-                Err("edge to update not found")
+                Err(GruPHstError::EdgeNotFound)
             }
         } else {
-            Err("no graphs in vault")
+            warn!("Vault {} does not exists", current_vault);
+            Err(GruPHstError::VaultNotExists(current_vault))
         }
     }
 
     /// Retrieves the current vault or returns the current one
+    // XXX: Try to change this to return an error...
     fn select_vault_label(&self, vault_label: Option<&str>) -> String {
         let mut current_vault = self.label.clone();
         if let Some(vlt) = vault_label {

@@ -7,6 +7,7 @@ use std::io::BufReader;
 use std::io::Write;
 
 use crate::config::get_max_mem_usage;
+use crate::errors::GruPHstError;
 use crate::graphs::Graphs;
 
 impl Graphs {
@@ -63,7 +64,7 @@ impl Graphs {
         let max_mem = get_max_mem_usage();
         // checks if trying to load a file over the limit of memory
         if reader.buffer().len() > max_mem {
-            return Err("Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var".into());
+            return Err(GruPHstError::PersistenceFile.into());
         }
         let readed_graph: Graphs = bincode::deserialize(reader.buffer())?;
         Ok(readed_graph)

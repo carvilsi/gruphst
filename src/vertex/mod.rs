@@ -146,7 +146,7 @@ impl Vertex {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err(GruPHstError::AttributeError)
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
@@ -159,7 +159,7 @@ impl Vertex {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err(GruPHstError::AttributeError)
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
@@ -188,7 +188,7 @@ impl Vertex {
             *attr = attr_v.to_string();
             return Ok(());
         }
-        Err(GruPHstError::AttributeError)
+        Err(GruPHstError::AttributeNotFound)
     }
 
     /// Updates the value of an attribute or creates a new one if attribute key does not exists
@@ -211,7 +211,7 @@ impl Vertex {
             Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
-                Err(GruPHstError::AttributeError)
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
@@ -250,7 +250,7 @@ impl Vertex {
     pub fn get_relations_out_on_edges(
         &self,
         edges: Vec<Edge>,
-    ) -> Result<HashMap<String, Vec<Vertex>>, &'static str> {
+    ) -> Result<HashMap<String, Vec<Vertex>>, GruPHstError> {
         let mut relations_out: HashMap<String, Vec<Vertex>> = HashMap::new();
         for edge in edges {
             if edge.get_from_vertex().get_id() == self.get_id() {
@@ -265,7 +265,7 @@ impl Vertex {
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
-            Err("no relations out for vertex")
+            Err(GruPHstError::EdgeNoRelations(String::from("out")))
         }
     }
 
@@ -273,7 +273,7 @@ impl Vertex {
     pub fn get_relations_in_on_edges(
         &self,
         edges: Vec<Edge>,
-    ) -> Result<HashMap<String, Vec<Vertex>>, &'static str> {
+    ) -> Result<HashMap<String, Vec<Vertex>>, GruPHstError> {
         let mut relations_in: HashMap<String, Vec<Vertex>> = HashMap::new();
         for edge in edges {
             if edge.get_to_vertex().get_id() == self.get_id() {
@@ -288,7 +288,7 @@ impl Vertex {
         if !relations_in.is_empty() {
             Ok(relations_in)
         } else {
-            Err("no relations in for edge")
+            Err(GruPHstError::EdgeNoRelations(String::from("in")))
         }
     }
 }
