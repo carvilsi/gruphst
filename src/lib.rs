@@ -7,6 +7,7 @@ pub mod graphs_stats;
 pub mod logger;
 mod util;
 pub mod vertex;
+pub mod errors;
 
 // TODO: add an importer/exporter thingy; to_csv, from_csv
 // TODO: Improve Error handling
