@@ -12,19 +12,14 @@ impl Graphs {
         id: &str,
         vault_name: Option<&str>,
     ) -> Result<Vertex, GruPHstError> {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get(&current_vault) {
-            for edge in edges { 
-                if let Ok(vertex) = edge.find_vertex_by_id(id) {
-                    return Ok(vertex);
-                }
+        let current_vault = self.select_vault(vault_name)?;
+        for edge in current_vault { 
+            if let Ok(vertex) = edge.find_vertex_by_id(id) {
+                return Ok(vertex);
             }
-            warn!("Vertex with id: {} not found", id);
-            Err(GruPHstError::VertexNotFound)
-        } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
         }
+        warn!("Vertex with id: {} not found", id);
+        Err(GruPHstError::VertexNotFound)
     }
 
     /// Returns a Vertex that provided id matches with id of From, To vertices
@@ -41,6 +36,7 @@ impl Graphs {
 
     /// Retrieves all the vertices with incoming relation
     /// for some provided vault_name or default when None
+    // XXX: check why not select_vault_label working???
     pub fn find_vertices_with_relation_in(
         &self,
         relation_in: &str,
