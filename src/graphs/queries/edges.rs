@@ -12,7 +12,7 @@ impl Graphs {
         relation_name: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let edges = self.select_vault(vault_name)?;
+        let edges = self.select_vault_mut(vault_name)?;
         let result = edges.iter()
             .filter(|edge| edge.get_relation() == relation_name)
             .collect::<Vec<&Edge>>();
@@ -32,7 +32,7 @@ impl Graphs {
         relations: Vec<&str>,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let vault = self.select_vault(vault_name)?;
+        let vault = self.select_vault_mut(vault_name)?;
         let edges = vault.iter()
             .filter(|edge| relations.contains(&edge.get_relation().as_str()))
             .collect::<Vec<&Edge>>();
@@ -51,7 +51,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let edges = self.select_vault(vault_name)?;
+        let edges = self.select_vault_mut(vault_name)?;
         let vrtcs = edges
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_key_like(attr_k))
@@ -71,7 +71,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let edges = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_key(attr_k))
@@ -91,7 +91,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let edges = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_str_key(attr_k))
@@ -111,7 +111,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let edges = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_str_key_like(attr_k))
@@ -126,32 +126,26 @@ impl Graphs {
  
     /// Returns a collection of edges that matches a string attribute vertex 
     /// for some provided vault_name or default when None
-    // XXX: check this one why can not use select_vault
     pub fn find_edges_with_vertex_attr_str_equals_to<T>(
         &self,
         attr_k: &str,
         attr_v: T,
         vault_name: Option<&str>,
-    ) -> Result<Vec<&Edge>, GruPHstError>
+    ) -> Result<Vec<Edge>, GruPHstError>
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get(&current_vault) {
-            let vrtcs = edges
-                .iter()
+        let current_vault = self.select_vault(vault_name)?;
+            let edges = current_vault 
+                .into_iter()
                 .filter(|edge| edge.has_vertex_with_attr_str_value_equals_to(attr_k, attr_v.clone()))
-                .collect::<Vec<&Edge>>();
-            if !vrtcs.is_empty() {
-                Ok(vrtcs)
+                .collect::<Vec<Edge>>();
+            if !edges.is_empty() {
+                Ok(edges)
             } else {
                 warn!("Any edge found for attribute: {}", attr_k);
                 Err(GruPHstError::EdgeNotFound)
             }
-        } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
-        }
     }   
  
     /// Returns a collection of edges that matches a vector u8 attribute vertex by key
@@ -161,7 +155,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let edges = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_vec_u8_key(attr_k))
@@ -181,7 +175,7 @@ impl Graphs {
         attr_k: &str,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let edges = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_vec_u8_key_like(attr_k))
@@ -202,7 +196,7 @@ impl Graphs {
         attr_v: &Vec<u8>,
         vault_name: Option<&str>,
     ) -> Result<Vec<&Edge>, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         let vrtcs = current_vault 
             .iter()
             .filter(|edge| edge.has_vertex_with_attr_vec_u8_value_equals_to(attr_k, attr_v))
@@ -222,7 +216,7 @@ impl Graphs {
         id: &str,
         vault_name: Option<&str>,
     ) -> Result<&mut Edge, GruPHstError> {
-        let current_vault = self.select_vault(vault_name)?;
+        let current_vault = self.select_vault_mut(vault_name)?;
         if let Some(edge) = current_vault
             .iter_mut()
             .find(|edge| {

@@ -273,7 +273,13 @@ fn should_return_the_unique_relations_for_certain_graph_on_vault() {
 #[test]
 fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    assert!(graphs.uniq_graph_relations(Some("foobar")).is_err());
+    assert_eq!(graphs.uniq_graph_relations(Some("foobar")), Err(GruPHstError::VaultNotExists("foobar".to_string())));
+}
+
+#[test]
+fn should_fail_uinque_graph_relations_since_vault_is_emtpy() {
+    let graphs = Graphs::init("empty");
+    assert_eq!(graphs.uniq_graph_relations(None), Err(GruPHstError::VaultEmpty));
 }
 
 #[test]

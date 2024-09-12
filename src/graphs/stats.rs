@@ -1,5 +1,4 @@
 use crate::{errors::GruPHstError, graphs::Graphs};
-use log::warn;
 
 impl Graphs {
     /// Returns an array with the unique relations in the current graph
@@ -9,19 +8,13 @@ impl Graphs {
         graphs_name: Option<&str>,
     ) -> Result<Vec<String>, GruPHstError> {
         let mut uniq_rel = Vec::new();
-        let current_vault = self.select_vault_label(graphs_name);
-        if let Some(edges) = self.vault.get(&current_vault) {
-            for edge in edges.iter() {
-                uniq_rel.push(edge.get_relation());
-            }
-            uniq_rel.sort();
-            uniq_rel.dedup();
-            Ok(uniq_rel)
-        } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
-
+        let current_vault = self.select_vault(graphs_name)?;
+        for edge in current_vault.iter() {
+            uniq_rel.push(edge.get_relation());
         }
+        uniq_rel.sort();
+        uniq_rel.dedup();
+        Ok(uniq_rel)
     }
 
     /// Returns an array with the unique relations in the whole Graphs
