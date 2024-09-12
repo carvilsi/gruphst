@@ -141,19 +141,12 @@ impl Graphs {
     /// Retrieves the collection of edges
     /// the default one or by name
     pub fn get_edges(&self, vault_name: Option<&str>) -> Result<Vec<Edge>, GruPHstError> {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get(&current_vault) {
-            Ok(edges.clone())
-        } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
-        }
+        Ok(self.select_vault(vault_name)?)
     }
 
     /// Returns a collection with the unique vertices on a vault
-    // FIXME: missing error returning
-    pub fn get_uniq_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, &'static str> {
-        let edges = self.get_edges(vault_name).unwrap();
+    pub fn get_uniq_vertices(&self, vault_name: Option<&str>) -> Result<Vec<Vertex>, GruPHstError> {
+        let edges = self.select_vault(vault_name)?;
         let mut vertices_map: HashMap<String, Vertex> = HashMap::new();
         for edge in edges {
             vertices_map.insert(edge.get_from_vertex().get_id(), edge.get_from_vertex());
@@ -174,19 +167,14 @@ impl Graphs {
         id: String,
         vault_name: Option<&str>,
     ) -> Result<(), GruPHstError> {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get_mut(&current_vault) {
-            if let Some(index) = edges.iter().position(|edge| edge.get_id() == id) {
-                edges.remove(index);
-                graphs_memory_watcher(self);
-                Ok(())
-            } else {
-                error!("Edge [{}] to delete not found", id);
-                Err(GruPHstError::EdgeNotFound)
-            }
+        let edges = self.select_vault_mut(vault_name)?;
+        if let Some(index) = edges.iter().position(|edge| edge.get_id() == id) {
+            edges.remove(index);
+            graphs_memory_watcher(self);
+            Ok(())
         } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
+            error!("Edge [{}] to delete not found", id);
+            Err(GruPHstError::EdgeNotFound)
         }
     }
 
@@ -196,34 +184,57 @@ impl Graphs {
         edge_to_update: &Edge,
         vault_name: Option<&str>,
     ) -> Result<(), GruPHstError> {
-        let current_vault = self.select_vault_label(vault_name);
-        if let Some(edges) = self.vault.get_mut(&current_vault) {
-            let index = edges
-                .iter()
-                .position(|vertex| vertex.get_id() == edge_to_update.get_id());
-            if index.is_some() {
-                let i = index.unwrap();
-                edges.remove(i);
-                edges.push(edge_to_update.clone());
-                graphs_memory_watcher(self);
-                Ok(())
-            } else {
-                error!("Edge to update with id: [{}] not found", edge_to_update.get_id());
-                Err(GruPHstError::EdgeNotFound)
-            }
+        let edges: &mut Vec<Edge> = self.select_vault_mut(vault_name)?;
+        let index = edges
+            .iter()
+            .position(|vertex| vertex.get_id() == edge_to_update.get_id());
+        if index.is_some() {
+            let i = index.unwrap();
+            edges.remove(i);
+            edges.push(edge_to_update.clone());
+            graphs_memory_watcher(self);
+            Ok(())
         } else {
-            warn!("Vault {} does not exists", current_vault);
-            Err(GruPHstError::VaultNotExists(current_vault))
+            error!("Edge to update with id: [{}] not found", edge_to_update.get_id());
+            Err(GruPHstError::EdgeNotFound)
         }
     }
 
     /// Retrieves the current vault or returns the current one
-    // XXX: Try to change this to return an error...
     fn select_vault_label(&self, vault_label: Option<&str>) -> String {
         let mut current_vault = self.label.clone();
         if let Some(vlt) = vault_label {
             current_vault = vlt.to_string();
         }
         current_vault.to_string()
+    }
+
+    fn select_vault_not_exists_error(vault: String) -> GruPHstError {
+        warn!("Vault {} does not exists", vault);
+        GruPHstError::VaultNotExists(vault)
+    }
+
+    fn select_vault_mut(&mut self, vault_label: Option<&str>) -> Result<&mut Vec<Edge>, GruPHstError> {
+        let vault = self.select_vault_label(vault_label);
+        if let Some(edges) = self.vault.get_mut(&vault) {
+            match edges.is_empty() {
+                false => Ok(edges),
+                true => Err(GruPHstError::VaultEmpty),
+            }
+        } else {
+            Err(Graphs::select_vault_not_exists_error(vault)) 
+        }
+    }
+
+    fn select_vault(&self, vault_label: Option<&str>) -> Result<Vec<Edge>, GruPHstError> {
+        let vault = self.select_vault_label(vault_label);
+        if let Some(edges) = self.vault.get(&vault) {
+            match edges.is_empty() {
+                false => Ok(edges.clone()),
+                true => Err(GruPHstError::VaultEmpty),
+            }
+        } else {
+            Err(Graphs::select_vault_not_exists_error(vault)) 
+        }
     }
 }

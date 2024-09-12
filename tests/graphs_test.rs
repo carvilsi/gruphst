@@ -135,6 +135,13 @@ fn should_not_find_edges_by_relation_since_vault_does_not_exists() {
 }
 
 #[test]
+fn should_not_find_edges_by_relation_since_vault_is_empty() {
+    let mut graphs = Graphs::init("empty");
+    let e = graphs.find_edges_by_relation("friend of", Some("empty"));
+    assert_eq!(e, Err(GruPHstError::VaultEmpty));
+}
+
+#[test]
 fn should_edges_find_by_relation_in_graphs() {
     let mut graphs = prepare_graphs_test();
     let mut vertices_found = graphs.find_edges_by_relation("friend of", None).unwrap();
@@ -266,7 +273,13 @@ fn should_return_the_unique_relations_for_certain_graph_on_vault() {
 #[test]
 fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    assert!(graphs.uniq_graph_relations(Some("foobar")).is_err());
+    assert_eq!(graphs.uniq_graph_relations(Some("foobar")), Err(GruPHstError::VaultNotExists("foobar".to_string())));
+}
+
+#[test]
+fn should_fail_uinque_graph_relations_since_vault_is_emtpy() {
+    let graphs = Graphs::init("empty");
+    assert_eq!(graphs.uniq_graph_relations(None), Err(GruPHstError::VaultEmpty));
 }
 
 #[test]
@@ -407,6 +420,12 @@ fn should_fail_getting_edges_since_vault_does_note_exists() {
 }
 
 #[test]
+fn should_fail_getting_edges_since_vault_is_empty() {
+    let graphs = Graphs::init("empty graphs");
+    assert_eq!(graphs.get_edges(Some("empty graphs")), Err(GruPHstError::VaultEmpty));
+}
+
+#[test]
 fn should_update_graph() {
     let mut my_graphs = Graphs::init("my-graphs");
 
@@ -494,6 +513,20 @@ fn should_return_uniq_vertices_from_graph() {
     assert!(labels.contains(&"Alice".to_string()));
     assert!(labels.contains(&"Bob".to_string()));
     assert!(labels.contains(&"Fred".to_string()));
+}
+
+#[test]
+fn should_fail_returning_unique_vertices_vault_does_not_exists() {
+    let graphs = prepare_graphs_test();
+    let e = graphs.get_uniq_vertices(Some("!exists"));
+    assert_eq!(e, Err(GruPHstError::VaultNotExists("!exists".to_string())));
+}
+
+#[test]
+fn should_fail_returning_unique_vertices_vault_is_empty() {
+    let graphs = Graphs::init("vault void");
+    let e = graphs.get_uniq_vertices(Some("vault void"));
+    assert_eq!(e, Err(GruPHstError::VaultEmpty));
 }
 
 #[test]
