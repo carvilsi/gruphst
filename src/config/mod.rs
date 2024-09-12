@@ -41,7 +41,7 @@ const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Error;
 
 /// Read log level configuration from .env file
 /// or setted environmental variable
-/// if not exists returns default leve that is Info
+/// if not exists returns default level that is Info
 ///
 /// # Example
 /// ```rust
@@ -63,6 +63,30 @@ pub fn get_log_level() -> log::Level {
         Err(_) => {
             warn!("No config for {}, using default value: {}", GRUPHST_LOG_LEVEL, DEFAULT_GRUPHST_LOG_LEVEL);
             DEFAULT_GRUPHST_LOG_LEVEL
+        },
+    }
+}
+
+const GRUPHST_CSV_DELIMITER: &str = "GRUPHST_CSV_DELIMITER";
+const DEFAULT_GRUPHST_CSV_DELIMITER: u8 = b';';
+
+/// Read CSV delimiter configuration from .env file
+/// or setted environmental variable
+/// if not exists returns default character that is ";" 
+///
+/// # Example
+/// ```rust
+/// use gruphst::config::get_csv_delimiter;
+///
+/// let csv_delimiter = get_csv_delimiter();
+/// ```
+pub fn get_csv_delimiter() -> u8 {
+    dotenv().ok();
+    match dotenv::var(GRUPHST_CSV_DELIMITER) {
+        Ok(value) => value.as_bytes()[0],
+        Err(_) => {
+            warn!("No config for {}, using default value: {}", GRUPHST_CSV_DELIMITER, DEFAULT_GRUPHST_CSV_DELIMITER);
+            DEFAULT_GRUPHST_CSV_DELIMITER
         },
     }
 }

@@ -12,3 +12,9 @@ fn should_retrieve_logging_level_configuration() {
     let config_log_level = get_log_level();
     assert_eq!(config_log_level, log::Level::Error);
 }
+
+#[test]
+fn should_retrieve_csv_delimiter_character_configuration() {
+    let csv_delimiter: u8 = get_csv_delimiter();
+    assert_eq!(csv_delimiter, b';');
+}
