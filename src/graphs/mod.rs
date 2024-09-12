@@ -227,9 +227,9 @@ impl Graphs {
         current_vault.to_string()
     }
 
-    fn select_vautl(&mut self, vault_label: Option<&str>) -> Result<&mut Vec<Edge>, GruPHstError> {
+    fn select_vautl(&mut self, vault_label: Option<&str>) -> Result<&Vec<Edge>, GruPHstError> {
         let vault = self.select_vault_label(vault_label);
-        if let Some(edges) = self.vault.get_mut(&vault) {
+        if let Some(edges) = self.vault.get(&vault) {
             Ok(edges)
         } else {
             warn!("Vault {} does not exists", vault);
