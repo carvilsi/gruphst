@@ -4,28 +4,33 @@ use gruphst::vertex::Vertex;
 
 fn prepare_persistence_test() -> (Graphs, Edge, Edge) {
     let mut gru = Graphs::init("graphs-a");
-    let mut edge1 = Vertex::new("a edge");
-    edge1.set_attr("foo", "bar");
-    let edge2 = Vertex::new("b edge");
-    let edge1 = Edge::create(&edge1, "relation a-b", &edge2);
+    
+    let mut vertex1 = Vertex::new("a edge");
+    vertex1.set_attr("foo", "bar");
+    
+    let vertex2 = Vertex::new("b edge");
+
+    let edge1 = Edge::create(&vertex1, "relation a-b", &vertex2);
     gru.add_edge(&edge1, None);
 
-    let edge3 = Vertex::new("c edge");
-    let edge4 = Vertex::new("d edge");
-    let edge2 = Edge::create(&edge3, "relation c-d", &edge4);
+    let vertex3 = Vertex::new("c edge");
+
+    let vertex4 = Vertex::new("d edge");
+
+    let edge2 = Edge::create(&vertex3, "relation c-d", &vertex4);
     gru.add_edge(&edge2, None);
 
     (gru, edge1, edge2)
 }
 
 fn assertion_persisted_graphs(grphs: Graphs, name: String, edge1: Edge, edge2: Edge) {
-    let graphs = grphs.get_edges(Some(name.as_str())).unwrap();
+    let edges = grphs.get_edges(Some(name.as_str())).unwrap();
     assert_eq!(grphs.get_label(), name);
-    assert_eq!(graphs[0].get_relation(), edge1.get_relation());
-    assert_eq!(graphs[0].get_from_vertex().get_label(), "a edge");
-    assert_eq!(graphs[0].get_from_vertex().attrs_len(), 1);
-    assert_eq!(graphs[0].get_from_vertex().get_attr("foo").unwrap(), "bar");
-    assert_eq!(graphs[1], edge2);
+    assert_eq!(edges[0].get_relation(), edge1.get_relation());
+    assert_eq!(edges[0].get_from_vertex().get_label(), "a edge");
+    assert_eq!(edges[0].get_from_vertex().attrs_len(), 1);
+    assert_eq!(edges[0].get_from_vertex().get_attr("foo").unwrap(), "bar");
+    assert_eq!(edges[1], edge2);
 }
 
 #[test]

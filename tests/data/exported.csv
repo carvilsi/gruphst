@@ -1,0 +1,3 @@
+from_label;from_attributes;relation;to_label;to_attributes
+gandalf;known as: Gandalf the Gray | name: Gandalf;friend of;frodo;name: Frodo Bolson
+sam;surname: Gamgee;best firend of;frodo;name: Frodo Bolson

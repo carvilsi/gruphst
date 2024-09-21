@@ -3,3 +3,4 @@ tags
 gruphst.bin
 *.grphst
 tarpaulin-report.html
+tests/data/export_custom.csv
