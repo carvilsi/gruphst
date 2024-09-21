@@ -1,11 +1,11 @@
-use gruphst::edge::Edge;
+use gruphst::{edge::Edge, errors::GruPHstError};
 use gruphst::graphs::Graphs;
 use gruphst::vertex::Vertex;
 use gruphst::exporter_importer::csv::*;
 use std::fs::{read_to_string, File};
 
 fn prepare_export_import_test() -> (Graphs, Edge, Edge) {
-    let mut gru = Graphs::init("graphs-a");
+    let mut gru = Graphs::init("shire-friendships");
     
     let mut vertex1 = Vertex::new("gandalf");
     vertex1.set_attr("name", "Gandalf");
@@ -37,13 +37,7 @@ fn assertion_persisted_graphs(grphs: Graphs, name: String, edge1: Edge, edge2: E
     assert_eq!(edges[1], edge2);
 }
 
-#[test]
-fn should_export_to_csv_custom_file_name_and_path() {
-    let (gru, _edge1, _edge2) = prepare_export_import_test();
-    
-    export_to_csv_gruphst_format(&gru, Some("./tests/data/"), Some("export_custom")).unwrap();
-    
-    let csv_file_path = "./tests/data/export_custom.csv";
+fn assertion_exported_csv_file(csv_file_path: &str) {
     let exported_file = File::open(csv_file_path).unwrap();
     assert!(exported_file.metadata().unwrap().len() != 0);
     
@@ -61,5 +55,50 @@ fn should_export_to_csv_custom_file_name_and_path() {
     assert!(second_row.contains("known as: Gandalf the Gray"));
     assert!(second_row.contains(";friend of;frodo;name: Frodo Bolson"));
     assert_eq!(csv_lines.next().unwrap(), &row3);
+
+}
+
+#[test]
+fn should_export_to_csv_custom_file_name_and_path() {
+    let (gru, _edge1, _edge2) = prepare_export_import_test();
     
+    export_to_csv_gruphst_format(&gru, Some("./tests/data/"), Some("export_custom")).unwrap();
+    
+    let csv_file_path = "./tests/data/export_custom.csv";
+    
+    assertion_exported_csv_file(csv_file_path);
+}
+
+#[test]
+fn should_export_to_csv_default_file_name_and_path() {
+    let (gru, _edge1, _edge2) = prepare_export_import_test();
+    
+    export_to_csv_gruphst_format(&gru, Some("./tests/data/"), None).unwrap();
+    
+    let csv_file_path = "./tests/data/shire-friendships.csv";
+    assertion_exported_csv_file(csv_file_path);
+}
+
+#[test]
+fn should_export_to_csv_default_file_name_and_default_path() {
+    let (gru, _edge1, _edge2) = prepare_export_import_test();
+    
+    export_to_csv_gruphst_format(&gru, None, None).unwrap();
+    
+    let csv_file_path = "shire-friendships.csv";
+    assertion_exported_csv_file(csv_file_path);
+}
+
+#[test]
+fn should_fail_export_to_csv_on_non_existent_path() {
+    let (gru, _edge1, _edge2) = prepare_export_import_test();
+
+    assert!(export_to_csv_gruphst_format(&gru, Some("/foobar"), None).is_err());
+}
+
+#[test]
+fn should_fail_export_to_csv_on_empty_graph() {
+    let gru = Graphs::init("empty");
+    let e = export_to_csv_gruphst_format(&gru, Some("./tests/data/"), None);
+    assert!(e.is_err());
 }
