@@ -27,16 +27,6 @@ fn prepare_export_import_test() -> (Graphs, Edge, Edge) {
     (gru, edge, edge2)
 }
 
-fn assertion_imported_graphs_from_csv(grphs: Graphs, name: String, edge1: Edge, edge2: Edge) {
-    let edges = grphs.get_edges(Some(name.as_str())).unwrap();
-    assert_eq!(grphs.get_label(), name);
-    assert_eq!(edges[0].get_relation(), edge1.get_relation());
-    assert_eq!(edges[0].get_from_vertex().get_label(), "a edge");
-    assert_eq!(edges[0].get_from_vertex().attrs_len(), 1);
-    assert_eq!(edges[0].get_from_vertex().get_attr("foo").unwrap(), "bar");
-    assert_eq!(edges[1], edge2);
-}
-
 fn assertion_exported_csv_file(csv_file_path: &str) {
     let exported_file = File::open(csv_file_path).unwrap();
     assert!(exported_file.metadata().unwrap().len() != 0);
@@ -101,4 +91,20 @@ fn should_fail_export_to_csv_on_empty_graph() {
     let gru = Graphs::init("empty");
     let e = export_to_csv_gruphst_format(&gru, Some("./tests/data/"), None);
     assert!(e.is_err());
+}
+
+fn should_import_from_csv_file() {
+    let csv_file_path = "./tests/data/exported.csv";
+    let graphs: Graphs = import_from_csv_gruphst_format(csv_file_path).unwrap();
+    let edges: Vec<Edge> = graphs.get_edges(None).unwrap();
+    assert_eq!(edges[0].get_relation(), "friend of");
+    assert_eq!(edges[1].get_relation(), "best friend of");
+    assert_eq!(edges[0].get_from_vertex().get_label(), "gandalf");
+    assert_eq!(edges[0].get_from_vertex().get_attr("known as"), "Gandalf the Gray");
+    assert_eq!(edges[0].get_from_vertex().get_attr("name"), "Gandalf");
+    assert_eq!(edges[0].get_to_vertex().get_label(), "frodo");
+    assert_eq!(edges[1].get_from_vertex().get_label(), "sam");
+    assert_eq!(edges[1].get_from_vertex().get_attr("surname"), "Gamgee");
+    assert_eq!(edges[1].get_to_vertex().get_label(), "frodo");
+    assert_eq!(edges[1].get_to_vertex().get_attr(name), "Frodo Bolson");
 }

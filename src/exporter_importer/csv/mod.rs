@@ -64,6 +64,9 @@ fn collect_graphs_csv_rows_values(
     Ok(csv_rows)
 } 
 
+/// Exports Graphs to csv format
+/// with semicolon ';' as default delimiter,
+/// for custom delimiter character check config file
 pub fn export_to_csv_gruphst_format(
     graphs: &Graphs,
     csv_file_path: Option<&str>,
