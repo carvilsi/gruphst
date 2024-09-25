@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use serde::{Deserialize, Serialize};
-use crate::{config::get_csv_delimiter, graphs::Graphs, vertex::Vertex, edge::Edge};
+use crate::{config::get_csv_delimiter, edge::Edge, graphs::Graphs, vertex::Vertex};
 
 /// Structure of CSV file
 /// from_label; from_attributes; relation; to_label; to_attributes

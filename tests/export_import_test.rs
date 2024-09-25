@@ -27,7 +27,7 @@ fn prepare_export_import_test() -> (Graphs, Edge, Edge) {
     (gru, edge, edge2)
 }
 
-fn assertion_persisted_graphs(grphs: Graphs, name: String, edge1: Edge, edge2: Edge) {
+fn assertion_imported_graphs_from_csv(grphs: Graphs, name: String, edge1: Edge, edge2: Edge) {
     let edges = grphs.get_edges(Some(name.as_str())).unwrap();
     assert_eq!(grphs.get_label(), name);
     assert_eq!(edges[0].get_relation(), edge1.get_relation());

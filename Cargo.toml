@@ -1,6 +1,6 @@
 [package]
 name = "gruphst"
-version = "1.0.0"
+version = "0.15.0"
 edition = "2021"
 description = "An in-memory graph database"
 license = "MIT"

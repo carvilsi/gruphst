@@ -11,6 +11,7 @@ use crate::errors::GruPHstError;
 use crate::graphs::Graphs;
 
 impl Graphs {
+
     /// Saves the current Graphs into a file with the Graphs's name
     /// # Examples
     /// ```rust
@@ -24,9 +25,39 @@ impl Graphs {
     ///
     /// // will write a file called 'Middle-earth.grphst' with
     /// // the content of the graphs
-    /// graphs.persists(None);
+    /// graphs.persists();
     /// ```
-    pub fn persists(&self, file_path: Option<&str>) -> Result<(), Box<dyn Error>> {
+    #[deprecated(since = "0.15.0", note = "please, for good, use `save` method instead")]
+    pub fn persists(&self) -> Result<(), Box<dyn Error>> {
+        let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(file_name.clone())?;
+        let bytes = bincode::serialize(self)?;
+        file.write_all(&bytes)?;
+        info!("Current Graphs persisted at {} file with {} bytes written", file_name, bytes.len());
+        Ok(())
+    }
+
+    /// Saves the current Graphs into a file with the Graphs's name
+    /// or in the provided path and failename
+    /// # Examples
+    /// ```rust
+    /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
+    ///  
+    /// let edge = Edge::create(
+    ///     &Vertex::new("Sauron"),
+    ///     "created",
+    ///     &Vertex::new("One Ring"));
+    /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
+    ///
+    /// // will write a file called 'Middle-earth.grphst' with
+    /// // the content of the graphs
+    /// graphs.save(None);
+    /// ```
+    pub fn save(&self, file_path: Option<&str>) -> Result<(), Box<dyn Error>> {
         let file_name = match file_path {
             Some(fp) => format!("{}{}.grphst", fp, self.get_label().replace(' ', "_")),
             None => format!("{}.grphst", self.get_label().replace(' ', "_")),
@@ -52,7 +83,7 @@ impl Graphs {
     ///     "created",
     ///     &Vertex::new("One Ring"));
     /// let mut graphs = Graphs::init_with("Middle-earth", &edge);
-    /// graphs.persists(None);
+    /// graphs.save(None);
     ///
     /// let loaded_graphs = Graphs::load("Middle-earth.grphst").unwrap();
     /// ```
