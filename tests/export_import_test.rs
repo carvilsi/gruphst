@@ -39,6 +39,14 @@ fn prepare_export_import_test() -> Graphs {
     gru
 }
 
+fn assertion_gandalf_line(line: &str) {
+    assert!(line.contains("|"));
+    assert!(line.contains("name: Gandalf"));
+    assert!(line.contains("gandalf;"));
+    assert!(line.contains("known as: Gandalf the Gray"));
+    assert!(line.contains(";friend of;frodo;name: Frodo Bolson"));
+}
+
 fn assertion_exported_csv_file(csv_file_path: &str) {
     let exported_file = File::open(csv_file_path).unwrap();
     assert!(exported_file.metadata().unwrap().len() != 0);
@@ -52,18 +60,22 @@ fn assertion_exported_csv_file(csv_file_path: &str) {
     let mut csv_lines = binding.lines(); 
     
     assert_eq!(csv_lines.next().unwrap(), &row1);
-    assert_eq!(csv_lines.next().unwrap(), &row2);
-    assert_eq!(csv_lines.next().unwrap(), &row3);
-    let fourth_row = csv_lines.next().unwrap();
-    assert!(fourth_row.contains("|"));
-    assert!(fourth_row.contains("name: Gandalf"));
-    assert!(fourth_row.contains("gandalf;"));
-    assert!(fourth_row.contains("known as: Gandalf the Gray"));
-    assert!(fourth_row.contains(";friend of;frodo;name: Frodo Bolson"));
-    assert_eq!(csv_lines.next().unwrap(), &row5);
+    let line = csv_lines.next().unwrap();
+    if line == &row2 {
+        assert_eq!(csv_lines.next().unwrap(), &row3);
+        let fourth_row = csv_lines.next().unwrap();
+        assertion_gandalf_line(fourth_row);
+        assert_eq!(csv_lines.next().unwrap(), &row5);
+    } else {
+        assertion_gandalf_line(line);
+        assert_eq!(csv_lines.next().unwrap(), row5);        
+        assert_eq!(csv_lines.next().unwrap(), row2);        
+        assert_eq!(csv_lines.next().unwrap(), row3);        
+    }
+    
 }
 
-// #[test]
+#[test]
 fn should_export_to_csv_custom_file_name_and_path() {
     let gru = prepare_export_import_test();
     
@@ -84,7 +96,7 @@ fn should_export_to_csv_default_file_name_and_path() {
     assertion_exported_csv_file(csv_file_path);
 }
 
-// #[test]
+#[test]
 fn should_export_to_csv_default_file_name_and_default_path() {
     let gru = prepare_export_import_test();
     
@@ -94,7 +106,7 @@ fn should_export_to_csv_default_file_name_and_default_path() {
     assertion_exported_csv_file(csv_file_path);
 }
 
-// #[test]
+#[test]
 fn should_fail_export_to_csv_on_non_existent_path() {
     let gru = prepare_export_import_test();
 

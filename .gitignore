@@ -4,6 +4,6 @@ gruphst.bin
 *.grphst
 tarpaulin-report.html
 tests/data/export_custom.csv
-tests/data/shire-friendships.csv
+tests/data/middle-earth-enemies.csv
 tests/data/empty.csv
-shire-friendships.csv
+middle-earth-enemies.csv

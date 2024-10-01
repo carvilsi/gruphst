@@ -283,6 +283,11 @@ fn should_fail_uinque_graph_relations_since_vault_is_emtpy() {
 }
 
 #[test]
+fn should_fail_since_graphs_vault_is_emtpy() {
+    let graphs = Graphs::init("empty");
+    assert_eq!(graphs.get_vaults(), Err(GruPHstError::NoVaultOnGrpahs));
+}
+#[test]
 fn equals_attributes() {
     let graphs = prepare_graphs_test();
     let results = graphs.find_edges_with_vertex_attr_str_equals_to("age", 42, None).unwrap();

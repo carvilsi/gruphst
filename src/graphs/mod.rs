@@ -98,8 +98,18 @@ impl Graphs {
         self.stats.clone()
     }
 
-    pub fn get_vaults(&self) -> HashMap<String, Vec<Edge>> {
-        self.vault.clone()
+    pub fn get_vaults(&self) -> Result<HashMap<String, Vec<Edge>>, GruPHstError> {
+        let vaults = self.vault.clone();
+        if vaults.values().len() == 1  {
+            for val in vaults.values() {
+                if val.len() == 0 {
+                    return Err(GruPHstError::NoVaultOnGrpahs);
+                }
+            }
+            Ok(vaults)
+        } else {
+            Ok(vaults)
+        }
     }
 
     /// Adds a Edge element to the Graphs' vault
