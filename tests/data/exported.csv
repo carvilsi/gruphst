@@ -1,3 +1,5 @@
-from_label;from_attributes;relation;to_label;to_attributes
-gandalf;known as: Gandalf the Gray | name: Gandalf;friend of;frodo;name: Frodo Bolson
-sam;surname: Gamgee;best firend of;frodo;name: Frodo Bolson
+graphs_vault;from_label;from_attributes;relation;to_label;to_attributes
+middle-earth-enemies;saruman;known as: Saruman of Many Colours;ally of;sauron;identified as: Necromancer
+middle-earth-enemies;sauron;identified as: Necromancer;lord of;saruman;known as: Saruman of Many Colours
+shire-friendships;gandalf;known as: Gandalf the Gray | name: Gandalf;friend of;frodo;name: Frodo Bolson
+shire-friendships;sam;surname: Gamgee;best friend of;frodo;name: Frodo Bolson

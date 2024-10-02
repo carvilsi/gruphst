@@ -285,7 +285,7 @@ fn should_fail_uinque_graph_relations_since_vault_is_emtpy() {
 #[test]
 fn should_fail_since_graphs_vault_is_emtpy() {
     let graphs = Graphs::init("empty");
-    assert_eq!(graphs.get_vaults(), Err(GruPHstError::NoVaultOnGrpahs));
+    assert_eq!(graphs.get_vaults(), Err(GruPHstError::NoVaultOnGraphs));
 }
 #[test]
 fn equals_attributes() {

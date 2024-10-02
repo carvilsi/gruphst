@@ -103,7 +103,7 @@ impl Graphs {
         if vaults.values().len() == 1  {
             for val in vaults.values() {
                 if val.len() == 0 {
-                    return Err(GruPHstError::NoVaultOnGrpahs);
+                    return Err(GruPHstError::NoVaultOnGraphs);
                 }
             }
             Ok(vaults)

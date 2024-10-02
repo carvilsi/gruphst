@@ -27,7 +27,7 @@ impl Graphs {
     /// // the content of the graphs
     /// graphs.persists();
     /// ```
-    #[deprecated(since = "0.15.0", note = "please, for good, use `save` method instead")]
+    #[deprecated(since = "1.0.0", note = "please, for good, use `save` method instead")]
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
         let mut file = OpenOptions::new()

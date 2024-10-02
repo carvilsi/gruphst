@@ -17,11 +17,13 @@ pub enum GruPHstError {
     #[error("Provided vault: \"{0}\" does not exists")]
     VaultNotExists(String),
     #[error("No vaults on Grpahs")]
-    NoVaultOnGrpahs,
+    NoVaultOnGraphs,
     #[error("Persisted file excedes max memory usage, check GRUPHST_MAX_MEM_USAGE var")]
     PersistenceFile,
     #[error("Not valid file on path")]
-    NotValidFilenameOnPath,
+    NotValidFileNameOnPath,
+    #[error("CSV file empty")]
+    CSVEmpty,
     #[error("Unknown GruPHst Error")]
     Unknown
 }
