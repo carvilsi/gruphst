@@ -22,6 +22,20 @@ pub struct CSVRow {
     to_attributes: String,
 }
 
+impl CSVRow {
+    fn generate_vertices(&self) -> (Vertex, Vertex) {
+        let mut vertex_from = Vertex::new(&self.from_label);
+        if !self.from_attributes.is_empty() {
+            process_vertex_attributes(&mut vertex_from, &self.from_attributes);
+        }
+        let mut vertex_to = Vertex::new(&self.to_label);
+        if !self.to_attributes.is_empty() {
+            process_vertex_attributes(&mut vertex_to, &self.to_attributes);
+        }
+        (vertex_from, vertex_to)
+    }
+}
+
 fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
     let attr_str_keys = vertex.get_attr_keys();
     let mut res = String::new();
@@ -123,17 +137,7 @@ fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
     }
 }
 
-fn generate_vertices(csv_row: &CSVRow) -> (Vertex, Vertex) {
-    let mut vertex_from = Vertex::new(&csv_row.from_label);
-    if !csv_row.from_attributes.is_empty() {
-        process_vertex_attributes(&mut vertex_from, &csv_row.from_attributes);
-    }
-    let mut vertex_to = Vertex::new(&csv_row.to_label);
-    if !csv_row.to_attributes.is_empty() {
-        process_vertex_attributes(&mut vertex_to, &csv_row.to_attributes);
-    }
-    (vertex_from, vertex_to)
-}
+
 
 fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
     for csv_row in csv_rows {
@@ -145,7 +149,7 @@ fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>) -> Result
     let mut graphs = Graphs::init(graphs_name);
     create_vaults_from_csv(&mut graphs, csv_rows);
     for csv_row in csv_rows {
-        let (vertex_from, vertex_to) = generate_vertices(&csv_row);
+        let (vertex_from, vertex_to) = &csv_row.generate_vertices();
         let edge = Edge::create(&vertex_from, &csv_row.relation, &vertex_to);
         graphs.add_edge(&edge, Some(&csv_row.graphs_vault));
     }
