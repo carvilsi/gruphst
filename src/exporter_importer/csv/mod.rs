@@ -114,7 +114,7 @@ pub fn export_to_csv_gruphst_format(
         .delimiter(csv_delimiter)
         .from_path(filename.as_str())?;
     let csv_rows: Vec<CSVRow> = collect_graphs_csv_rows(graphs)?;
-    for csv_row in csv_rows {
+    for csv_row in csv_rows.iter() {
         wtr.serialize(csv_row)?;
     }
     wtr.flush()?;
@@ -129,7 +129,7 @@ fn fill_vertex_attributes(vertex: &mut Vertex, attr_str: &str) {
 fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
     if attrs_str.contains("|") {
         let raw_attrs_vec: Vec<&str> = attrs_str.split('|').collect();
-        for attr_str in raw_attrs_vec {
+        for attr_str in raw_attrs_vec.iter() {
             fill_vertex_attributes(vertex, &attr_str);
         }
     } else {
@@ -138,7 +138,7 @@ fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
 }
 
 fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
-    for csv_row in csv_rows {
+    for csv_row in csv_rows.iter() {
         graphs.insert(&csv_row.graphs_vault);
     }
 }
@@ -146,7 +146,7 @@ fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
 fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>) -> Result<Graphs, GruPHstError> {
     let mut graphs = Graphs::init(graphs_name);
     create_vaults_from_csv(&mut graphs, csv_rows);
-    for csv_row in csv_rows {
+    for csv_row in csv_rows.iter() {
         let (vertex_from, vertex_to) = &csv_row.generate_vertices();
         let edge = Edge::create(&vertex_from, &csv_row.relation, &vertex_to);
         graphs.add_edge(&edge, Some(&csv_row.graphs_vault));
