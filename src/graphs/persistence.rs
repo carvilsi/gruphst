@@ -13,6 +13,8 @@ use crate::graphs::Graphs;
 impl Graphs {
 
     /// Saves the current Graphs into a file with the Graphs's name
+    /// <div class="warning">Deprecated method; will be removed on ver. 1.0.0</div>
+    /// 
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
@@ -27,7 +29,7 @@ impl Graphs {
     /// // the content of the graphs
     /// graphs.persists();
     /// ```
-    #[deprecated(since = "1.0.0", note = "please, for good, use `save` method instead")]
+    #[deprecated(since = "0.15.0", note = "please, for good, use `save` method instead")]
     pub fn persists(&self) -> Result<(), Box<dyn Error>> {
         let file_name = format!("{}.grphst", self.get_label().replace(' ', "_"));
         let mut file = OpenOptions::new()

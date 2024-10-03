@@ -145,7 +145,7 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.13.0"`
+`gruphst = "0.15.0"`
 
 ## Tests & Coverage & Benchmarking
 

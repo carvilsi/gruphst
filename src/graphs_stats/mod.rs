@@ -84,7 +84,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
     // lets count the amount of attributes in the graph
     let mut attr_counter = 0;
     for (_name, edges) in grphs.get_vaults()?.iter() {
-        for edge in edges {
+        for edge in edges.iter() {
             attr_counter += edge.get_from_vertex().attrs_len();
             attr_counter += edge.get_to_vertex().attrs_len();
             attr_counter += edge.attr_len();
