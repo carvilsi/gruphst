@@ -28,3 +28,7 @@ criterion = { version = "0.5", features = ["html_reports"] }
 [[bench]]
 name = "gruphst_memory_watcher"
 harness = false
+
+[[bench]]
+name = "gruphst_import_from_csv"
+harness = false

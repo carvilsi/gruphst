@@ -163,3 +163,19 @@ fn should_fail_import_from_csv_file_since_file_is_empty() {
     let e = import_from_csv_gruphst_format(csv_file_path);
     assert!(e.is_err());
 }
+
+#[test]
+fn should_fail_import_from_csv_file_since_row_miss_a_relation() {
+    let csv_file_path = "./tests/data/exported-wrong.csv";
+    let e = import_from_csv_gruphst_format(csv_file_path);
+    println!("----- {:#?}", e);
+    
+    assert!(e.is_err());
+}
+
+#[test]
+fn should_fail_import_from_csv_file_since_one_header_value_is_missing() {
+    let csv_file_path = "./tests/data/exported-wrong-header.csv";
+    let e = import_from_csv_gruphst_format(csv_file_path);
+    assert!(e.is_err());
+}

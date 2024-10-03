@@ -12,7 +12,7 @@ pub enum GruPHstError {
     EdgeNotFound,
     #[error("No relations: \"{0}\" on Edges")]
     EdgeNoRelations(String),
-    #[error("Vault is empy; no Edges")]
+        #[error("Vault is empy; no Edges")]
     VaultEmpty,
     #[error("Provided vault: \"{0}\" does not exists")]
     VaultNotExists(String),
@@ -24,6 +24,8 @@ pub enum GruPHstError {
     NotValidFileNameOnPath,
     #[error("CSV file empty")]
     CSVEmpty,
+    #[error("CSV row missing relation value for edge")]
+    CSVEdgeMissingRelation,
     #[error("Unknown GruPHst Error")]
     Unknown
 }

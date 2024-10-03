@@ -82,7 +82,6 @@ fn collect_graphs_csv_rows(
 /// with semicolon ';' as default delimiter,
 /// for custom delimiter character check config file
 /// variable GRUPHST_CSV_DELIMITER
-// FIXME: add the rest of the graphs in the vault
 pub fn export_to_csv_gruphst_format(
     graphs: &Graphs,
     csv_file_path: Option<&str>,
@@ -156,6 +155,10 @@ fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>) -> Result
     Ok(graphs)
 }
 
+/// Imports Graphs from csv format file
+/// with semicolon ';' as default delimiter,
+/// for custom delimiter character check config file
+/// variable GRUPHST_CSV_DELIMITER
 pub fn import_from_csv_gruphst_format(csv_file_path: &str) -> Result<Graphs, Box<dyn Error>> {
     let csv_delimiter = get_csv_delimiter();
     let graph_name = get_file_name_from_path(csv_file_path)?;
@@ -165,6 +168,9 @@ pub fn import_from_csv_gruphst_format(csv_file_path: &str) -> Result<Graphs, Box
     let mut csv_rows: Vec<CSVRow> = Vec::new();
     for row in rdr.deserialize() {
         let csv_row: CSVRow = row?;
+        if csv_row.relation.trim().is_empty() {
+            return Err(Box::new(GruPHstError::CSVEdgeMissingRelation));
+        }
         csv_rows.push(csv_row);
     }
     Ok(generate_graphs_from_csv(&graph_name, &csv_rows)?)
