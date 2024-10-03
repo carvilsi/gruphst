@@ -34,6 +34,24 @@ impl CSVRow {
         }
         (vertex_from, vertex_to)
     }
+
+    fn collect_edge_csv_row_values(edge: &Edge, vault_name: &str) -> Result<Self, Box<dyn Error>> {
+        let mut vertex = edge.get_from_vertex();
+        let from_label = vertex.get_label();
+        let from_attributes = collect_attributes_str(&vertex)?;
+        vertex = edge.get_to_vertex();
+        let to_label = vertex.get_label();
+        let to_attributes = collect_attributes_str(&vertex)?;
+        let csv_row = CSVRow {
+            graphs_vault: vault_name.to_string(),
+            from_label,
+            from_attributes,
+            relation: edge.get_relation(),
+            to_label,
+            to_attributes,
+        };
+        Ok(csv_row)
+    }
 }
 
 fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
@@ -52,31 +70,13 @@ fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
     Ok(res)
 }
 
-fn collect_edge_csv_row_values(edge: &Edge, vault_name: &str) -> Result<CSVRow, Box<dyn Error>> {
-    let mut vertex = edge.get_from_vertex();
-    let from_label = vertex.get_label();
-    let from_attributes = collect_attributes_str(&vertex)?;
-    vertex = edge.get_to_vertex();
-    let to_label = vertex.get_label();
-    let to_attributes = collect_attributes_str(&vertex)?;
-    let csv_row = CSVRow {
-        graphs_vault: vault_name.to_string(),
-        from_label,
-        from_attributes,
-        relation: edge.get_relation(),
-        to_label,
-        to_attributes,
-    };
-    Ok(csv_row)
-}
-
 fn collect_graphs_csv_rows_values<'a>(
     csv_rows: &'a mut Vec<CSVRow>,
     edges:  &'a Vec<Edge>,
     vault_name: &str,
 ) -> Result<&'a mut Vec<CSVRow>, Box<dyn Error>> {
     for edge in edges.iter() {
-        csv_rows.push(collect_edge_csv_row_values(edge, vault_name)?);
+        csv_rows.push(CSVRow::collect_edge_csv_row_values(edge, vault_name)?);
     }
     Ok(csv_rows)
 }
@@ -136,8 +136,6 @@ fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
         fill_vertex_attributes(vertex, attrs_str);
     }
 }
-
-
 
 fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
     for csv_row in csv_rows {
