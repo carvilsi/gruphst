@@ -136,6 +136,9 @@ fn should_import_from_csv_file() {
     assert_eq!(edges[1].get_from_vertex().get_attr("surname").unwrap(), "Gamgee".to_string());
     assert_eq!(edges[1].get_to_vertex().get_label(), "frodo");
     assert_eq!(edges[1].get_to_vertex().get_attr("name").unwrap(), "Frodo Bolson".to_string());
+     
+    assert_eq!(edges[2].get_relation(), "friend of");
+    assert_eq!(edges[2].get_to_vertex().get_label(), "galadriel");
     
     edges = graphs.get_edges(Some("middle-earth-enemies")).unwrap();
     assert_eq!(edges[0].get_label(), "ally of");
@@ -147,6 +150,11 @@ fn should_import_from_csv_file() {
     assert_eq!(edges[1].get_from_vertex().get_label(), "sauron".to_string());
     assert_eq!(edges[1].get_to_vertex().get_label(), "saruman".to_string());
     assert_eq!(edges[1].get_from_vertex().get_attr("identified as").unwrap(), "Necromancer".to_string());
+    
+    assert_eq!(edges[2].get_relation(), "seeks");
+    assert_eq!(edges[2].get_to_vertex().get_label(), "".to_string());
+    assert_eq!(edges[2].get_to_vertex().get_attr("name").unwrap(), "Smeagol".to_string());
+
 
 }
 
