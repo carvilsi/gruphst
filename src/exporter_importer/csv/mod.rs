@@ -107,16 +107,16 @@ pub fn export_to_csv_gruphst_format(
     Ok(())
 }
 
-fn fill_vertex_attributes(mut vertex: Vertex, attr_str: &str) {
+fn fill_vertex_attributes(vertex: &mut Vertex, attr_str: &str) {
     let attr: Vec<&str> = attr_str.split(':').collect();
     vertex.set_attr(attr.get(0).unwrap().trim(), attr.get(1).unwrap().trim());
 }
 
-fn process_vertex_attributes(vertex: Vertex, attrs_str: &str) {
+fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
     if attrs_str.contains("|") {
         let raw_attrs_vec: Vec<&str> = attrs_str.split('|').collect();
         for attr_str in raw_attrs_vec {
-            fill_vertex_attributes(vertex.clone(), &attr_str);
+            fill_vertex_attributes(vertex, &attr_str);
         }
     } else {
         fill_vertex_attributes(vertex, attrs_str);
@@ -124,13 +124,13 @@ fn process_vertex_attributes(vertex: Vertex, attrs_str: &str) {
 }
 
 fn generate_vertices(csv_row: &CSVRow) -> (Vertex, Vertex) {
-    let vertex_from = Vertex::new(&csv_row.from_label);
+    let mut vertex_from = Vertex::new(&csv_row.from_label);
     if !csv_row.from_attributes.is_empty() {
-        process_vertex_attributes(vertex_from.clone(), &csv_row.from_attributes);
+        process_vertex_attributes(&mut vertex_from, &csv_row.from_attributes);
     }
-    let vertex_to = Vertex::new(&csv_row.to_label);
+    let mut vertex_to = Vertex::new(&csv_row.to_label);
     if !csv_row.to_attributes.is_empty() {
-        process_vertex_attributes(vertex_to.clone(), &csv_row.to_attributes);
+        process_vertex_attributes(&mut vertex_to, &csv_row.to_attributes);
     }
     (vertex_from, vertex_to)
 }
