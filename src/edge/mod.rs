@@ -1,3 +1,5 @@
+//! Edge modules
+
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use log::warn;

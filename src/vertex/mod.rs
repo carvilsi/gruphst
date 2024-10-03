@@ -1,3 +1,5 @@
+//! Vertex modules
+
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

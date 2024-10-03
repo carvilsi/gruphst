@@ -1,3 +1,5 @@
+//! Configuration module
+
 use dotenv::dotenv;
 use log::warn;
 

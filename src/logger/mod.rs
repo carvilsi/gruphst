@@ -1,3 +1,5 @@
+//! Logger module
+
 /// Enables logging providing a level
 ///
 /// # Examples

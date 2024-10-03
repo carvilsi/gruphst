@@ -1,3 +1,5 @@
+//! Graphs Stats module
+
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use crate::graphs::Graphs;

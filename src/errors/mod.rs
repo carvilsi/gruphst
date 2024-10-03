@@ -1,3 +1,5 @@
+//! Error module
+
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -12,7 +14,7 @@ pub enum GruPHstError {
     EdgeNotFound,
     #[error("No relations: \"{0}\" on Edges")]
     EdgeNoRelations(String),
-        #[error("Vault is empy; no Edges")]
+    #[error("Vault is empy; no Edges")]
     VaultEmpty,
     #[error("Provided vault: \"{0}\" does not exists")]
     VaultNotExists(String),

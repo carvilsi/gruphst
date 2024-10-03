@@ -1,16 +1,24 @@
+//! CSV export/import module
+//! 
+//! Structure of CSV file:
+//! ```csv
+//! grpahs; from_label; from_attributes; relation; to_label; to_attributes
+//! shire-friends; gandalf; name: Gandalf | known as: Gandalf the Gray; friend of; Frodo; surname: Bolson
+//! shire-friends; gandalf; name: Gandalf | known as: Gandalf the Gray; enemy of; Saruman; known as: The White
+//! middle-earth-enemies; saruman; name: Saruman | former: Saruman the White; ally of; sauron; activity: necromancer
+//! ```
+
 use std::error::Error;
 
+use csv_handlers::{collect_attributes_str, collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
 use serde::{Deserialize, Serialize};
 use crate::{config::get_csv_delimiter, edge::Edge, errors::GruPHstError, graphs::Graphs, util::get_file_name_from_path, vertex::Vertex};
 
-/// Structure of CSV file
-/// grpahs; from_label; from_attributes; relation; to_label; to_attributes
-/// shire-friends; gandalf; name: Gandalf | known as: Gandalf the Gray; friend of; Frodo; surname: Bolson
-/// shire-friends; gandalf; name: Gandalf | known as: Gandalf the Gray; enemy of; Saruman; known as: The White
-/// middle-earth-enemies; saruman; name: Saruman | former: Saruman the White; ally of; sauron; activity: necromancer
+mod csv_handlers;
 
 // XXX: Comments; things to think and to implement
 // - We need to support at least two different types of attributes, the Stringy ones and the Vec<u8>
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CSVRow {
@@ -54,48 +62,37 @@ impl CSVRow {
     }
 }
 
-fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
-    let attr_str_keys = vertex.get_attr_keys();
-    let mut res = String::new();
-    let mut cntr = 0;
-    for attr_k in attr_str_keys.iter() {
-        cntr += 1;
-        res.push_str(&attr_k);
-        res.push_str(": ");
-        res.push_str(&vertex.get_attr(attr_k)?);
-        if cntr != attr_str_keys.len() {
-            res.push_str(" | ");
-        }
-    }
-    Ok(res)
-}
-
-fn collect_graphs_csv_rows_values<'a>(
-    csv_rows: &'a mut Vec<CSVRow>,
-    edges:  &'a Vec<Edge>,
-    vault_name: &str,
-) -> Result<&'a mut Vec<CSVRow>, Box<dyn Error>> {
-    for edge in edges.iter() {
-        csv_rows.push(CSVRow::collect_edge_csv_row_values(edge, vault_name)?);
-    }
-    Ok(csv_rows)
-}
-
-fn collect_graphs_csv_rows(
-    graphs: &Graphs
-) -> Result<Vec<CSVRow>, Box<dyn Error>> {
-    let mut csv_rows: Vec<CSVRow> = Vec::new();
-    let vaults = graphs.get_vaults()?;
-    for (vault_name, edges) in vaults {
-        let _ = collect_graphs_csv_rows_values(&mut csv_rows, &edges, &vault_name)?;
-    }
-    Ok(csv_rows)
-}
-
 /// Exports Graphs to csv format
 /// with semicolon ';' as default delimiter,
 /// for custom delimiter character check config file
 /// variable GRUPHST_CSV_DELIMITER
+/// 
+/// #Examples
+/// ```rust
+/// use gruphst::edge::Edge;
+/// use gruphst::vertex::Vertex;
+/// use gruphst::graphs::Graphs;
+/// use gruphst::exporter_importer::csv::export_to_csv_gruphst_format;
+/// 
+/// let mut gru = Graphs::init("shire-friendships");
+/// 
+/// let mut gandalf_v = Vertex::new("gandalf");
+/// gandalf_v.set_attr("name", "Gandalf");
+/// gandalf_v.set_attr("known as", "Gandalf the Gray");
+///
+/// let mut frodo_v = Vertex::new("frodo");
+/// frodo_v.set_attr("name", "Frodo Bolson");
+///
+/// let edge = Edge::create(&gandalf_v, "friend of", &frodo_v);
+/// 
+/// gru.add_edge(&edge, None);
+/// 
+/// export_to_csv_gruphst_format(
+///     &gru,
+///     Some("./"),
+///     Some("export_csv_filename")
+/// ).unwrap();
+/// ```
 pub fn export_to_csv_gruphst_format(
     graphs: &Graphs,
     csv_file_path: Option<&str>,
@@ -121,46 +118,19 @@ pub fn export_to_csv_gruphst_format(
     Ok(())
 }
 
-fn fill_vertex_attributes(vertex: &mut Vertex, attr_str: &str) {
-    let attr: Vec<&str> = attr_str.split(':').collect();
-    vertex.set_attr(attr.get(0).unwrap().trim(), attr.get(1).unwrap().trim());
-}
-
-fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
-    if attrs_str.contains("|") {
-        let raw_attrs_vec: Vec<&str> = attrs_str.split('|').collect();
-        for attr_str in raw_attrs_vec.iter() {
-            fill_vertex_attributes(vertex, &attr_str);
-        }
-    } else {
-        fill_vertex_attributes(vertex, attrs_str);
-    }
-}
-
-fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
-    for csv_row in csv_rows.iter() {
-        graphs.insert(&csv_row.graphs_vault);
-    }
-}
-
-fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>) -> Result<Graphs, GruPHstError> {
-    let mut graphs = Graphs::init(graphs_name);
-    create_vaults_from_csv(&mut graphs, csv_rows);
-    for csv_row in csv_rows.iter() {
-        let (vertex_from, vertex_to) = &csv_row.generate_vertices();
-        let edge = Edge::create(&vertex_from, &csv_row.relation, &vertex_to);
-        graphs.add_edge(&edge, Some(&csv_row.graphs_vault));
-    }
-    if graphs.get_vaults() == Err(GruPHstError::NoVaultOnGraphs) {
-        return Err(GruPHstError::CSVEmpty);
-    } 
-    Ok(graphs)
-}
-
 /// Imports Graphs from csv format file
 /// with semicolon ';' as default delimiter,
 /// for custom delimiter character check config file
 /// variable GRUPHST_CSV_DELIMITER
+/// 
+/// #Examples
+/// ```rust
+/// use gruphst::graphs::Graphs;
+/// use gruphst::exporter_importer::csv::import_from_csv_gruphst_format;
+/// 
+/// let csv_file_path = "./tests/data/exported.csv";
+/// let graphs: Graphs = import_from_csv_gruphst_format(csv_file_path).unwrap();
+/// ```
 pub fn import_from_csv_gruphst_format(csv_file_path: &str) -> Result<Graphs, Box<dyn Error>> {
     let csv_delimiter = get_csv_delimiter();
     let graph_name = get_file_name_from_path(csv_file_path)?;
