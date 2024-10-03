@@ -87,6 +87,24 @@ fn should_insert_a_graph_into_the_vault() {
 }
 
 #[test]
+fn should_remove_graph_from_the_vault() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    graphs.insert("middle-earth");
+    assert_eq!(graphs.len_graphs(), 2);
+    graphs.delete_vault("middle-earth").unwrap();
+    assert_eq!(graphs.len_graphs(), 1);
+}
+
+#[test]
+fn should_fail_remove_graph_from_the_vault_since_does_not_exits() {
+    let mut graphs = prepare_graphs_test();
+    assert_eq!(graphs.len_graphs(), 1);
+    let e = graphs.delete_vault("!exists");
+    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+}
+
+#[test]
 fn should_insert_a_graph_into_the_vault_without_init() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
@@ -144,7 +162,8 @@ fn should_not_find_edges_by_relation_since_vault_is_empty() {
 #[test]
 fn should_edges_find_by_relation_in_graphs() {
     let mut graphs = prepare_graphs_test();
-    let mut vertices_found = graphs.find_edges_by_relation("friend of", None).unwrap();
+    let mut vertices_found = 
+        graphs.find_edges_by_relation("friend of", None).unwrap();
     assert_eq!(vertices_found.len(), 3);
     prepare_insert_graph_test(&mut graphs);
     vertices_found = graphs
@@ -157,7 +176,8 @@ fn should_edges_find_by_relation_in_graphs() {
 fn should_find_by_relations_name() {
     let mut graphs = prepare_graphs_test();
     let relations = vec!["friend of", "relative of"];
-    let vertices_found = graphs.find_edges_by_relations(relations, None).unwrap();
+    let vertices_found =
+        graphs.find_edges_by_relations(relations, None).unwrap();
     assert_eq!(vertices_found.len(), 4);
 }
 
@@ -172,7 +192,8 @@ fn should_not_find_by_relations_name() {
 fn should_not_find_by_relations_name_vault_does_not_exists() {
     let mut graphs = Graphs::init("void");
     let relations = vec!["foo", "bar"];
-    let e = graphs.find_edges_by_relations(relations, Some("!exists"));
+    let e =
+        graphs.find_edges_by_relations(relations, Some("!exists"));
     assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
 }
 

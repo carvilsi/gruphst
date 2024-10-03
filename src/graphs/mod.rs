@@ -249,4 +249,23 @@ impl Graphs {
             Err(Graphs::select_vault_not_exists_error(vault)) 
         }
     }
+    
+    /// Removes a graph from the vault
+    /// 
+    /// #Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// 
+    /// let mut graphs = Graphs::init("graph-one");
+    /// assert_eq!(graphs.len_graphs(), 1);
+    /// graphs.insert("graph-two");
+    /// assert_eq!(graphs.len_graphs(), 2);
+    /// graphs.delete_vault("graph-two").unwrap(); 
+    /// ```
+    pub fn delete_vault(&mut self, graph_name: &str) -> Result<(), GruPHstError> {
+        match self.vault.remove(graph_name) {
+            Some(_) => Ok(()),
+            None => Err(GruPHstError::VaultNotExists(graph_name.to_string())),
+        }
+    }
 }
