@@ -170,7 +170,139 @@ It will generate a report called *tarpauling-report.html*
 
 Right now only covers *add_edge* method.
 
-### Examples
+## Configuration
+
+GruPHst uses [dotenv](https://docs.rs/dotenv/latest/dotenv/index.html) to deal with configurations.
+You can place a *.env* file in order to handle your configuration values or you can use *environment variables* instead to run your binary. The *environmental variables* will override the configuration from *.env* file.
+
+*e.g. override log level in your binary:*
+
+`$ GRUPHST_LOG_LEVEL=trace cargo run`
+
+This is the currnet *.env* file:
+
+```toml
+# limit for memory usage in MB
+GRUPHST_MAX_MEM_USAGE=100 
+
+# log level, case insensitive, possible values:
+# trace
+# debug
+# info
+# warn 
+# warning
+# err
+# error
+GRUPHST_LOG_LEVEL=info
+
+# delimiter character for CSV import-export 
+GRUPHST_CSV_DELIMITER=;
+```
+
+### Configurable variables
+
+#### Maximum memory usage 
+
+Configures the maximum memory in **MB** that GruPHst will use. In case that this limit will reach, before **panic** will persists the current status.
+
+`GRUPHST_MAX_MEM_USAGE=100`
+
+#### Level for logging
+
+Sets the level for logging in case insensitive, the possible values are:
+
+- trace
+- debug
+- info
+- warn 
+- warning
+- err
+- error
+
+`GRUPHST_LOG_LEVEL=info`
+
+In order to use it on your binary:
+
+```rust
+// import from config and logger level
+use gruphst::config::get_log_level;
+use gruphst::logger::enable_logging;
+
+// get the configured log level; on .env file or environmental
+let log_level = get_log_level();
+
+// enable logging
+enable_logging(log_level);
+```
+
+#### Character delimiter for CSV file
+
+Configures the character used to import and export for CSV format.
+
+`GRUPHST_CSV_DELIMITER=;`
+
+## Export & Import
+
+### CSV
+
+The **delimiter** could be configured with **GRUPHST_CSV_DELIMITER** variable, via *.env* file or with *environmental var* usage. The default character is '**;**'.
+
+#### File format
+
+**Headers:**
+
+```csv
+graphs_vault;from_label;from_attributes;relation;to_label;to_attributes
+```
+
+**Row example:**
+```csv
+shire-friendships;gandalf;known as: Gandalf the Gray | name: Gandalf;friend of;frodo;name: Frodo Bolson
+```
+
+**Note:**
+The different attributes are separated by '|' character and key followed by ':' and vaule.
+
+#### Export and import usage
+
+```rust
+use gruphst::graphs::Graphs;
+use gruphst::edge::Edge;
+use gruphst::vertex::Vertex;
+use gruphst::exporter_importer::csv::*;
+
+let mut graphs = Graphs::init("to_export");
+let foo = Vertex::new("foo");
+let bar = Vertex::new("bar");
+graphs.add_edge(&Edge::create(&foo, "is related to", &bar), None);
+
+// export graphs to CSV file
+export_to_csv_gruphst_format(&graphs, Some("./"), Some("export_csv_filename")).unwrap();
+
+// import graphs from CSV file
+let graphs: Graphs = import_from_csv_gruphst_format("./export_csv_filename.csv").unwrap();
+```
+
+## Cryptography
+
+### Argon2 Hashes
+
+You can use [Argon2](https://docs.rs/argon2/latest/argon2/) to store passwords or whatever sensible data you are dealing with, and verify it.
+
+```rust
+use gruphst::vertex::Vertex;
+
+// create a vertex
+let mut vertex = Vertex::new("Brian");
+// set an Argon2 hash
+vertex.set_hash("password", "53cr37");
+
+// Check if the provided value is valid
+assert!(vertex.is_hash_valid("password", "53cr37").unwrap());
+assert!(!vertex.is_hash_valid("password", "f00b4r").unwrap());
+```
+
+## Examples
 
 Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
 
