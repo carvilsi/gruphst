@@ -92,12 +92,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Also possible to retrieve the vertices that has a certain
     // relation in
-    let vertices_with_relation_in = graphs.has_relation_in("lives at", None)?; 
+    let vertices_with_relation_in = graphs.find_vertices_with_relation_in("lives at", None)?; 
     assert_eq!(vertices_with_relation_in[0].get_label(), "The Shire");
     assert_eq!(vertices_with_relation_in[1].get_label(), "Isengard");
 
     // Or get the edge that has a vertex with an attribute equals to
-    let found = graphs.attr_equals_to("years old", 24000, None)?;
+    let found = graphs.find_edges_with_vertex_attr_str_equals_to("years old", 24000, None)?;
     assert_eq!(found[0].get_from_vertex().get_label(), "Gandalf");
 
     // Since we have a humble middle-earth network
@@ -105,7 +105,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // a file called "middle-earth.grphst" will be created, 
     // later we can load it with:
     // let loaded_graphs = Graphs::load("middle-earth.grphst")?;
-    graphs.persists(None)?;
+    graphs.save(None)?;
 
     Ok(())
 }

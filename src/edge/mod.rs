@@ -1,12 +1,14 @@
+//! Edge modules
+
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::vertex::{Vertex, Vertex_};
+use crate::{errors::GruPHstError, vertex::{Vertex, Vertex_}};
 
-mod query;
+mod queries;
 
 /// Representation of a Edge, that consists on the relation of two vertices
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -145,19 +147,19 @@ impl Edge {
     }
 
     /// Get attribute for a edge
-    pub fn get_attr(&self, attr_k: &str) -> Result<&String, &'static str> {
+    pub fn get_attr(&self, attr_k: &str) -> Result<&String, GruPHstError> {
         let res = self.attr.get(attr_k);
         match res {
             Some(res) => Ok(res),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
 
     /// Updates the value of an attribute
-    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), GruPHstError>
     where
         T: std::fmt::Display,
     {
@@ -165,7 +167,8 @@ impl Edge {
             *attr = attr_v.to_string();
             return Ok(());
         }
-        Err("not attribute found to update")
+        warn!("attribute {} not found for update", attr_k);
+        Err(GruPHstError::AttributeNotFound)
     }
 
     /// Updates the value of an attribute or creates a new one if attribute key does not exists
@@ -181,23 +184,29 @@ impl Edge {
     }
 
     /// Deletes an attribute
-    pub fn delete_attr(&mut self, v: &str) -> Result<(), &'static str> {
-        let res = self.attr.remove(v);
+    pub fn delete_attr(&mut self, attr_k: &str) -> Result<(), GruPHstError> {
+        let res = self.attr.remove(attr_k);
         match res {
             Some(_) => Ok(()),
             None => {
-                warn!("attribute {} not found for remove", v);
-                Err("attribute not found for remove")
+                warn!("attribute {} not found for remove", attr_k);
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
 
     /// Returns an Array containing all attribute keys
-    pub fn get_attr_keys(&self) -> Vec<&str> {
+    pub fn get_attr_keys(&self) -> Result<Vec<&str>, GruPHstError> {
         let mut key_vec = Vec::new();
         for key in self.attr.keys() {
             key_vec.push(key.as_str());
         }
-        key_vec
+        match key_vec.is_empty() {
+            false => Ok(key_vec),
+            true => {
+                warn!("Attributes empty for {}", self.get_label());
+                Err(GruPHstError::AttributesEmpty)
+            },
+        }
     }
 }

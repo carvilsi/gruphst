@@ -1,13 +1,17 @@
+//! Vertex modules
+
 use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::edge::Edge;
+use crate::errors::GruPHstError;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::vec;
 
 mod query;
+mod cryptography;
 
 /// Representation of a vertex.
 /// A vertex or node, vertices in plural,
@@ -137,27 +141,27 @@ impl Vertex {
     /// let gandalf_years = gandalf.get_attr("years old").unwrap();
     /// assert_eq!(gandalf_years, "24000");
     /// ```
-    pub fn get_attr(&self, attr_k: &str) -> Result<String, &'static str> {
+    pub fn get_attr(&self, attr_k: &str) -> Result<String, GruPHstError> {
         let binding = self.vrtx.borrow();
         let res = binding.attr.get(attr_k);
         match res {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
 
     /// Get attribute of type Vev<u8>
-    pub fn get_attr_vec_u8(&self, attr_k: &str) -> Result<Vec<u8>, &'static str> {
+    pub fn get_attr_vec_u8(&self, attr_k: &str) -> Result<Vec<u8>, GruPHstError> {
         let binding = self.vrtx.borrow();
         let res = binding.attr_vec_u8.get(attr_k);
         match res {
             Some(resp) => Ok(resp.clone()),
             None => {
                 warn!("attribute '{}' not found", attr_k);
-                Err("attribute not found")
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
@@ -178,7 +182,7 @@ impl Vertex {
     /// gandalf_years = gandalf.get_attr("years old").unwrap();
     /// assert_eq!(gandalf_years, "24001");
     /// ```
-    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), &'static str>
+    pub fn update_attr<T>(&mut self, attr_k: &str, attr_v: T) -> Result<(), GruPHstError>
     where
         T: std::fmt::Display,
     {
@@ -186,7 +190,7 @@ impl Vertex {
             *attr = attr_v.to_string();
             return Ok(());
         }
-        Err("not attribute found to update")
+        Err(GruPHstError::AttributeNotFound)
     }
 
     /// Updates the value of an attribute or creates a new one if attribute key does not exists
@@ -203,19 +207,20 @@ impl Vertex {
     }
 
     /// Deletes an attribute
-    pub fn del_attr(&mut self, v: &str) -> Result<(), &'static str> {
+    pub fn del_attr(&mut self, v: &str) -> Result<(), GruPHstError> {
         let res = self.vrtx.borrow_mut().attr.remove(v);
         match res {
             Some(_) => Ok(()),
             None => {
                 warn!("attribute {} not found for remove", v);
-                Err("attribute not found for remove")
+                Err(GruPHstError::AttributeNotFound)
             }
         }
     }
 
     /// Returns an collection containing all attribute keys
-    pub fn get_attr_keys(&self) -> Vec<String> {
+    /// of String attributes
+    pub fn get_attr_str_keys(&self) -> Vec<String> {
         let binding = self.vrtx.borrow();
         // FIXME: clippy has a warning here:
         // let kv: Vec<String> = binding.attr.iter().map(|(k,_v)| k.clone()).collect();
@@ -225,11 +230,29 @@ impl Vertex {
         kv
     }
 
+    /// Returns an collection containing all attribute keys
+    /// of Vec<u8> attributes
+    pub fn get_attr_vec_u8_keys(&self) -> Vec<String> {
+        let binding = self.vrtx.borrow();
+        let kv: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        kv
+    }
+
+    /// Returns an collection containing all attribute keys
+    /// of any type of attributes
+    pub fn get_attr_keys(&self) -> Vec<String> {
+        let binding = self.vrtx.borrow();
+        let mut kv_attr: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
+        let mut kv_attr_vec_u8: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        kv_attr.append(&mut kv_attr_vec_u8);
+        kv_attr 
+    }
+
     /// Retrieves the vertices that has relation out for the given vertex on a collection of edges
     pub fn get_relations_out_on_edges(
         &self,
         edges: Vec<Edge>,
-    ) -> Result<HashMap<String, Vec<Vertex>>, &'static str> {
+    ) -> Result<HashMap<String, Vec<Vertex>>, GruPHstError> {
         let mut relations_out: HashMap<String, Vec<Vertex>> = HashMap::new();
         for edge in edges {
             if edge.get_from_vertex().get_id() == self.get_id() {
@@ -244,7 +267,7 @@ impl Vertex {
         if !relations_out.is_empty() {
             Ok(relations_out)
         } else {
-            Err("no relations out for vertex")
+            Err(GruPHstError::EdgeNoRelations(String::from("out")))
         }
     }
 
@@ -252,7 +275,7 @@ impl Vertex {
     pub fn get_relations_in_on_edges(
         &self,
         edges: Vec<Edge>,
-    ) -> Result<HashMap<String, Vec<Vertex>>, &'static str> {
+    ) -> Result<HashMap<String, Vec<Vertex>>, GruPHstError> {
         let mut relations_in: HashMap<String, Vec<Vertex>> = HashMap::new();
         for edge in edges {
             if edge.get_to_vertex().get_id() == self.get_id() {
@@ -267,7 +290,7 @@ impl Vertex {
         if !relations_in.is_empty() {
             Ok(relations_in)
         } else {
-            Err("no relations in for edge")
+            Err(GruPHstError::EdgeNoRelations(String::from("in")))
         }
     }
 }

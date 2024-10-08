@@ -21,7 +21,28 @@ Early state of development with lot of TODOs, just doing nerdy things with Graph
 
 [Code Coverage](https://app.codecov.io/github/carvilsi/gruphst)
 
-## Basic Usage
+---
+
+1. [Basic Usage](#basic-usage)
+2. [Install](#install)
+3. [Tests & Coverage & Benchmarking](#tests-coverage-benchmarking)
+4. [Configuration](#configuration)
+    1. [Configurable variables](#configurable-variables)
+    2. [Maximum memory usage](#maximum-memory-usage)
+    3. [Level for logging](#level-for-logging) 
+    4. [Character delimiter for CSV file](#character-delimiter-for-csv-file)
+5. [Save & Load](#save-load)
+6. [Export & Import](#export-import)
+    1. [CSV](#csv)
+        1. [File Format](#file-format)
+        2. [Export & Import Usage](#export-import-usage)
+7. [Cryptography](#cryptography)
+    1. [Argon2 Hashes](#argon2-hashes)
+8. [Examples](#examples)
+
+---
+
+## Basic Usage<a name="basic-usage">
 
 ```rust
 use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
@@ -118,12 +139,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Also possible to retrieve the vertices that has a certain
     // relation in
-    let vertices_with_relation_in = graphs.has_relation_in("lives at", None)?; 
+    let vertices_with_relation_in = graphs.find_vertices_with_relation_in("lives at", None)?; 
     assert_eq!(vertices_with_relation_in[0].get_label(), "The Shire");
     assert_eq!(vertices_with_relation_in[1].get_label(), "Isengard");
 
     // Or get the edge that has a vertex with an attribute equals to
-    let found = graphs.attr_equals_to("years old", 24000, None)?;
+    let found = graphs.find_edges_with_vertex_attr_str_equals_to("years old", 24000, None)?;
     assert_eq!(found[0].get_from_vertex().get_label(), "Gandalf");
 
     // Since we have a humble middle-earth network
@@ -131,13 +152,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     // a file called "middle-earth.grphst" will be created, 
     // later we can load it with:
     // let loaded_graphs = Graphs::load("middle-earth.grphst")?;
-    graphs.persists(None)?;
+    graphs.save(None)?;
 
     Ok(())
 }
 ```
 
-## Install
+## Install<a name="install">
 
 Run the following Cargo command in your project directory:
 
@@ -145,9 +166,9 @@ Run the following Cargo command in your project directory:
 
 Or add the following line to your Cargo.toml:
 
-`gruphst = "0.13.0"`
+`gruphst = "0.15.0"`
 
-## Tests & Coverage & Benchmarking
+## Tests & Coverage & Benchmarking<a name="tests-coverage-benchmarking">
 
 **To run tests locally**
 This will show output, if a test name is provided as argument will run this tests 
@@ -170,7 +191,162 @@ It will generate a report called *tarpauling-report.html*
 
 Right now only covers *add_edge* method.
 
-### Examples
+## Configuration<a name="configuration">
+
+GruPHst uses [dotenv](https://docs.rs/dotenv/latest/dotenv/index.html) to deal with configurations.
+You can place a *.env* file in order to handle your configuration values or you can use *environment variables* instead to run your binary. The *environmental variables* will override the configuration from *.env* file.
+
+*e.g. override log level in your binary:*
+
+`$ GRUPHST_LOG_LEVEL=trace cargo run`
+
+This is the currnet *.env* file:
+
+```toml
+# limit for memory usage in MB
+GRUPHST_MAX_MEM_USAGE=100 
+
+# log level, case insensitive, possible values:
+# trace
+# debug
+# info
+# warn 
+# warning
+# err
+# error
+GRUPHST_LOG_LEVEL=info
+
+# delimiter character for CSV import-export 
+GRUPHST_CSV_DELIMITER=;
+```
+
+### Configurable variables<a name="configurable-variables">
+
+#### Maximum memory usage<a name="maximum-memory-usage">
+
+Configures the maximum memory in **MB** that GruPHst will use. In case that this limit will reach, before **panic** will persists the current status.
+
+`GRUPHST_MAX_MEM_USAGE=100`
+
+#### Level for logging<a name="level-for-logging">
+
+Sets the level for logging in case insensitive, the possible values are:
+
+- trace
+- debug
+- info
+- warn 
+- warning
+- err
+- error
+
+`GRUPHST_LOG_LEVEL=info`
+
+In order to use it on your binary:
+
+```rust
+// import from config and logger level
+use gruphst::config::get_log_level;
+use gruphst::logger::enable_logging;
+
+// get the configured log level; on .env file or environmental
+let log_level = get_log_level();
+
+// enable logging
+enable_logging(log_level);
+```
+
+#### Character delimiter for CSV file<a name="character-delimiter-for-csv-file">
+
+Configures the character used to import and export for CSV format.
+
+`GRUPHST_CSV_DELIMITER=;`
+
+## Save & Load<a name="save-load">
+
+You can persists the data on a file in GruPHst format.
+And later load the saved data.
+
+```rust
+use gruphst::graphs::Graphs;
+use gruphst::edge::Edge;
+use gruphst::vertex::Vertex;
+
+let mut graphs = Graphs::init("to_export");
+let foo = Vertex::new("foo");
+let bar = Vertex::new("bar");
+graphs.add_edge(&Edge::create(&foo, "is related to", &bar), None);
+
+// persists the graphs data on file, 
+// with "./to_export.grphst"
+graphs.save(Some("./"));
+
+// load the saved data
+let saved_graphs = Graphs::load("./to_export.grphst").unwrap();
+```
+
+## Export & Import<a name="export-import">
+
+### CSV<a name="csv">
+
+The **delimiter** could be configured with **GRUPHST_CSV_DELIMITER** variable, via *.env* file or with *environmental var* usage. The default character is '**;**'.
+
+#### File Format<a name="file-format">
+
+**Headers:**
+
+```csv
+graphs_vault;from_label;from_attributes;relation;to_label;to_attributes
+```
+
+**Row example:**
+```csv
+shire-friendships;gandalf;known as: Gandalf the Gray | name: Gandalf;friend of;frodo;name: Frodo Bolson
+```
+
+**Note:**
+The different attributes are separated by '|' character and key followed by ':' and vaule.
+
+#### Export & Import Usage<a name="export-import-usage">
+
+```rust
+use gruphst::graphs::Graphs;
+use gruphst::edge::Edge;
+use gruphst::vertex::Vertex;
+use gruphst::exporter_importer::csv::*;
+
+let mut graphs = Graphs::init("to_export");
+let foo = Vertex::new("foo");
+let bar = Vertex::new("bar");
+graphs.add_edge(&Edge::create(&foo, "is related to", &bar), None);
+
+// export graphs to CSV file
+export_to_csv_gruphst_format(&graphs, Some("./"), Some("export_csv_filename")).unwrap();
+
+// import graphs from CSV file
+let graphs: Graphs = import_from_csv_gruphst_format("./export_csv_filename.csv").unwrap();
+```
+
+## Cryptography<a name="cryptography">
+
+### Argon2 Hashes<a name="argon2-hashes">
+
+You can use [Argon2](https://docs.rs/argon2/latest/argon2/) to store passwords or whatever sensible data you are dealing with, and verify it.
+
+```rust
+use gruphst::vertex::Vertex;
+
+// create a vertex
+let mut vertex = Vertex::new("Brian");
+// set an Argon2 hash
+vertex.set_hash("password", "53cr37");
+
+// Check if the provided value is valid
+assert!(vertex.is_hash_valid("password", "53cr37").unwrap());
+assert!(!vertex.is_hash_valid("password", "f00b4r").unwrap());
+```
+
+## Examples<a name="examples">
 
 Check the [Rock Paper Scissors Spock Lizard](https://github.com/carvilsi/gruphst/tree/main/examples/rock-paper-scissors-lizard-spock) example.
 

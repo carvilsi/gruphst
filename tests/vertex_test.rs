@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use graphs_test::{prepare_graphs_test, prepare_insert_graph_test};
-use gruphst::{edge::Edge, vertex::Vertex};
+use gruphst::{edge::Edge, errors::GruPHstError, vertex::Vertex};
 
 #[path = "./graphs_test.rs"]
 mod graphs_test;
@@ -10,6 +10,8 @@ fn prepare_vertex_test() -> (Vertex, String) {
     let mut vertex = Vertex::new("alice");
     vertex.set_attr("name", "Alice");
     vertex.set_attr("age", 42);
+    let v: Vec<u8> = vec![3, 1, 3, 3, 7];
+    vertex.set_attr_vec_u8("code", &v);
     (vertex.clone(), vertex.get_id())
 }
 
@@ -36,15 +38,15 @@ fn vertex_get_id() {
 #[test]
 fn vertex_attribute_len() {
     let (vertex, _id) = prepare_vertex_test();
-    assert_eq!(vertex.attr_len(), 2);
+    assert_eq!(vertex.attrs_len(), 3);
 }
 
 #[test]
 fn vertex_attribute_emptiness() {
     let (vertex, _id) = prepare_vertex_test();
-    assert!(!vertex.attr_is_empty());
+    assert!(!vertex.attrs_empty());
     let ed = Vertex::new("Ed");
-    assert!(ed.attr_is_empty());
+    assert!(ed.attrs_empty());
 }
 
 #[test]
@@ -105,12 +107,32 @@ fn vertex_delete_attributes_fail_since_attribute_does_not_exists() {
 }
 
 #[test]
-fn vertex_attribute_keys() {
+fn vertex_attribute_str_keys() {
     let (vertex, _id) = prepare_vertex_test();
-    let keys = vertex.get_attr_keys();
+    let keys = vertex.get_attr_str_keys();
     assert!(keys.contains(&"name".to_string()));
     assert!(keys.contains(&"age".to_string()));
     assert!(!keys.contains(&"surname".to_string()));
+    assert_eq!(keys.len(), 2);
+}
+
+#[test]
+fn vertex_attribute_vec_u8_keys() {
+    let (vertex, _id) = prepare_vertex_test();
+    let keys = vertex.get_attr_vec_u8_keys();
+    assert!(keys.contains(&"code".to_string()));
+    assert_eq!(keys.len(), 1);
+}
+
+#[test]
+fn vertex_attribute_keys() {
+    let (vertex, _id) = prepare_vertex_test();
+    let keys = vertex.get_attr_keys();
+    assert!(keys.contains(&"code".to_string()));
+    assert!(keys.contains(&"name".to_string()));
+    assert!(keys.contains(&"age".to_string()));
+    assert!(!keys.contains(&"surname".to_string()));
+    assert_eq!(keys.len(), 3);
 }
 
 #[test]
@@ -119,7 +141,7 @@ fn get_vertex_relation_out() {
     prepare_insert_graph_test(&mut graphs);
 
     let find_results = graphs
-        .has_relation_out("relative of", Some("my graphs"))
+        .find_vertices_with_relation_out("relative of", Some("my graphs"))
         .unwrap();
     assert_eq!(find_results.len(), 1);
     assert_eq!(find_results[0].get_label(), "Fred");
@@ -167,7 +189,7 @@ fn get_vertex_relation_in() {
     prepare_insert_graph_test(&mut graphs);
 
     let find_results = graphs
-        .has_relation_in("friend of", Some("my graphs"))
+        .find_vertices_with_relation_in("friend of", Some("my graphs"))
         .unwrap();
     assert_eq!(find_results.len(), 2);
     let mut vertex: Vertex = Vertex::new("tmp");
@@ -216,5 +238,64 @@ fn should_not_get_vertex_vec_u8_attr() {
     let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
     vertex.set_attr_vec_u8("vector_u8", &vector); 
     let e = vertex.get_attr_vec_u8("not exists");
-    assert_eq!(e, Err("attribute not found"));
+    assert!(e.is_err());
+    assert_eq!(e, Err(GruPHstError::AttributeNotFound));
+}
+
+#[test]
+fn should_check_if_vertex_has_an_attribute_value_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_like("aLi"));
+    assert!(!vertex.has_attr_like("oo"));
+}
+
+#[test]
+fn should_find_attributes_keys_for_all_type_of_attributes() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_key("name"));
+    assert!(vertex.has_attr_key("code"));
+    assert!(!vertex.has_attr_key("foo"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_key() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_vec_u8_key_equals_to("code"));
+    assert!(!vertex.has_attr_vec_u8_key_equals_to("foobar"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_key_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_vec_u8_key_like("oDe"));
+    assert!(!vertex.has_attr_vec_u8_key_like("bAr"));
+}
+
+#[test]
+fn should_check_if_vertex_has_a_vector_u8_attribute_value_equals_to() {
+    let (vertex, _id) = prepare_vertex_test();
+    let v_ok: Vec<u8> = vec![3, 1, 3, 3, 7];
+    let v_nok: Vec<u8> = vec![1, 0, 1];
+    assert!(vertex.has_attr_vec_u8_equals_to("code", &v_ok));
+    assert!(!vertex.has_attr_vec_u8_equals_to("code", &v_nok));
+    assert!(!vertex.has_attr_vec_u8_equals_to("foobar", &v_ok));
+}
+
+#[test]
+fn should_check_if_vertex_has_aany_attribute_key_like() {
+    let (vertex, _id) = prepare_vertex_test();
+    assert!(vertex.has_attr_key_like("oDe"));
+    assert!(vertex.has_attr_key_like("AmE"));
+    assert!(!vertex.has_attr_key_like("bAr"));
+}
+
+#[test]
+fn should_store_and_validate_a_cryptographic_hashed_value() {
+    let (mut vertex, _id) = prepare_vertex_test();
+    let attr_hash_key = "hash_argon2";
+    let plain_text = "1. The world is all that is the case.";
+    vertex.set_hash(attr_hash_key, plain_text);
+    assert!(vertex.is_hash_valid(attr_hash_key, plain_text).unwrap());
+    assert!(!vertex.is_hash_valid(attr_hash_key, "foo bar plain text").unwrap());
+    assert!(vertex.is_hash_valid("foo bar attr", plain_text).is_err());
 }

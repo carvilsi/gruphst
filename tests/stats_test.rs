@@ -17,6 +17,9 @@ fn prepare_stats_test() -> Graphs {
     bob.set_attr("email", "bob@mailinator.com");
     bob.set_attr("age", 39);
 
+    let v: Vec<u8> = vec![3, 1, 3, 3, 7];
+    bob.set_attr_vec_u8("code", &v);
+
     let relation_friend_of = "friend of";
     let relation_relative_of = "relative of";
 
@@ -46,11 +49,10 @@ fn prepare_stats_test() -> Graphs {
 fn graphs_stats() {
     let mut graphs = prepare_stats_test();
 
-    // XXX: Note that this could be arch dependent ¯\\(°_o)/¯
     let stats = graphs.get_stats();
     assert_eq!(stats.get_total_edges(), 6);
-    assert_eq!(stats.get_total_attr(), 17);
-    assert_eq!(stats.get_mem(), 1967);
+    assert_eq!(stats.get_total_attr(), 19);
+    assert_eq!(stats.get_mem(), 2017);
     assert_eq!(stats.get_uniq_rel(), 4);
     assert_eq!(stats.get_total_graphs(), 2);
     assert_eq!(stats.get_total_vertices(), 12);

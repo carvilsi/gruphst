@@ -1,6 +1,8 @@
 use gruphst::{edge::Edge, graphs::Graphs, vertex::Vertex};
 use rand::Rng;
 use std::collections::HashMap;
+use gruphst::config::get_log_level;
+use gruphst::logger::enable_logging;
 
 fn create_game_rules() -> Graphs {
     // Create the sets of edges and add some attributes
@@ -82,11 +84,15 @@ fn resolve_game(player_one_game: Vertex, player_two_game: Vertex, rules: Graphs)
 }
 
 fn main() {
+    // get and enabling logging 
+    let log_level = get_log_level();
+    enable_logging(log_level);
+    
     let rules = create_game_rules();
 
     // maybe now you want to persists the game rules
     // to use it other day ;)
-    let _ = rules.persists(None);
+    let _ = rules.save(None);
 
     // get the characters
     let characters = rules.get_uniq_vertices(None).unwrap();
