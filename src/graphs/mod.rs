@@ -1,3 +1,5 @@
+//! Graphs modules
+
 use log::{error, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -98,8 +100,18 @@ impl Graphs {
         self.stats.clone()
     }
 
-    pub fn get_vaults(&self) -> HashMap<String, Vec<Edge>> {
-        self.vault.clone()
+    pub fn get_vaults(&self) -> Result<HashMap<String, Vec<Edge>>, GruPHstError> {
+        let vaults = self.vault.clone();
+        if vaults.values().len() == 1  {
+            for val in vaults.values() {
+                if val.len() == 0 {
+                    return Err(GruPHstError::NoVaultOnGraphs);
+                }
+            }
+            Ok(vaults)
+        } else {
+            Ok(vaults)
+        }
     }
 
     /// Adds a Edge element to the Graphs' vault
@@ -235,6 +247,25 @@ impl Graphs {
             }
         } else {
             Err(Graphs::select_vault_not_exists_error(vault)) 
+        }
+    }
+    
+    /// Removes a graph from the vault
+    /// 
+    /// #Examples
+    /// ```rust
+    /// use gruphst::graphs::Graphs;
+    /// 
+    /// let mut graphs = Graphs::init("graph-one");
+    /// assert_eq!(graphs.len_graphs(), 1);
+    /// graphs.insert("graph-two");
+    /// assert_eq!(graphs.len_graphs(), 2);
+    /// graphs.delete_vault("graph-two").unwrap(); 
+    /// ```
+    pub fn delete_vault(&mut self, graph_name: &str) -> Result<(), GruPHstError> {
+        match self.vault.remove(graph_name) {
+            Some(_) => Ok(()),
+            None => Err(GruPHstError::VaultNotExists(graph_name.to_string())),
         }
     }
 }

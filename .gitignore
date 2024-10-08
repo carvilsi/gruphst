@@ -3,3 +3,8 @@ tags
 gruphst.bin
 *.grphst
 tarpaulin-report.html
+tests/data/export_custom.csv
+tests/data/middle-earth-enemies.csv
+tests/data/empty.csv
+middle-earth-enemies.csv
+export_csv_filename.csv

@@ -1,6 +1,6 @@
 [package]
 name = "gruphst"
-version = "1.0.0"
+version = "0.15.0"
 edition = "2021"
 description = "An in-memory graph database"
 license = "MIT"
@@ -20,10 +20,15 @@ simple_logger = "5.0.0"
 dotenv = "0.15.0"
 argon2 = "0.5.3"
 thiserror = "1.0.63"
+csv = "1.3.0"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
 
 [[bench]]
 name = "gruphst_memory_watcher"
+harness = false
+
+[[bench]]
+name = "gruphst_import_from_csv"
 harness = false
