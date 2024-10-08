@@ -10,8 +10,9 @@ use crate::config::get_max_mem_usage;
 use crate::errors::GruPHstError;
 use crate::graphs::Graphs;
 
-impl Graphs {
+// TODO: improve this; there is no need to deal with extension and add the possibility to use a custom filename
 
+impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
     /// <div class="warning">Deprecated method; will be removed on ver. 1.0.0</div>
     /// 

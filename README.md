@@ -278,11 +278,11 @@ let bar = Vertex::new("bar");
 graphs.add_edge(&Edge::create(&foo, "is related to", &bar), None);
 
 // persists the graphs data on file, 
-// with "saved_graphs.grphst"
-graphs.save(Some("saved_graphs")).unwrap();
+// with "./to_export.grphst"
+graphs.save(Some("./"));
 
 // load the saved data
-let saved_graphs = Graphs::load("saved_graphs.grphst").unwrap();
+let saved_graphs = Graphs::load("./to_export.grphst").unwrap();
 ```
 
 ## Export & Import<a name="export-import">
