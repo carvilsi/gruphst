@@ -26,7 +26,7 @@ impl Vertex {
     ///
     /// let mut vertex = Vertex::new("Frodo");
     /// vertex.set_attr("surname", "Baggins");
-    /// 
+    ///
     /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
     /// vertex.set_attr_vec_u8("code", &vu8);
     ///
@@ -36,7 +36,7 @@ impl Vertex {
     pub fn has_attr_vec_u8_key_equals_to(&self, attr_k: &str) -> bool {
         self.vrtx.borrow().attr_vec_u8.contains_key(attr_k)
     }
-    
+
     /// Checks if an attribute key exists
     /// either on String or Vec<u8> attribute
     ///
@@ -46,7 +46,7 @@ impl Vertex {
     ///
     /// let mut vertex = Vertex::new("Frodo");
     /// vertex.set_attr("surname", "Baggins");
-    /// 
+    ///
     /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
     /// vertex.set_attr_vec_u8("code", &vu8);
     ///
@@ -55,13 +55,14 @@ impl Vertex {
     /// assert!(!vertex.has_attr_key("age"));
     /// ```
     pub fn has_attr_key(&self, attr_k: &str) -> bool {
-        self.vrtx.borrow().attr.contains_key(attr_k) || self.vrtx.borrow().attr_vec_u8.contains_key(attr_k)
+        self.vrtx.borrow().attr.contains_key(attr_k)
+            || self.vrtx.borrow().attr_vec_u8.contains_key(attr_k)
     }
 
     /// Checks if an attribute values is like on a vertex
-    /// 
+    ///
     /// # Examples
-    /// ```rust 
+    /// ```rust
     /// use gruphst::vertex::Vertex;
     ///
     /// let mut vertex = Vertex::new("Frodo");
@@ -104,7 +105,7 @@ impl Vertex {
         false
     }
 
-    /// Checks if an Vec<u8> attribute key is like on a vertex 
+    /// Checks if an Vec<u8> attribute key is like on a vertex
     ///
     /// # Examples
     /// ```rust
@@ -112,7 +113,7 @@ impl Vertex {
     ///
     /// let mut vertex = Vertex::new("Frodo");
     /// vertex.set_attr("surname", "Baggins");
-    /// 
+    ///
     /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
     /// vertex.set_attr_vec_u8("code", &vu8);
     ///
@@ -128,7 +129,7 @@ impl Vertex {
         false
     }
 
-    /// Checks if any attribute key is like on a vertex 
+    /// Checks if any attribute key is like on a vertex
     ///
     /// # Examples
     /// ```rust
@@ -136,7 +137,7 @@ impl Vertex {
     ///
     /// let mut vertex = Vertex::new("Frodo");
     /// vertex.set_attr("surname", "Baggins");
-    /// 
+    ///
     /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
     /// vertex.set_attr_vec_u8("code", &vu8);
     ///
@@ -145,7 +146,7 @@ impl Vertex {
     /// assert!(!vertex.has_attr_key_like("dOC"));
     /// ```
     pub fn has_attr_key_like(&self, attr_k: &str) -> bool {
-       self.has_attr_str_key_like(attr_k) || self.has_attr_vec_u8_key_like(attr_k) 
+        self.has_attr_str_key_like(attr_k) || self.has_attr_vec_u8_key_like(attr_k)
     }
 
     /// Checks if an String attribute value matches on a vertex
@@ -182,7 +183,7 @@ impl Vertex {
     ///
     /// let mut vertex = Vertex::new("Frodo");
     /// vertex.set_attr("surname", "Baggins");
-    /// 
+    ///
     /// let vu8: Vec<u8> = vec![3, 1, 3, 3, 7];
     /// let v_nok: Vec<u8> = vec![1, 0, 1];
     /// vertex.set_attr_vec_u8("code", &vu8);

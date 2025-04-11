@@ -1,5 +1,5 @@
-use std::error::Error;
 use crate::vertex::Vertex;
+use std::error::Error;
 
 pub(super) fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
     let attr_str_keys = vertex.get_attr_keys();
@@ -16,4 +16,3 @@ pub(super) fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn 
     }
     Ok(res)
 }
-

@@ -4,9 +4,7 @@ use crate::{edge::Edge, errors::GruPHstError, graphs::Graphs, vertex::Vertex};
 
 use super::CSVRow;
 
-pub(super) fn collect_graphs_csv_rows(
-    graphs: &Graphs
-) -> Result<Vec<CSVRow>, Box<dyn Error>> {
+pub(super) fn collect_graphs_csv_rows(graphs: &Graphs) -> Result<Vec<CSVRow>, Box<dyn Error>> {
     let mut csv_rows: Vec<CSVRow> = Vec::new();
     let vaults = graphs.get_vaults()?;
     for (vault_name, edges) in vaults {
@@ -26,7 +24,10 @@ pub(super) fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
     }
 }
 
-pub(super) fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>) -> Result<Graphs, GruPHstError> {
+pub(super) fn generate_graphs_from_csv(
+    graphs_name: &str,
+    csv_rows: &Vec<CSVRow>,
+) -> Result<Graphs, GruPHstError> {
     let mut graphs = Graphs::init(graphs_name);
     create_vaults_from_csv(&mut graphs, csv_rows);
     for csv_row in csv_rows.iter() {
@@ -36,13 +37,13 @@ pub(super) fn generate_graphs_from_csv(graphs_name: &str, csv_rows: &Vec<CSVRow>
     }
     if graphs.get_vaults() == Err(GruPHstError::NoVaultOnGraphs) {
         return Err(GruPHstError::CSVEmpty);
-    } 
+    }
     Ok(graphs)
 }
 
 fn collect_graphs_csv_rows_values<'a>(
     csv_rows: &'a mut Vec<CSVRow>,
-    edges:  &'a Vec<Edge>,
+    edges: &'a Vec<Edge>,
     vault_name: &str,
 ) -> Result<&'a mut Vec<CSVRow>, Box<dyn Error>> {
     for edge in edges.iter() {

@@ -15,7 +15,7 @@ use crate::graphs::Graphs;
 impl Graphs {
     /// Saves the current Graphs into a file with the Graphs's name
     /// <div class="warning">Deprecated method; will be removed on ver. 1.0.0</div>
-    /// 
+    ///
     /// # Examples
     /// ```rust
     /// use gruphst::{edge::Edge, vertex::Vertex, graphs::Graphs};
@@ -40,7 +40,11 @@ impl Graphs {
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
-        info!("Current Graphs persisted at {} file with {} bytes written", file_name, bytes.len());
+        info!(
+            "Current Graphs persisted at {} file with {} bytes written",
+            file_name,
+            bytes.len()
+        );
         Ok(())
     }
 
@@ -72,7 +76,11 @@ impl Graphs {
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
-        info!("Current Graphs persisted at {} file with {} bytes written", file_name, bytes.len());
+        info!(
+            "Current Graphs persisted at {} file with {} bytes written",
+            file_name,
+            bytes.len()
+        );
         Ok(())
     }
 

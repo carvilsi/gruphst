@@ -1,17 +1,17 @@
 //! Vertex modules
 
-use log::warn;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use crate::edge::Edge;
 use crate::errors::GruPHstError;
+use log::warn;
+use serde::{Deserialize, Serialize};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 use std::vec;
+use uuid::Uuid;
 
-mod query;
 mod cryptography;
+mod query;
 
 /// Representation of a vertex.
 /// A vertex or node, vertices in plural,
@@ -79,7 +79,7 @@ impl Vertex {
     pub fn get_id(&self) -> String {
         self.vrtx.borrow().id.clone()
     }
-    
+
     /// Retrieves the label for a vertex
     /// # Examples
     /// ```rust
@@ -92,7 +92,7 @@ impl Vertex {
     pub fn get_label(&self) -> String {
         self.vrtx.borrow().label.clone()
     }
- 
+
     /// Sets the label for a vertex
     /// # Examples
     /// ```rust
@@ -119,14 +119,20 @@ impl Vertex {
     /// gandalf.set_attr("years old", 24000);
     /// ```
     pub fn set_attr<T>(&mut self, attr_k: &str, attr_v: T)
-    where 
+    where
         T: std::fmt::Display,
     {
-        self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
+        self.vrtx
+            .borrow_mut()
+            .attr
+            .insert(attr_k.to_string(), attr_v.to_string());
     }
 
     pub fn set_attr_vec_u8(&mut self, attr_k: &str, attr_v: &[u8]) {
-        self.vrtx.borrow_mut().attr_vec_u8.insert(attr_k.to_string(), attr_v.to_owned());
+        self.vrtx
+            .borrow_mut()
+            .attr_vec_u8
+            .insert(attr_k.to_string(), attr_v.to_owned());
     }
 
     /// Get attribute for a vertex
@@ -234,7 +240,11 @@ impl Vertex {
     /// of Vec<u8> attributes
     pub fn get_attr_vec_u8_keys(&self) -> Vec<String> {
         let binding = self.vrtx.borrow();
-        let kv: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        let kv: Vec<String> = binding
+            .attr_vec_u8
+            .iter()
+            .map(|(k, _v)| k.clone())
+            .collect();
         kv
     }
 
@@ -243,9 +253,13 @@ impl Vertex {
     pub fn get_attr_keys(&self) -> Vec<String> {
         let binding = self.vrtx.borrow();
         let mut kv_attr: Vec<String> = binding.attr.iter().map(|(k, _v)| k.clone()).collect();
-        let mut kv_attr_vec_u8: Vec<String> = binding.attr_vec_u8.iter().map(|(k, _v)| k.clone()).collect();
+        let mut kv_attr_vec_u8: Vec<String> = binding
+            .attr_vec_u8
+            .iter()
+            .map(|(k, _v)| k.clone())
+            .collect();
         kv_attr.append(&mut kv_attr_vec_u8);
-        kv_attr 
+        kv_attr
     }
 
     /// Retrieves the vertices that has relation out for the given vertex on a collection of edges

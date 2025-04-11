@@ -1,5 +1,12 @@
 # Changelog
 
+newchangelogentry
+
+# [v0.16.0](https://github.com/carvilsi/gruphst/releases/tag/v0.16.0) (2025-04-?)
+
+- adds get_uniq_vertices_on_graphs to return a collection with the unique vertices from all vaults
+- adds export Graphs to Graphviz format
+
 # [v0.15.0](https://github.com/carvilsi/gruphst/releases/tag/v0.15.0) (2024-10-08)
 
 - deprecating persists method and adding save one

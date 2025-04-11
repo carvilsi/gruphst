@@ -1,5 +1,5 @@
 //! CSV export/import module
-//! 
+//!
 //! Structure of CSV file:
 //! ```csv
 //! grpahs; from_label; from_attributes; relation; to_label; to_attributes
@@ -10,9 +10,12 @@
 
 use std::error::Error;
 
+use crate::{
+    config::get_csv_delimiter, edge::Edge, errors::GruPHstError, graphs::Graphs,
+    util::get_file_name_from_path, vertex::Vertex,
+};
 use csv_handlers::{collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
 use serde::{Deserialize, Serialize};
-use crate::{config::get_csv_delimiter, edge::Edge, errors::GruPHstError, graphs::Graphs, util::get_file_name_from_path, vertex::Vertex};
 
 use super::generic::collect_attributes_str;
 
@@ -20,7 +23,6 @@ mod csv_handlers;
 
 // XXX: Comments; things to think and to implement
 // - We need to support at least two different types of attributes, the Stringy ones and the Vec<u8>
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CSVRow {
@@ -68,16 +70,16 @@ impl CSVRow {
 /// with semicolon ';' as default delimiter,
 /// for custom delimiter character check config file
 /// variable GRUPHST_CSV_DELIMITER
-/// 
+///
 /// #Examples
 /// ```rust
 /// use gruphst::edge::Edge;
 /// use gruphst::vertex::Vertex;
 /// use gruphst::graphs::Graphs;
 /// use gruphst::exporter_importer::csv::export_to_csv_gruphst_format;
-/// 
+///
 /// let mut gru = Graphs::init("shire-friendships");
-/// 
+///
 /// let mut gandalf_v = Vertex::new("gandalf");
 /// gandalf_v.set_attr("name", "Gandalf");
 /// gandalf_v.set_attr("known as", "Gandalf the Gray");
@@ -86,9 +88,9 @@ impl CSVRow {
 /// frodo_v.set_attr("name", "Frodo Bolson");
 ///
 /// let edge = Edge::create(&gandalf_v, "friend of", &frodo_v);
-/// 
+///
 /// gru.add_edge(&edge, None);
-/// 
+///
 /// export_to_csv_gruphst_format(
 ///     &gru,
 ///     Some("./"),
@@ -98,7 +100,7 @@ impl CSVRow {
 pub fn export_to_csv_gruphst_format(
     graphs: &Graphs,
     csv_file_path: Option<&str>,
-    csv_filename: Option<&str>
+    csv_filename: Option<&str>,
 ) -> Result<(), Box<dyn Error>> {
     let csv_delimiter = get_csv_delimiter();
     let mut export_csv_filename: String = graphs.get_label();
@@ -107,7 +109,7 @@ pub fn export_to_csv_gruphst_format(
     }
     if let Some(cvsfpth) = csv_file_path {
         export_csv_filename = format!("{}/{}", cvsfpth, export_csv_filename);
-    } 
+    }
     let filename = format!("{}.csv", export_csv_filename);
     let mut wtr = csv::WriterBuilder::new()
         .delimiter(csv_delimiter)
@@ -124,12 +126,12 @@ pub fn export_to_csv_gruphst_format(
 /// with semicolon ';' as default delimiter,
 /// for custom delimiter character check config file
 /// variable GRUPHST_CSV_DELIMITER
-/// 
+///
 /// #Examples
 /// ```rust
 /// use gruphst::graphs::Graphs;
 /// use gruphst::exporter_importer::csv::import_from_csv_gruphst_format;
-/// 
+///
 /// let csv_file_path = "./tests/data/exported.csv";
 /// let graphs: Graphs = import_from_csv_gruphst_format(csv_file_path).unwrap();
 /// ```
