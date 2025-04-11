@@ -10,9 +10,11 @@
 
 use std::error::Error;
 
-use csv_handlers::{collect_attributes_str, collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
+use csv_handlers::{collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
 use serde::{Deserialize, Serialize};
 use crate::{config::get_csv_delimiter, edge::Edge, errors::GruPHstError, graphs::Graphs, util::get_file_name_from_path, vertex::Vertex};
+
+use super::generic::collect_attributes_str;
 
 mod csv_handlers;
 

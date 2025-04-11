@@ -1,0 +1,17 @@
+digraph {
+	frodo [label="frodo" tooltip="name: Frodo Bolson"]
+	gandalf [label="gandalf" tooltip="name: Gandalf | known as: Gandalf the Gray"]
+	sam [label="sam" tooltip="surname: Gamgee"]
+	gandalf -> frodo [label="friend of"]
+	frodo -> gandalf [label="friend of"]
+	sam -> frodo [label="best friend of"]
+	sauron [label="sauron" tooltip="identified as: Necromancer"]
+	saruman [label="saruman" tooltip="known as: Saruman of Many Colours"]
+	gandalf [label="gandalf" tooltip="name: Gandalf | known as: Gandalf the Gray"]
+	frodo [label="frodo" tooltip="name: Frodo Bolson"]
+	saruman -> sauron [label="ally of"]
+	sauron -> saruman [label="lord of"]
+	gandalf -> sauron [label="enemy of"]
+	gandalf -> saruman [label="enemy of"]
+	sauron -> frodo [label="wants to catch"]
+}

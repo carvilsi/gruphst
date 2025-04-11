@@ -4,7 +4,7 @@ use gruphst::vertex::Vertex;
 use gruphst::exporter_importer::csv::*;
 use std::fs::{read_to_string, File};
 
-fn prepare_export_import_test() -> Graphs {
+fn prepare_export_import_csv_test() -> Graphs {
     let mut gru = Graphs::init("shire-friendships");
     
     let mut gandalf_v = Vertex::new("gandalf");
@@ -24,16 +24,16 @@ fn prepare_export_import_test() -> Graphs {
     let edge2 = Edge::create(&sam_v, "best friend of", &frodo_v);
     gru.add_edge(&edge2, None);
 
-     gru.insert("middle-earth-enemies");
-     let mut saruman = Vertex::new("saruman");
-     saruman.set_attr("known as", "Saruman of Many Colours");
-     let mut sauron = Vertex::new("sauron");
-     sauron.set_attr("identified as", "Necromancer");
+    gru.insert("middle-earth-enemies");
+    let mut saruman = Vertex::new("saruman");
+    saruman.set_attr("known as", "Saruman of Many Colours");
+    let mut sauron = Vertex::new("sauron");
+    sauron.set_attr("identified as", "Necromancer");
 
-     let edge3 = Edge::create(&saruman, "ally of", &sauron);
-     let edge4 = Edge::create(&sauron, "lord of", &saruman);
+    let edge3 = Edge::create(&saruman, "ally of", &sauron);
+    let edge4 = Edge::create(&sauron, "lord of", &saruman);
 
-     gru.add_edges(&mut vec!(edge3, edge4), None);
+    gru.add_edges(&mut vec!(edge3, edge4), None);
 
     gru
 }
@@ -76,7 +76,7 @@ fn assertion_exported_csv_file(csv_file_path: &str) {
 
 #[test]
 fn should_export_to_csv_custom_file_name_and_path() {
-    let gru = prepare_export_import_test();
+    let gru = prepare_export_import_csv_test();
     
     export_to_csv_gruphst_format(&gru, Some("./tests/data/"), Some("export_custom")).unwrap();
     
@@ -87,7 +87,7 @@ fn should_export_to_csv_custom_file_name_and_path() {
 
 #[test]
 fn should_export_to_csv_default_file_name_and_path() {
-    let gru = prepare_export_import_test();
+    let gru = prepare_export_import_csv_test();
     
     export_to_csv_gruphst_format(&gru, Some("./tests/data/"), None).unwrap();
     
@@ -97,7 +97,7 @@ fn should_export_to_csv_default_file_name_and_path() {
 
 #[test]
 fn should_export_to_csv_default_file_name_and_default_path() {
-    let gru = prepare_export_import_test();
+    let gru = prepare_export_import_csv_test();
     
     export_to_csv_gruphst_format(&gru, None, None).unwrap();
     
@@ -107,7 +107,7 @@ fn should_export_to_csv_default_file_name_and_default_path() {
 
 #[test]
 fn should_fail_export_to_csv_on_non_existent_path() {
-    let gru = prepare_export_import_test();
+    let gru = prepare_export_import_csv_test();
 
     assert!(export_to_csv_gruphst_format(&gru, Some("/foobar"), None).is_err());
 }
