@@ -32,17 +32,16 @@ pub fn export_to_graphviz_format(
     let header = generate_graphviz_header();
     writeln!(file, "{}", header)?;
     
-    let vaults = graphs.get_vaults()?;
-    for (vault_name, edges) in vaults {
-      let vertices = graphs.get_uniq_vertices(Some(&vault_name))?;
-      for vertex in vertices {
+    let vertives = graphs.get_uniq_vertices_on_graphs()?;
+    for vertex in vertives {
         let label = vertex.get_label();
         println!("label: {}", label);
         let tooltip = collect_attributes_str(&vertex)?;
         writeln!(file, "\t{} [label=\"{}\" tooltip=\"{}\"];", label, label, tooltip)?;
-      }
-      
-      // let edges = graphs.get_edges(None)?;
+    }
+
+    let vaults = graphs.get_vaults()?;
+    for (_vault_name, edges) in vaults {
       for edge in edges {
         let from_vertex = edge.get_from_vertex();
         let to_vertex = edge.get_to_vertex();
