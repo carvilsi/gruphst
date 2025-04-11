@@ -35,7 +35,6 @@ pub fn export_to_graphviz_format(
     let vertives = graphs.get_uniq_vertices_on_graphs()?;
     for vertex in vertives {
         let label = vertex.get_label();
-        println!("label: {}", label);
         let tooltip = collect_attributes_str(&vertex)?;
         writeln!(file, "\t{} [label=\"{}\" tooltip=\"{}\"];", label, label, tooltip)?;
     }

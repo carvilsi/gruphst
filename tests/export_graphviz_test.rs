@@ -2,6 +2,7 @@ use gruphst::{edge::Edge, exporter_importer::graphviz::export_to_graphviz_format
 use gruphst::graphs::Graphs;
 use gruphst::vertex::Vertex;
 use std::fs::{read_to_string, File};
+use std::vec;
 
 fn prepare_export_graphviz_test() -> Graphs {
     let mut gru = Graphs::init("shire-friendships");
@@ -46,57 +47,34 @@ fn assertion_exported_graphviz_file(gv_file_path: &str) {
     let exported_file = File::open(gv_file_path).unwrap();
     assert!(exported_file.metadata().unwrap().len() != 0);
     
-    let row1 = String::from("digraph {");
-    let row2_0 = String::from("gandalf [label=\"gandalf\" tooltip=\"name: Gandalf | known as: Gandalf the Gray\"];");
-    let row2 = String::from("gandalf [label=\"gandalf\" tooltip=\"known as: Gandalf the Gray | name: Gandalf\"];");
-    let row3 = String::from("saruman [label=\"saruman\" tooltip=\"known as: Saruman of Many Colours\"];");
-    let row4 = String::from("frodo [label=\"frodo\" tooltip=\"name: Frodo Bolson\"];");
-    let row5 = String::from("sam [label=\"sam\" tooltip=\"surname: Gamgee\"];");
-    let row6 = String::from("sauron [label=\"sauron\" tooltip=\"identified as: Necromancer\"];");
-    let row7 = String::from("gandalf -> frodo [label=\"friend of\"];");
-    let row8 = String::from("frodo -> gandalf [label=\"friend of\"];");
-    let row9 = String::from("sam -> frodo [label=\"best friend of\"];");
-    let row10 = String::from("saruman -> sauron [label=\"ally of\"];");
-    let row11 = String::from("sauron -> saruman [label=\"lord of\"];");
-    let row12 = String::from("gandalf -> sauron [label=\"enemy of\"];");
-    let row13 = String::from("gandalf -> saruman [label=\"enemy of\"];");
-    let row14 = String::from("sauron -> frodo [label=\"wants to catch\"];");
-    let row15 = String::from("}");
+    let mut vector = Vec::new();
+    vector.push(String::from("digraph {"));
+    vector.push(String::from("gandalf [label=\"gandalf\" tooltip=\"name: Gandalf | known as: Gandalf the Gray\"];"));
+    vector.push(String::from("gandalf [label=\"gandalf\" tooltip=\"known as: Gandalf the Gray | name: Gandalf\"];"));
+    vector.push(String::from("saruman [label=\"saruman\" tooltip=\"known as: Saruman of Many Colours\"];"));
+    vector.push(String::from("frodo [label=\"frodo\" tooltip=\"name: Frodo Bolson\"];"));
+    vector.push(String::from("sam [label=\"sam\" tooltip=\"surname: Gamgee\"];"));
+    vector.push(String::from("sauron [label=\"sauron\" tooltip=\"identified as: Necromancer\"];"));
+    vector.push(String::from("gandalf -> frodo [label=\"friend of\"];"));
+    vector.push(String::from("frodo -> gandalf [label=\"friend of\"];"));
+    vector.push(String::from("sam -> frodo [label=\"best friend of\"];"));
+    vector.push(String::from("saruman -> sauron [label=\"ally of\"];"));
+    vector.push(String::from("sauron -> saruman [label=\"lord of\"];"));
+    vector.push(String::from("gandalf -> sauron [label=\"enemy of\"];"));
+    vector.push(String::from("gandalf -> saruman [label=\"enemy of\"];"));
+    vector.push(String::from("sauron -> frodo [label=\"wants to catch\"];"));
+    vector.push(String::from("}"));
     
-    let binding = read_to_string(gv_file_path).unwrap(); 
-    println!("binding: {}", binding);
-    // let mut gv_lines = binding.lines(); 
-    assert!(binding.contains(&row1));
-    assert!(binding.contains(&row2) || binding.contains(&row2_0));
-    assert!(binding.contains(&row3));
-    assert!(binding.contains(&row4));
-    assert!(binding.contains(&row5));
-    assert!(binding.contains(&row6));
-    assert!(binding.contains(&row7));
-    assert!(binding.contains(&row8));
-    assert!(binding.contains(&row9));
-    assert!(binding.contains(&row10));
-    assert!(binding.contains(&row11));
-    assert!(binding.contains(&row12));
-    assert!(binding.contains(&row13));
-    assert!(binding.contains(&row14));
-    assert!(binding.contains(&row15));
-    
-    // assert_eq!(gv_lines.next().unwrap(), &row1);
-    // assert_eq!(gv_lines.next().unwrap(), &row2);
-    // assert_eq!(gv_lines.next().unwrap(), &row3);
-    // assert_eq!(gv_lines.next().unwrap(), &row4);
-    // assert_eq!(gv_lines.next().unwrap(), &row5);
-    // assert_eq!(gv_lines.next().unwrap(), &row6);
-    // assert_eq!(gv_lines.next().unwrap(), &row7);
-    // assert_eq!(gv_lines.next().unwrap(), &row8);
-    // assert_eq!(gv_lines.next().unwrap(), &row9);
-    // assert_eq!(gv_lines.next().unwrap(), &row10);
-    // assert_eq!(gv_lines.next().unwrap(), &row11);
-    // assert_eq!(gv_lines.next().unwrap(), &row12);
-    // assert_eq!(gv_lines.next().unwrap(), &row13);
-    // assert_eq!(gv_lines.next().unwrap(), &row14);
-    // assert_eq!(gv_lines.next().unwrap(), &row15);
+    let lines= read_to_string(gv_file_path).unwrap(); 
+    let mut count = 0;
+    for line in vector.iter() {
+        if count == 1 || count == 2 {
+            assert_eq!(lines.contains(&vector[1]) || lines.contains(&vector[2]), true);
+        } else {
+            assert!(lines.contains(line)); 
+        }
+        count += 1;
+    } 
 }
 
 #[test]
