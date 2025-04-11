@@ -46,25 +46,41 @@ fn assertion_exported_graphviz_file(gv_file_path: &str) {
     let exported_file = File::open(gv_file_path).unwrap();
     assert!(exported_file.metadata().unwrap().len() != 0);
     
-    // let row1 = String::from("digraph {");
-    // let row2 = String::from("gandalf [label=\"gandalf\" tooltip=\"name: Gandalf | known as: Gandalf the Gray\"];");
-    // let row3 = String::from("saruman [label=\"saruman\" tooltip=\"known as: Saruman of Many Colours\"];");
-    // let row4 = String::from("frodo [label=\"frodo\" tooltip=\"name: Frodo Bolson\"];");
-    // let row5 = String::from("sam [label=\"sam\" tooltip=\"surname: Gamgee\"];");
-    // let row6 = String::from("sauron [label=\"sauron\" tooltip=\"identified as: Necromancer\"];");
-    // let row7 = String::from("gandalf -> frodo [label=\"friend of\"];");
-    // let row8 = String::from("frodo -> gandalf [label=\"friend of\"];");
-    // let row9 = String::from("sam -> frodo [label=\"best friend of\"];");
-    // let row10 = String::from("saruman -> sauron [label=\"ally of\"];");
-    // let row11 = String::from("sauron -> saruman [label=\"lord of\"];");
-    // let row12 = String::from("gandalf -> sauron [label=\"enemy of\"];");
-    // let row13 = String::from("gandalf -> saruman [label=\"enemy of\"];");
-    // let row14 = String::from("sauron -> frodo [label=\"wants to catch\"];");
-    // let row15 = String::from("}");
+    let row1 = String::from("digraph {");
+    let row2_0 = String::from("gandalf [label=\"gandalf\" tooltip=\"name: Gandalf | known as: Gandalf the Gray\"];");
+    let row2 = String::from("gandalf [label=\"gandalf\" tooltip=\"known as: Gandalf the Gray | name: Gandalf\"];");
+    let row3 = String::from("saruman [label=\"saruman\" tooltip=\"known as: Saruman of Many Colours\"];");
+    let row4 = String::from("frodo [label=\"frodo\" tooltip=\"name: Frodo Bolson\"];");
+    let row5 = String::from("sam [label=\"sam\" tooltip=\"surname: Gamgee\"];");
+    let row6 = String::from("sauron [label=\"sauron\" tooltip=\"identified as: Necromancer\"];");
+    let row7 = String::from("gandalf -> frodo [label=\"friend of\"];");
+    let row8 = String::from("frodo -> gandalf [label=\"friend of\"];");
+    let row9 = String::from("sam -> frodo [label=\"best friend of\"];");
+    let row10 = String::from("saruman -> sauron [label=\"ally of\"];");
+    let row11 = String::from("sauron -> saruman [label=\"lord of\"];");
+    let row12 = String::from("gandalf -> sauron [label=\"enemy of\"];");
+    let row13 = String::from("gandalf -> saruman [label=\"enemy of\"];");
+    let row14 = String::from("sauron -> frodo [label=\"wants to catch\"];");
+    let row15 = String::from("}");
     
-    // let binding = read_to_string(gv_file_path).unwrap(); 
+    let binding = read_to_string(gv_file_path).unwrap(); 
+    println!("binding: {}", binding);
     // let mut gv_lines = binding.lines(); 
-
+    assert!(binding.contains(&row1));
+    assert!(binding.contains(&row2) || binding.contains(&row2_0));
+    assert!(binding.contains(&row3));
+    assert!(binding.contains(&row4));
+    assert!(binding.contains(&row5));
+    assert!(binding.contains(&row6));
+    assert!(binding.contains(&row7));
+    assert!(binding.contains(&row8));
+    assert!(binding.contains(&row9));
+    assert!(binding.contains(&row10));
+    assert!(binding.contains(&row11));
+    assert!(binding.contains(&row12));
+    assert!(binding.contains(&row13));
+    assert!(binding.contains(&row14));
+    assert!(binding.contains(&row15));
     
     // assert_eq!(gv_lines.next().unwrap(), &row1);
     // assert_eq!(gv_lines.next().unwrap(), &row2);
