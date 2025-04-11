@@ -168,6 +168,20 @@ impl Graphs {
         Ok(uniq_vertices)
     }
 
+    /// Returns a collection with the unique vertices from all vaults
+    pub fn get_uniq_vertices_on_graphs(&self) -> Result<Vec<Vertex>, GruPHstError> {
+        let vaults = self.get_vaults()?;
+        let mut vertices_map: HashMap<String, Vertex> = HashMap::new();
+        for (_, edges) in vaults {
+            for edge in edges {
+                vertices_map.insert(edge.get_from_vertex().get_id(), edge.get_from_vertex());
+                vertices_map.insert(edge.get_to_vertex().get_id(), edge.get_to_vertex());
+            }
+        }
+        let uniq_vertices: Vec<Vertex> = vertices_map.into_values().collect();
+        Ok(uniq_vertices)
+    }
+
     /// Updates the name of the Graphs
     pub fn update_label(&mut self, label: &str) {
         self.label = label.to_string();

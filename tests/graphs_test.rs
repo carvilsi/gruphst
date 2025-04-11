@@ -556,6 +556,31 @@ fn should_fail_returning_unique_vertices_vault_is_empty() {
 }
 
 #[test]
+fn should_return_uniq_vertices_from_all_graphs() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+    let uniq_vertices = graphs.get_uniq_vertices_on_graphs().unwrap();
+    assert_eq!(uniq_vertices.len(), 5);
+    let mut labels: Vec<String> = Vec::new();
+    for edge in uniq_vertices {
+        labels.push(edge.get_label());
+    }
+
+    assert!(labels.contains(&"Alice".to_string()));
+    assert!(labels.contains(&"Bob".to_string()));
+    assert!(labels.contains(&"Fred".to_string()));
+    assert!(labels.contains(&"Gandalf".to_string()));
+    assert!(labels.contains(&"Saruman".to_string()));
+}
+
+#[test]
+fn should_fail_returning_unique_vertices_on_graphs_vault_is_empty() {
+    let graphs = Graphs::init("vault void");
+    let e = graphs.get_uniq_vertices_on_graphs();
+    assert_eq!(e, Err(GruPHstError::NoVaultOnGraphs));
+}
+
+#[test]
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
