@@ -22,7 +22,6 @@ const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
 ///
 /// let max_mem = get_max_mem_usage();
 /// ```
-
 pub fn get_max_mem_usage() -> usize {
     dotenv().ok();
     match dotenv::var(GRUPHST_MAX_MEM_USAGE) {

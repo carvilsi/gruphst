@@ -17,7 +17,7 @@ pub(super) fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
     if attrs_str.contains("|") {
         let raw_attrs_vec: Vec<&str> = attrs_str.split('|').collect();
         for attr_str in raw_attrs_vec.iter() {
-            fill_vertex_attributes(vertex, &attr_str);
+            fill_vertex_attributes(vertex, attr_str);
         }
     } else {
         fill_vertex_attributes(vertex, attrs_str);
