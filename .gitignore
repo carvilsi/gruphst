@@ -11,3 +11,4 @@ export_csv_filename.csv
 middle-earth-enemies.gv.txt
 tests/data/empty.gv.txt
 tests/data/export_custom_graphviz.gv.txt
+export_graphviz_filename.gv.txt
