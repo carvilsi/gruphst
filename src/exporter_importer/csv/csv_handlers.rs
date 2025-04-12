@@ -26,7 +26,7 @@ pub(super) fn process_vertex_attributes(vertex: &mut Vertex, attrs_str: &str) {
 
 pub(super) fn generate_graphs_from_csv(
     graphs_name: &str,
-    csv_rows: &Vec<CSVRow>,
+    csv_rows: &[CSVRow],
 ) -> Result<Graphs, GruPHstError> {
     let mut graphs = Graphs::init(graphs_name);
     create_vaults_from_csv(&mut graphs, csv_rows);

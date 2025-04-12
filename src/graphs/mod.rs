@@ -107,7 +107,7 @@ impl Graphs {
         let vaults = self.vault.clone();
         if vaults.values().len() == 1 {
             for val in vaults.values() {
-                if val.len() == 0 {
+                if val.is_empty() {
                     return Err(GruPHstError::NoVaultOnGraphs);
                 }
             }
