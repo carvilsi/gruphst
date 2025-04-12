@@ -224,10 +224,8 @@ impl Graphs {
             graphs_memory_watcher(self);
             Ok(())
         } else {
-            error!(
-                "Edge to update with id: [{}] not found",
-                edge_to_update.get_id()
-            );
+            #[rustfmt::skip]
+            error!("Edge to update with id: [{}] not found", edge_to_update.get_id());
             Err(GruPHstError::EdgeNotFound)
         }
     }
