@@ -40,11 +40,8 @@ impl Graphs {
             .open(file_name.clone())?;
         let bytes = bincode::serialize(self)?;
         file.write_all(&bytes)?;
-        info!(
-            "Current Graphs persisted at {} file with {} bytes written",
-            file_name,
-            bytes.len()
-        );
+        #[rustfmt::skip]
+        info!("Current Graphs persisted at {} file with {} bytes written", file_name, bytes.len());
         Ok(())
     }
 
