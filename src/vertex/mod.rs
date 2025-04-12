@@ -122,10 +122,8 @@ impl Vertex {
     where
         T: std::fmt::Display,
     {
-        self.vrtx
-            .borrow_mut()
-            .attr
-            .insert(attr_k.to_string(), attr_v.to_string());
+        #[rustfmt::skip]
+        self.vrtx.borrow_mut().attr.insert(attr_k.to_string(), attr_v.to_string());
     }
 
     pub fn set_attr_vec_u8(&mut self, attr_k: &str, attr_v: &[u8]) {

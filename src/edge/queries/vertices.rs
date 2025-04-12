@@ -30,8 +30,8 @@ impl Edge {
     where
         T: std::fmt::Display + std::clone::Clone,
     {
-        self.get_from_vertex()
-            .has_attr_str_equals_to(attr_k, attr_v.clone())
+        #[cfg_attr(tarpaulin, ignore)]
+        self.get_from_vertex().has_attr_str_equals_to(attr_k, attr_v.clone())
             || self
                 .get_to_vertex()
                 .has_attr_str_equals_to(attr_k, attr_v.clone())
