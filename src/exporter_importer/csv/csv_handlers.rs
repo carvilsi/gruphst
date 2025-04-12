@@ -43,7 +43,7 @@ pub(super) fn generate_graphs_from_csv(
 
 fn collect_graphs_csv_rows_values<'a>(
     csv_rows: &'a mut Vec<CSVRow>,
-    edges: &'a Vec<Edge>,
+    edges: &'a [Edge],
     vault_name: &str,
 ) -> Result<&'a mut Vec<CSVRow>, Box<dyn Error>> {
     for edge in edges.iter() {
@@ -54,10 +54,10 @@ fn collect_graphs_csv_rows_values<'a>(
 
 fn fill_vertex_attributes(vertex: &mut Vertex, attr_str: &str) {
     let attr: Vec<&str> = attr_str.split(':').collect();
-    vertex.set_attr(attr.get(0).unwrap().trim(), attr.get(1).unwrap().trim());
+    vertex.set_attr(attr.first().unwrap().trim(), attr.get(1).unwrap().trim());
 }
 
-fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &Vec<CSVRow>) {
+fn create_vaults_from_csv(graphs: &mut Graphs, csv_rows: &[CSVRow]) {
     for csv_row in csv_rows.iter() {
         graphs.insert(&csv_row.graphs_vault);
     }
