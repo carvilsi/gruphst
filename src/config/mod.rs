@@ -32,10 +32,7 @@ pub fn get_max_mem_usage() -> usize {
             max_conf as usize
         }
         Err(_) => {
-            warn!(
-                "No config for {}, using default value: {}",
-                GRUPHST_MAX_MEM_USAGE, DEFAULT_GRUPHST_MAX_MEM_USAGE
-            );
+            warn!("No config for {}, using default value: {}", GRUPHST_MAX_MEM_USAGE, DEFAULT_GRUPHST_MAX_MEM_USAGE);
             DEFAULT_GRUPHST_MAX_MEM_USAGE
         }
     }
@@ -66,10 +63,7 @@ pub fn get_log_level() -> log::Level {
             _ => DEFAULT_GRUPHST_LOG_LEVEL,
         },
         Err(_) => {
-            warn!(
-                "No config for {}, using default value: {}",
-                GRUPHST_LOG_LEVEL, DEFAULT_GRUPHST_LOG_LEVEL
-            );
+            warn!("No config for {}, using default value: {}", GRUPHST_LOG_LEVEL, DEFAULT_GRUPHST_LOG_LEVEL);
             DEFAULT_GRUPHST_LOG_LEVEL
         }
     }
