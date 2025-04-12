@@ -32,7 +32,7 @@ pub(super) fn generate_graphs_from_csv(
     create_vaults_from_csv(&mut graphs, csv_rows);
     for csv_row in csv_rows.iter() {
         let (vertex_from, vertex_to) = &csv_row.generate_vertices();
-        let edge = Edge::create(&vertex_from, &csv_row.relation, &vertex_to);
+        let edge = Edge::create(vertex_from, &csv_row.relation, vertex_to);
         graphs.add_edge(&edge, Some(&csv_row.graphs_vault));
     }
     if graphs.get_vaults() == Err(GruPHstError::NoVaultOnGraphs) {
