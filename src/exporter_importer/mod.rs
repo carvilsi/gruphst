@@ -1,5 +1,5 @@
 //! Exporter/Importer modules
 
 pub mod csv;
-mod generic;
+mod util;
 pub mod graphviz;

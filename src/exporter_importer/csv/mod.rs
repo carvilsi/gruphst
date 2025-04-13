@@ -17,7 +17,7 @@ use crate::{
 use csv_handlers::{collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
 use serde::{Deserialize, Serialize};
 
-use super::generic::collect_attributes_str;
+use super::util::collect_attributes_str;
 
 mod csv_handlers;
 

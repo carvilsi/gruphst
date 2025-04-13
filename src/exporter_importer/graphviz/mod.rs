@@ -3,7 +3,7 @@ use std::io::Write;
 
 use crate::graphs::Graphs;
 
-use super::generic::collect_attributes_str;
+use super::util::collect_attributes_str;
 
 fn generate_graphviz_header() -> String {
     String::from("digraph {")
@@ -13,6 +13,34 @@ fn generate_graphviz_footer() -> String {
     String::from("}")
 }
 
+/// Export the Graphs to a Graphviz format
+/// 
+/// #Examples
+/// ```rust
+/// use gruphst::edge::Edge;
+/// use gruphst::vertex::Vertex;
+/// use gruphst::graphs::Graphs;
+/// use gruphst::exporter_importer::graphviz::export_to_graphviz_format;
+///
+/// let mut gru = Graphs::init("shire-friendships");
+///
+/// let mut gandalf_v = Vertex::new("gandalf");
+/// gandalf_v.set_attr("name", "Gandalf");
+/// gandalf_v.set_attr("known as", "Gandalf the Gray");
+///
+/// let mut frodo_v = Vertex::new("frodo");
+/// frodo_v.set_attr("name", "Frodo Bolson");
+///
+/// let edge = Edge::create(&gandalf_v, "friend of", &frodo_v);
+///
+/// gru.add_edge(&edge, None);
+///
+/// export_to_graphviz_format(
+///     &gru,
+///     Some("./"),
+///     Some("export_graphviz_filename")
+/// ).unwrap();
+/// ```
 pub fn export_to_graphviz_format(
     graphs: &Graphs,
     gv_file_path: Option<&str>,
