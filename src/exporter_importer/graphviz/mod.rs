@@ -3,7 +3,7 @@ use std::io::Write;
 
 use crate::graphs::Graphs;
 
-use super::util::collect_attributes_str;
+use super::util::{collect_attributes_str, get_filename, ExportFileFormat};
 
 fn generate_graphviz_header() -> String {
     String::from("digraph {")
@@ -14,7 +14,7 @@ fn generate_graphviz_footer() -> String {
 }
 
 /// Export the Graphs to a Graphviz format
-/// 
+///
 /// #Examples
 /// ```rust
 /// use gruphst::edge::Edge;
@@ -46,14 +46,12 @@ pub fn export_to_graphviz_format(
     gv_file_path: Option<&str>,
     gv_filename: Option<&str>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut export_gv_filename: String = graphs.get_label();
-    if let Some(gvflnm) = gv_filename {
-        export_gv_filename = gvflnm.to_string();
-    }
-    if let Some(gvfpth) = gv_file_path {
-        export_gv_filename = format!("{}/{}", gvfpth, export_gv_filename);
-    }
-    let filename = format!("{}.gv.txt", export_gv_filename);
+    let filename = get_filename(
+        graphs,
+        gv_filename,
+        gv_file_path,
+        ExportFileFormat::GraphViz,
+    );
 
     let mut file = std::fs::File::create(&filename)?;
 
