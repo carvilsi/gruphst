@@ -17,7 +17,7 @@ use crate::{
 use csv_handlers::{collect_graphs_csv_rows, generate_graphs_from_csv, process_vertex_attributes};
 use serde::{Deserialize, Serialize};
 
-use super::util::collect_attributes_str;
+use super::util::{collect_attributes_str, get_filename, ExportFileFormat};
 
 mod csv_handlers;
 
@@ -103,14 +103,7 @@ pub fn export_to_csv_gruphst_format(
     csv_filename: Option<&str>,
 ) -> Result<(), Box<dyn Error>> {
     let csv_delimiter = get_csv_delimiter();
-    let mut export_csv_filename: String = graphs.get_label();
-    if let Some(csvflnm) = csv_filename {
-        export_csv_filename = csvflnm.to_string();
-    }
-    if let Some(cvsfpth) = csv_file_path {
-        export_csv_filename = format!("{}/{}", cvsfpth, export_csv_filename);
-    }
-    let filename = format!("{}.csv", export_csv_filename);
+    let filename = get_filename(graphs, csv_filename, csv_file_path, ExportFileFormat::CSV);
     let mut wtr = csv::WriterBuilder::new()
         .delimiter(csv_delimiter)
         .from_path(filename.as_str())?;

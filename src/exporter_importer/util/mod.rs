@@ -1,5 +1,13 @@
-use crate::vertex::Vertex;
+use crate::{graphs::Graphs, vertex::Vertex};
 use std::error::Error;
+
+const CSV_EXTENSION: &str = "csv";
+const GRAPHVIZ_EXTENSION: &str = "gv.txt";
+
+pub(super) enum ExportFileFormat {
+    CSV,
+    GraphViz,
+}
 
 pub(super) fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn Error>> {
     let attr_str_keys = vertex.get_attr_keys();
@@ -15,4 +23,25 @@ pub(super) fn collect_attributes_str(vertex: &Vertex) -> Result<String, Box<dyn 
         }
     }
     Ok(res)
+}
+
+pub(super) fn get_filename(
+    graphs: &Graphs,
+    flnm: Option<&str>,
+    flpth: Option<&str>,
+    format: ExportFileFormat,
+) -> String {
+    let mut export_filename: String = graphs.get_label();
+    if let Some(csvflnm) = flnm {
+        export_filename = csvflnm.to_string();
+    }
+    if let Some(cvsfpth) = flpth {
+        export_filename = format!("{}/{}", cvsfpth, export_filename);
+    }
+    let extension = match format {
+        ExportFileFormat::CSV => CSV_EXTENSION,
+        ExportFileFormat::GraphViz => GRAPHVIZ_EXTENSION,
+    };
+    let filename = format!("{}.{}", export_filename, extension);
+    filename
 }
