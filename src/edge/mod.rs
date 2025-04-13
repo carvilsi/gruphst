@@ -6,7 +6,10 @@ use log::warn;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{errors::GruPHstError, vertex::{Vertex, Vertex_}};
+use crate::{
+    errors::GruPHstError,
+    vertex::{Vertex, Vertex_},
+};
 
 mod queries;
 
@@ -206,7 +209,7 @@ impl Edge {
             true => {
                 warn!("Attributes empty for {}", self.get_label());
                 Err(GruPHstError::AttributesEmpty)
-            },
+            }
         }
     }
 }

@@ -29,5 +29,5 @@ pub enum GruPHstError {
     #[error("CSV row missing relation value for edge")]
     CSVEdgeMissingRelation,
     #[error("Unknown GruPHst Error")]
-    Unknown
+    Unknown,
 }

@@ -9,7 +9,7 @@ fn prepare_edge_test() -> (Edge, String) {
     let mut edge = Edge::create(&alice, "friend of", &bob);
     edge.set_attr("type", "friendship");
     edge.set_attr("value", 2);
-    
+
     (edge.clone(), edge.get_id())
 }
 
@@ -258,7 +258,7 @@ fn should_find_vertex_by_id() {
     let (edge, _id) = prepare_edge_test();
     let vertex_id = edge.get_to_vertex().get_id();
     let found_vertex = edge.find_vertex_by_id(vertex_id.as_str()).unwrap();
-    assert_eq!(found_vertex.get_id(), vertex_id); 
+    assert_eq!(found_vertex.get_id(), vertex_id);
 }
 
 #[test]

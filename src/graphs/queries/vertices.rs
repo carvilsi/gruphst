@@ -13,7 +13,7 @@ impl Graphs {
         vault_name: Option<&str>,
     ) -> Result<Vertex, GruPHstError> {
         let current_vault = self.select_vault_mut(vault_name)?;
-        for edge in current_vault { 
+        for edge in current_vault {
             if let Ok(vertex) = edge.find_vertex_by_id(id) {
                 return Ok(vertex);
             }
@@ -44,9 +44,7 @@ impl Graphs {
         let mut relations_in: Vec<Vertex> = Vec::new();
         let current_vault = self.select_vault(vault_name)?;
         for edge in current_vault {
-            if edge.get_relation() == relation_in
-                && !relations_in.contains(&edge.get_to_vertex())
-            {
+            if edge.get_relation() == relation_in && !relations_in.contains(&edge.get_to_vertex()) {
                 relations_in.push(edge.get_to_vertex().clone());
             }
         }

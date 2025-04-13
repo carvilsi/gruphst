@@ -4,10 +4,10 @@ use gruphst::vertex::Vertex;
 
 fn prepare_persistence_test() -> (Graphs, Edge, Edge) {
     let mut gru = Graphs::init("graphs-a");
-    
+
     let mut vertex1 = Vertex::new("a edge");
     vertex1.set_attr("foo", "bar");
-    
+
     let vertex2 = Vertex::new("b edge");
 
     let edge1 = Edge::create(&vertex1, "relation a-b", &vertex2);
@@ -44,7 +44,7 @@ fn should_persists_deprecated_method() {
     let grphs = Graphs::load(&file_name);
     match grphs {
         Ok(grphs) => {
-            assertion_persisted_graphs(grphs, name, edge1, edge2);            
+            assertion_persisted_graphs(grphs, name, edge1, edge2);
         }
         Err(_) => panic!(),
     }
@@ -61,7 +61,7 @@ fn should_save_on_default_path() {
     let grphs = Graphs::load(&file_name);
     match grphs {
         Ok(grphs) => {
-            assertion_persisted_graphs(grphs, name, edge1, edge2);            
+            assertion_persisted_graphs(grphs, name, edge1, edge2);
         }
         Err(_) => panic!(),
     }
@@ -82,7 +82,7 @@ fn should_save_on_custom_path() {
         }
         Err(_err) => {
             panic!()
-        },
+        }
     }
 }
 #[test]
