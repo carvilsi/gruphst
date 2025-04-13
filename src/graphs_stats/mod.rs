@@ -1,9 +1,9 @@
 //! Graphs Stats module
 
+use crate::config::get_max_mem_usage;
+use crate::graphs::Graphs;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use crate::graphs::Graphs;
-use crate::config::get_max_mem_usage;
 
 /// Represents stats data from the Graphs
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -42,7 +42,7 @@ impl GraphsStats {
     pub fn get_mem(&self) -> usize {
         self.mem
     }
-    
+
     /// Retrieves the maximum memory allow usage for the Graphs
     pub fn get_max_mem(&self) -> usize {
         self.max_mem
@@ -98,7 +98,7 @@ fn get_stats(grphs: &Graphs) -> Result<GraphsStats, Box<dyn Error>> {
         total_vertices: grphs.len() * 2,
         uniq_rel: grphs.uniq_relations().len(),
         total_graphs: grphs.get_vaults()?.len(),
-        max_mem: get_max_mem_usage(), 
+        max_mem: get_max_mem_usage(),
     };
     Ok(stats)
 }

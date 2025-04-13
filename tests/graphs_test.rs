@@ -34,9 +34,9 @@ pub fn prepare_vector_edges() -> Vec<Edge> {
     let v1 = Vertex::new("v1");
     let v2 = Vertex::new("v2");
     let v3 = Vertex::new("v3");
-    
+
     let mut edges: Vec<Edge> = Vec::new();
-    
+
     let e1 = Edge::create(&v1, "v1->v2", &v2);
     edges.push(e1);
     let e2 = Edge::create(&v1, "v1->v3", &v3);
@@ -101,7 +101,10 @@ fn should_fail_remove_graph_from_the_vault_since_does_not_exits() {
     let mut graphs = prepare_graphs_test();
     assert_eq!(graphs.len_graphs(), 1);
     let e = graphs.delete_vault("!exists");
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -149,7 +152,10 @@ fn should_find_edges_by_relation() {
 fn should_not_find_edges_by_relation_since_vault_does_not_exists() {
     let mut graphs = Graphs::init("empty");
     let e = graphs.find_edges_by_relation("friend of", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -162,8 +168,7 @@ fn should_not_find_edges_by_relation_since_vault_is_empty() {
 #[test]
 fn should_edges_find_by_relation_in_graphs() {
     let mut graphs = prepare_graphs_test();
-    let mut vertices_found = 
-        graphs.find_edges_by_relation("friend of", None).unwrap();
+    let mut vertices_found = graphs.find_edges_by_relation("friend of", None).unwrap();
     assert_eq!(vertices_found.len(), 3);
     prepare_insert_graph_test(&mut graphs);
     vertices_found = graphs
@@ -176,8 +181,7 @@ fn should_edges_find_by_relation_in_graphs() {
 fn should_find_by_relations_name() {
     let mut graphs = prepare_graphs_test();
     let relations = vec!["friend of", "relative of"];
-    let vertices_found =
-        graphs.find_edges_by_relations(relations, None).unwrap();
+    let vertices_found = graphs.find_edges_by_relations(relations, None).unwrap();
     assert_eq!(vertices_found.len(), 4);
 }
 
@@ -192,9 +196,11 @@ fn should_not_find_by_relations_name() {
 fn should_not_find_by_relations_name_vault_does_not_exists() {
     let mut graphs = Graphs::init("void");
     let relations = vec!["foo", "bar"];
-    let e =
-        graphs.find_edges_by_relations(relations, Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    let e = graphs.find_edges_by_relations(relations, Some("!exists"));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -221,7 +227,9 @@ fn should_return_the_unique_relations_labels_for_whole_graphs() {
 #[test]
 fn should_find_edges_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    let edges_found = graphs.find_edges_with_vertex_attr_str_key("age", None).unwrap();
+    let edges_found = graphs
+        .find_edges_with_vertex_attr_str_key("age", None)
+        .unwrap();
     assert_eq!(edges_found.len(), 3);
     assert_eq!(edges_found[0].get_to_vertex().get_label(), "Bob");
 }
@@ -229,20 +237,27 @@ fn should_find_edges_with_attribute() {
 #[test]
 fn should_not_find_edges_with_attribute() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.find_edges_with_vertex_attr_str_key("foo", None).is_err());
+    assert!(graphs
+        .find_edges_with_vertex_attr_str_key("foo", None)
+        .is_err());
 }
 
 #[test]
 fn should_not_find_edges_with_attribute_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_key("foo", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
 fn should_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    let found_graphs = graphs.find_edges_with_vertex_attr_str_key_like("Ag", None).unwrap();
+    let found_graphs = graphs
+        .find_edges_with_vertex_attr_str_key_like("Ag", None)
+        .unwrap();
     assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
 }
@@ -250,20 +265,27 @@ fn should_find_graphs_with_attribute_like() {
 #[test]
 fn should_not_find_graphs_with_attribute_like() {
     let mut graphs = prepare_graphs_test();
-    assert!(graphs.find_edges_with_vertex_attr_str_key_like("fo", None).is_err());
+    assert!(graphs
+        .find_edges_with_vertex_attr_str_key_like("fo", None)
+        .is_err());
 }
 
 #[test]
 fn should_not_find_graphs_with_attribute_like_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_key_like("Ag", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
 fn should_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
-    let found_graphs = graphs.find_edges_with_vertex_attr_str_equals_to("age", 42, None).unwrap();
+    let found_graphs = graphs
+        .find_edges_with_vertex_attr_str_equals_to("age", 42, None)
+        .unwrap();
     assert_eq!(found_graphs.len(), 3);
     assert_eq!(found_graphs[0].get_to_vertex().get_label(), "Bob");
 }
@@ -271,14 +293,19 @@ fn should_find_graphs_with_attribute_equal() {
 #[test]
 fn should_not_find_graphs_with_attribute_equal() {
     let graphs = prepare_graphs_test();
-    assert!(graphs.find_edges_with_vertex_attr_str_equals_to("age", 43, None).is_err());
+    assert!(graphs
+        .find_edges_with_vertex_attr_str_equals_to("age", 43, None)
+        .is_err());
 }
 
 #[test]
 fn should_not_find_graphs_with_attribute_equal_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_str_equals_to("age", 43, Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -294,13 +321,19 @@ fn should_return_the_unique_relations_for_certain_graph_on_vault() {
 #[test]
 fn should_fail_uinque_graph_relations_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
-    assert_eq!(graphs.uniq_graph_relations(Some("foobar")), Err(GruPHstError::VaultNotExists("foobar".to_string())));
+    assert_eq!(
+        graphs.uniq_graph_relations(Some("foobar")),
+        Err(GruPHstError::VaultNotExists("foobar".to_string()))
+    );
 }
 
 #[test]
 fn should_fail_uinque_graph_relations_since_vault_is_emtpy() {
     let graphs = Graphs::init("empty");
-    assert_eq!(graphs.uniq_graph_relations(None), Err(GruPHstError::VaultEmpty));
+    assert_eq!(
+        graphs.uniq_graph_relations(None),
+        Err(GruPHstError::VaultEmpty)
+    );
 }
 
 #[test]
@@ -311,14 +344,18 @@ fn should_fail_since_graphs_vault_is_emtpy() {
 #[test]
 fn equals_attributes() {
     let graphs = prepare_graphs_test();
-    let results = graphs.find_edges_with_vertex_attr_str_equals_to("age", 42, None).unwrap();
+    let results = graphs
+        .find_edges_with_vertex_attr_str_equals_to("age", 42, None)
+        .unwrap();
     assert_eq!(results.len(), 3);
 }
 
 #[test]
 fn should_find_vertices_with_relation_in() {
     let graphs = prepare_graphs_test();
-    let results = graphs.find_vertices_with_relation_in("friend of", None).unwrap();
+    let results = graphs
+        .find_vertices_with_relation_in("friend of", None)
+        .unwrap();
     assert_eq!(results.len(), 2);
     assert_eq!(results[0].get_label(), "Bob");
     assert_eq!(results[1].get_label(), "Alice");
@@ -335,13 +372,18 @@ fn should_not_find_vertices_with_relation_in() {
 fn should_not_find_vertices_with_relation_in_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_vertices_with_relation_in("foobar", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
 fn should_find_vertices_with_relation_out() {
     let graphs = prepare_graphs_test();
-    let results = graphs.find_vertices_with_relation_out("friend of", None).unwrap();
+    let results = graphs
+        .find_vertices_with_relation_out("friend of", None)
+        .unwrap();
     assert_eq!(results.len(), 3);
     assert_eq!(results[0].get_label(), "Alice");
     assert_eq!(results[1].get_label(), "Bob");
@@ -359,7 +401,10 @@ fn should_not_find_vertices_with_relation_out() {
 fn should_not_find_vertices_with_relation_out_since_vault_does_not_exists() {
     let graphs = prepare_graphs_test();
     let e = graphs.find_vertices_with_relation_out("foobar", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -442,13 +487,19 @@ fn delete_from_graph_fail_no_vault() {
 #[test]
 fn should_fail_getting_edges_since_vault_does_note_exists() {
     let graphs = prepare_graphs_test();
-    assert_eq!(graphs.get_edges(Some("foobar")), Err(GruPHstError::VaultNotExists(String::from("foobar"))));
+    assert_eq!(
+        graphs.get_edges(Some("foobar")),
+        Err(GruPHstError::VaultNotExists(String::from("foobar")))
+    );
 }
 
 #[test]
 fn should_fail_getting_edges_since_vault_is_empty() {
     let graphs = Graphs::init("empty graphs");
-    assert_eq!(graphs.get_edges(Some("empty graphs")), Err(GruPHstError::VaultEmpty));
+    assert_eq!(
+        graphs.get_edges(Some("empty graphs")),
+        Err(GruPHstError::VaultEmpty)
+    );
 }
 
 #[test]
@@ -487,7 +538,10 @@ fn should_not_find_by_non_existing_id() {
 fn should_not_find_by_id_since_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edge_by_id("000", Some("!exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!exists")))
+    );
 }
 
 #[test]
@@ -556,6 +610,31 @@ fn should_fail_returning_unique_vertices_vault_is_empty() {
 }
 
 #[test]
+fn should_return_uniq_vertices_from_all_graphs() {
+    let mut graphs = prepare_graphs_test();
+    prepare_insert_graph_test(&mut graphs);
+    let uniq_vertices = graphs.get_uniq_vertices_on_graphs().unwrap();
+    assert_eq!(uniq_vertices.len(), 5);
+    let mut labels: Vec<String> = Vec::new();
+    for edge in uniq_vertices {
+        labels.push(edge.get_label());
+    }
+
+    assert!(labels.contains(&"Alice".to_string()));
+    assert!(labels.contains(&"Bob".to_string()));
+    assert!(labels.contains(&"Fred".to_string()));
+    assert!(labels.contains(&"Gandalf".to_string()));
+    assert!(labels.contains(&"Saruman".to_string()));
+}
+
+#[test]
+fn should_fail_returning_unique_vertices_on_graphs_vault_is_empty() {
+    let graphs = Graphs::init("vault void");
+    let e = graphs.get_uniq_vertices_on_graphs();
+    assert_eq!(e, Err(GruPHstError::NoVaultOnGraphs));
+}
+
+#[test]
 fn should_return_stats_for_graphs() {
     let mut graphs = prepare_graphs_test();
     let graphs_stats = graphs.get_stats();
@@ -595,7 +674,9 @@ fn should_find_vertex_by_id() {
     let mut graphs = prepare_graphs_test();
     let a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
     assert_eq!(a_vertex.get_label(), "Alice".to_string());
-    let found_vertex = graphs.find_vertex_by_id(a_vertex.get_id().as_str(), None).unwrap();
+    let found_vertex = graphs
+        .find_vertex_by_id(a_vertex.get_id().as_str(), None)
+        .unwrap();
     assert_eq!(found_vertex.get_id(), a_vertex.get_id());
 }
 
@@ -610,7 +691,10 @@ fn should_not_find_vertex_by_id_that_does_not_exists() {
 fn should_not_find_vertex_by_id_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_vertex_by_id("foobar", Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }
 
 #[test]
@@ -619,11 +703,15 @@ fn should_find_vertex_by_id_on_any_graphs_vault() {
     let mut a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
     assert_eq!(a_vertex.get_label(), "Alice".to_string());
     prepare_insert_graph_test(&mut graphs);
-    let mut found_vertex = graphs.find_vertex_by_id_in_graphs(a_vertex.get_id().as_str()).unwrap();
+    let mut found_vertex = graphs
+        .find_vertex_by_id_in_graphs(a_vertex.get_id().as_str())
+        .unwrap();
     assert_eq!(found_vertex.get_id(), a_vertex.get_id());
     a_vertex = graphs.get_edges(None).unwrap()[0].get_from_vertex();
     assert_eq!(a_vertex.get_label(), "Gandalf".to_string());
-    found_vertex = graphs.find_vertex_by_id_in_graphs(a_vertex.get_id().as_str()).unwrap();
+    found_vertex = graphs
+        .find_vertex_by_id_in_graphs(a_vertex.get_id().as_str())
+        .unwrap();
     assert_eq!(found_vertex.get_id(), a_vertex.get_id());
 }
 
@@ -638,7 +726,7 @@ fn should_not_find_vertex_by_id_that_does_not_exists_on_any_graphs_vault() {
 #[test]
 fn should_add_a_collection_of_edges() {
     let mut graphs = Graphs::init("collection-edges");
-    
+
     let mut edges = prepare_vector_edges();
 
     graphs.add_edges(&mut edges, None);
@@ -647,7 +735,6 @@ fn should_add_a_collection_of_edges() {
     assert_eq!(stats.get_total_edges(), 4);
     assert_eq!(stats.get_total_vertices(), 8);
 }
-
 
 #[test]
 fn should_create_new_vault_and_add_a_colection_of_edges() {
@@ -664,10 +751,14 @@ fn should_create_new_vault_and_add_a_colection_of_edges() {
 #[test]
 fn should_find_edges_with_vertex_that_has_any_attr() {
     let mut graphs = prepare_graphs_test();
-    let mut found_edges = graphs.find_edges_with_vertex_attr_key("phone", None).unwrap();
+    let mut found_edges = graphs
+        .find_edges_with_vertex_attr_key("phone", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 3);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Alice");
-    found_edges = graphs.find_edges_with_vertex_attr_key("code", None).unwrap();
+    found_edges = graphs
+        .find_edges_with_vertex_attr_key("code", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 2);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
 }
@@ -685,13 +776,18 @@ fn should_not_find_edges_with_vertex_that_has_any_attr_that_does_not_exists() {
 fn should_not_find_edges_with_vertex_that_has_any_attr_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_key("phone", Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }
 
 #[test]
 fn should_find_edges_with_vertex_that_has_vec_u8_attr() {
     let mut graphs = prepare_graphs_test();
-    let found_edges = graphs.find_edges_with_vertex_attr_vec_u8_key("code", None).unwrap();
+    let found_edges = graphs
+        .find_edges_with_vertex_attr_vec_u8_key("code", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 2);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
 }
@@ -707,13 +803,18 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_that_does_not_exists()
 fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_vec_u8_key("phone", Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }
 
 #[test]
 fn should_find_edges_with_vertex_that_has_vec_u8_attr_like() {
     let mut graphs = prepare_graphs_test();
-    let found_edges = graphs.find_edges_with_vertex_attr_vec_u8_key_like("oDe", None).unwrap();
+    let found_edges = graphs
+        .find_edges_with_vertex_attr_vec_u8_key_like("oDe", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 2);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
 }
@@ -729,16 +830,23 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_that_does_not_exi
 fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_like_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_vec_u8_key_like("phone", Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }
 
 #[test]
 fn should_find_edges_with_vertex_that_has_any_attr_like() {
     let mut graphs = prepare_graphs_test();
-    let mut found_edges = graphs.find_edges_with_vertex_attr_key_like("Hon", None).unwrap();
+    let mut found_edges = graphs
+        .find_edges_with_vertex_attr_key_like("Hon", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 3);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Alice");
-    found_edges = graphs.find_edges_with_vertex_attr_key_like("oDe", None).unwrap();
+    found_edges = graphs
+        .find_edges_with_vertex_attr_key_like("oDe", None)
+        .unwrap();
     assert_eq!(found_edges.len(), 2);
     assert_eq!(found_edges[0].get_from_vertex().get_label(), "Fred");
 }
@@ -756,14 +864,19 @@ fn should_not_find_edges_with_vertex_that_has_any_attr_like_that_does_not_exists
 fn should_not_find_edges_with_vertex_that_has_any_attr_like_since_vault_doest_not_exists() {
     let mut graphs = prepare_graphs_test();
     let e = graphs.find_edges_with_vertex_attr_key_like("phone", Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }
 
 #[test]
 fn should_find_edges_with_vertex_that_has_vec_u8_attr_equals_to() {
     let mut graphs = prepare_graphs_test();
     let vec_u8_attr: Vec<u8> = vec![3, 1, 3, 3, 7];
-    let res = graphs.find_edges_with_vertex_attr_vec_u8_equals_to("code", &vec_u8_attr, None).unwrap();
+    let res = graphs
+        .find_edges_with_vertex_attr_vec_u8_equals_to("code", &vec_u8_attr, None)
+        .unwrap();
     assert_eq!(res.len(), 2);
     assert_eq!(res[0].get_from_vertex().get_label(), "Fred".to_string());
 }
@@ -788,6 +901,13 @@ fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_value_not_equals_to() 
 fn should_not_find_edges_with_vertex_that_has_vec_u8_attr_equals_to_vault_does_not_exists() {
     let mut graphs = prepare_graphs_test();
     let vec_u8_attr_nok: Vec<u8> = vec![1, 3, 3, 7];
-    let e = graphs.find_edges_with_vertex_attr_vec_u8_equals_to("code", &vec_u8_attr_nok, Some("!Exists"));
-    assert_eq!(e, Err(GruPHstError::VaultNotExists(String::from("!Exists"))));
+    let e = graphs.find_edges_with_vertex_attr_vec_u8_equals_to(
+        "code",
+        &vec_u8_attr_nok,
+        Some("!Exists"),
+    );
+    assert_eq!(
+        e,
+        Err(GruPHstError::VaultNotExists(String::from("!Exists")))
+    );
 }

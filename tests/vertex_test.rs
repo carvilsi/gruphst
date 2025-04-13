@@ -228,7 +228,7 @@ fn get_vertex_relation_in() {
 fn should_set_and_get_vertex_vec_u8_attr() {
     let (mut vertex, _id) = prepare_vertex_test();
     let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
-    vertex.set_attr_vec_u8("vector_u8", &vector); 
+    vertex.set_attr_vec_u8("vector_u8", &vector);
     assert_eq!(vertex.get_attr_vec_u8("vector_u8").unwrap(), vector);
 }
 
@@ -236,7 +236,7 @@ fn should_set_and_get_vertex_vec_u8_attr() {
 fn should_not_get_vertex_vec_u8_attr() {
     let (mut vertex, _id) = prepare_vertex_test();
     let vector: Vec<u8> = vec![0, 1, 2, 3, 4, 5];
-    vertex.set_attr_vec_u8("vector_u8", &vector); 
+    vertex.set_attr_vec_u8("vector_u8", &vector);
     let e = vertex.get_attr_vec_u8("not exists");
     assert!(e.is_err());
     assert_eq!(e, Err(GruPHstError::AttributeNotFound));
@@ -296,6 +296,8 @@ fn should_store_and_validate_a_cryptographic_hashed_value() {
     let plain_text = "1. The world is all that is the case.";
     vertex.set_hash(attr_hash_key, plain_text);
     assert!(vertex.is_hash_valid(attr_hash_key, plain_text).unwrap());
-    assert!(!vertex.is_hash_valid(attr_hash_key, "foo bar plain text").unwrap());
+    assert!(!vertex
+        .is_hash_valid(attr_hash_key, "foo bar plain text")
+        .unwrap());
     assert!(vertex.is_hash_valid("foo bar attr", plain_text).is_err());
 }

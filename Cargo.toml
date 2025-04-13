@@ -1,6 +1,6 @@
 [package]
 name = "gruphst"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 description = "An in-memory graph database"
 license = "MIT"
@@ -32,3 +32,6 @@ harness = false
 [[bench]]
 name = "gruphst_import_from_csv"
 harness = false
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin)'] }

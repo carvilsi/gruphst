@@ -36,6 +36,8 @@ Early state of development with lot of TODOs, just doing nerdy things with Graph
     1. [CSV](#csv)
         1. [File Format](#file-format)
         2. [Export & Import Usage](#export-import-usage)
+    2. [Graphviz](#graphviz)
+        1. [Export Usage](#export-usage)
 7. [Cryptography](#cryptography)
     1. [Argon2 Hashes](#argon2-hashes)
 8. [Examples](#examples)
@@ -325,6 +327,44 @@ export_to_csv_gruphst_format(&graphs, Some("./"), Some("export_csv_filename")).u
 
 // import graphs from CSV file
 let graphs: Graphs = import_from_csv_gruphst_format("./export_csv_filename.csv").unwrap();
+```
+
+### Graphviz<a name="graphviz">
+
+Exports graphs to [Graphviz format](https://graphviz.org/about/) for **visualization**.
+Right now only export has been implemented only with type *digraph* non *strict* and no layout.
+The exported file can be visualize e.g. [here](https://magjac.com/graphviz-visual-editor/).
+
+The exported file with format `*.gv.txt`, for the bellow example is something like:
+
+```graphviz
+digraph {
+	bar [label="bar" tooltip=""];
+	foo [label="foo" tooltip=""];
+	foo -> bar [label="is related to"];
+}
+```
+
+And visualized on the mentioned page something like:
+
+![foo-bar-graph](https://github.com/carvilsi/gruphst/blob/main/.github/images/foo-bar-graph.png?raw=true)
+
+#### Export Usage<a name="export-usage">
+
+```rust
+use gruphst::graphs::Graphs;
+use gruphst::edge::Edge;
+use gruphst::vertex::Vertex;
+use gruphst::exporter_importer::graphviz::*;
+
+let mut graphs = Graphs::init("to_export");
+let foo = Vertex::new("foo");
+let bar = Vertex::new("bar");
+graphs.add_edge(&Edge::create(&foo, "is related to", &bar), None);
+
+// export graphs to Graphviz file
+export_to_graphviz_format(&graphs, Some("./"), Some("export_graphviz_filename")).unwrap();
+
 ```
 
 ## Cryptography<a name="cryptography">
