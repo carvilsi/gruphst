@@ -1,6 +1,6 @@
 //! Configuration module
 
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use log::warn;
 
 // TODO: add something to auto-persists, like a deamon? or something on every CUD?
@@ -24,7 +24,7 @@ const DEFAULT_GRUPHST_MAX_MEM_USAGE: usize = 25 * 1024 * 1024;
 /// ```
 pub fn get_max_mem_usage() -> usize {
     dotenv().ok();
-    match dotenv::var(GRUPHST_MAX_MEM_USAGE) {
+    match dotenvy::var(GRUPHST_MAX_MEM_USAGE) {
         Ok(value) => {
             let mut max_conf: f32 = value.parse().unwrap();
             max_conf = max_conf * 1024.0_f32 * 1024.0_f32;
@@ -56,7 +56,7 @@ const DEFAULT_GRUPHST_LOG_LEVEL: log::Level = log::Level::Error;
 /// ```
 pub fn get_log_level() -> log::Level {
     dotenv().ok();
-    match dotenv::var(GRUPHST_LOG_LEVEL) {
+    match dotenvy::var(GRUPHST_LOG_LEVEL) {
         Ok(value) => match value.to_lowercase().as_str() {
             "trace" => log::Level::Trace,
             "debug" => log::Level::Debug,
@@ -91,7 +91,7 @@ const DEFAULT_GRUPHST_CSV_DELIMITER: u8 = b';';
 /// ```
 pub fn get_csv_delimiter() -> u8 {
     dotenv().ok();
-    match dotenv::var(GRUPHST_CSV_DELIMITER) {
+    match dotenvy::var(GRUPHST_CSV_DELIMITER) {
         Ok(value) => value.as_bytes()[0],
         Err(_) => {
             warn!(
