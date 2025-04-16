@@ -1,6 +1,6 @@
 # Changelog
 
-# [v0.16.1](https://github.com/carvilsi/gruphst/releases/tag/v0.16.1) (2025-04-16)
+# [v0.16.2](https://github.com/carvilsi/gruphst/releases/tag/v0.16.2) (2025-04-16)
 
 - added depencency audit step to CICD workflow 
 - replaces dotenv, not maintained dependency for dotenvy that it is maintained
