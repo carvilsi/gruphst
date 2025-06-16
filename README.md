@@ -2,7 +2,7 @@
     <img src="https://img.shields.io/github/actions/workflow/status/carvilsi/gruphst/test.yml?logo=github&label=tests" alt="test">
     <img src="https://img.shields.io/crates/v/gruphst.svg" alt="crates">
     <img src="https://img.shields.io/docsrs/gruphst/latest" alt="docs">
-    <img src="https://codecov.io/github/carvilsi/gruphst/graph/badge.svg?token=W1XVSQB3H0" alt="cov"/> 
+    <img src="https://codecov.io/gh/carvilsi/gruphst/graph/badge.svg?token=W1XVSQB3H0" alt="cov"/> 
     <img src="https://img.shields.io/badge/License-MIT-purple.svg" alt="cov"/> 
     <p></p>
     <p>GruPHst</p>
